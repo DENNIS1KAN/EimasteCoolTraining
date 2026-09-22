@@ -1,101 +1,168 @@
 /*
  * Design tokens: the ONLY place raw colors live. Everything else uses these names.
- * Values below are provisional; the chosen design direction sets the final values.
+ * Direction: "Night Session" (design/mockups/night-session/SPEC.md).
+ * Light = "daylight gym", dark = "night session" (primary). `.night` forces the dark island in both themes.
  */
 :root {
   color-scheme: light;
-  /* surfaces */
-  --bg: #f4f5f2;
-  --surface: #ffffff;
-  --surface-2: #f0f1ee; /* inset / secondary panels, inputs */
-  --surface-3: #e7e9e4; /* pressed / tracks */
-  --line: #dde0db; /* hairlines */
-  --line-strong: #c9cdc6;
-  /* ink */
-  --ink: #111418;
-  --ink-2: #3d434c;
-  --muted: #6b7280;
-  --faint: #9aa1ab;
-  /* brand accent */
-  --accent: #1d4ed8;
-  --accent-ink: #1d4ed8; /* accent used as text/icons on surface */
-  --on-accent: #ffffff;
-  --accent-soft: #dce5fb;
-  /* status (always paired with an icon or label) */
-  --good: #0f8a3c;
-  --good-soft: #d8eee2;
-  --warn: #b7791f;
-  --warn-soft: #fbefd5;
-  --danger: #c8102e;
-  --danger-soft: #f8dce0;
-  /* member identity colors (validated colorblind-safe order: blue, orange, aqua) */
-  --m-blue: #2a78d6;
-  --m-orange: #eb6834;
-  --m-aqua: #1baf7a;
+
+  /* ---------------------------------------------------------------- page + surfaces */
+  --bg: #f3f5f8;
+  --bg-glow: rgba(42, 120, 214, 0); /* top-right radial glow; the shell tints it with the viewer's color */
+  --surface: #ffffff; /* cards, tiles, sheets */
+  --surface-2: #f0f2f6; /* inputs, chips, segmented track, spec strip */
+  --surface-3: #e4e8ee; /* progress tracks, pressed, leader pill */
+  --seg-on: #ffffff; /* selected segment */
+  --card-border: rgba(16, 24, 40, 0.045);
+  --tabbar: rgba(255, 255, 255, 0.93); /* tab bar / sidebar, with backdrop blur */
+  --scrim: rgba(11, 16, 32, 0.42); /* sheet backdrop */
+  --knob: #ffffff; /* switch knob (off) */
+
+  /* ---------------------------------------------------------------- lines */
+  --line: #e5e8ee; /* hairline dividers */
+  --line-strong: #d3d9e2; /* outlines, ghost buttons, empty rings */
+
+  /* ---------------------------------------------------------------- ink */
+  --ink: #0b1020; /* primary text, numerals */
+  --ink-2: #4a5467; /* secondary text */
+  --muted: #737d91; /* labels, eyebrows, axis (>= 3.9:1 on surface) */
+  --faint: #8a93a3; /* placeholders, last time's numbers (~3:1) */
+
+  /* ---------------------------------------------------------------- accent: volt (one accent only) */
+  --accent: #d4ff3f; /* fills only: primary button, current week, active tab pill, done checks, PR badge */
+  --on-accent: #0b1020; /* text and icons on volt */
+  --accent-strong: #0b1020; /* volt as a stroke/text on a surface (ink-black in light: volt on white is 1.1:1) */
+  --accent-ink: #0b1020; /* legacy alias of --accent-strong (accent used as text/icons on a surface) */
+  --accent-soft: rgba(212, 255, 63, 0.34); /* highlighter band */
+  --accent-glow: rgba(150, 200, 0, 0.45); /* colored shadow under volt fills */
+  --heat: #0b1020; /* adherence heatmap ink (= accent-strong) */
+
+  /* ---------------------------------------------------------------- status (always paired with an icon or label) */
+  --good: #4f7f00;
+  --good-soft: rgba(79, 127, 0, 0.11);
+  --warn: #9c6500;
+  --warn-soft: rgba(196, 132, 0, 0.13);
+  --danger: #d6334f;
+  --danger-soft: rgba(214, 51, 79, 0.1);
+  --on-danger: #ffffff;
+
+  /* ---------------------------------------------------------------- member identity (validated set; never text color) */
+  --m-blue: #2a78d6; /* Stelios */
+  --m-orange: #eb6834; /* Thanos */
+  --m-aqua: #1baf7a; /* Dennis (coach) */
   --m-yellow: #eda100;
   --m-magenta: #e87ba4;
   --m-green: #008300;
   --m-violet: #4a3aa7;
   --m-red: #e34948;
-  /* charts */
-  --chart-surface: var(--surface);
-  --grid: #e6e8e3;
-  --axis: #c3c7bf;
-  /* type */
-  --font-display: 'Sofia Sans Extra Condensed', 'Sofia Sans Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif;
-  --font-body: 'Sofia Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  /* shape */
-  --r-xs: 6px;
-  --r-sm: 10px;
-  --r-md: 14px;
-  --r-lg: 20px;
-  --r-xl: 28px;
+  --glow-a: 0; /* member glow strength (0 light, 1 dark) */
+
+  /* ---------------------------------------------------------------- charts */
+  --chart-surface: #ffffff;
+  --grid: #e8ebf0;
+  --axis: #d3d9e2;
+
+  /* ---------------------------------------------------------------- type */
+  --font-display: 'Sofia Sans Extra Condensed Variable', 'Sofia Sans Extra Condensed', 'Roboto Condensed',
+    'Arial Narrow', 'Helvetica Neue', system-ui, sans-serif;
+  --font-body: 'Manrope Variable', 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --f-num: var(--font-display); /* mockup aliases */
+  --f-ui: var(--font-body);
+
+  /* ---------------------------------------------------------------- shape */
+  --r-xs: 7px; /* PR badge, leader pill */
+  --r-sm: 10px; /* segment inner, tick */
+  --r-btn-sm: 12px; /* small button */
+  --r-md: 14px; /* inputs, chips block, icon button */
+  --r-btn: 16px; /* primary button, set row band */
+  --r-lg: 18px; /* tiles */
+  --r-mini: 20px; /* mini cards */
+  --r-xl: 22px; /* cards, dock, timer, sheets */
+  --r-2xl: 26px; /* hero, VS card */
   --r-pill: 999px;
-  --shadow-1: 0 1px 2px rgba(17, 20, 24, 0.06), 0 1px 1px rgba(17, 20, 24, 0.04);
-  --shadow-2: 0 10px 30px rgba(17, 20, 24, 0.12), 0 2px 6px rgba(17, 20, 24, 0.06);
-  /* spacing (4px grid) */
+
+  /* ---------------------------------------------------------------- elevation */
+  --shadow-1: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 22px -12px rgba(16, 24, 40, 0.16);
+  --shadow-2: 0 18px 40px -12px rgba(16, 24, 40, 0.28), 0 2px 6px rgba(16, 24, 40, 0.06);
+  --shadow-accent: 0 10px 26px -10px rgba(150, 200, 0, 0.45);
+
+  /* ---------------------------------------------------------------- spacing (4px grid) */
   --s-1: 4px;
   --s-2: 8px;
   --s-3: 12px;
   --s-4: 16px;
   --s-5: 20px;
   --s-6: 24px;
+  --s-7: 28px;
   --s-8: 32px;
+  --s-9: 36px;
   --s-10: 40px;
-  /* motion */
+
+  /* ---------------------------------------------------------------- motion */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --dur-1: 120ms;
-  --dur-2: 220ms;
-  /* layout */
-  --tabbar-h: 64px;
+  --dur-1: 160ms;
+  --dur-2: 280ms;
+
+  /* ---------------------------------------------------------------- layout */
+  --gutter: 16px;
+  --tabbar-h: 58px; /* bottom tab bar without the home-indicator inset (0 on desktop) */
+  --sidebar-w: 0px; /* desktop left sidebar width (0 on phones) */
   --content-max: 720px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* ---------------------------------------------------------------- stacking */
+  --z-bar: 40;
+  --z-float: 60;
+  --z-sheet: 100;
+  --z-toast: 200;
+  --z-fx: 300;
 }
 
+@media (min-width: 1024px) {
+  :root {
+    --tabbar-h: 0px;
+    --sidebar-w: 232px;
+  }
+}
+
+/* ==================================================================== dark: night session */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --bg: #0b0d10;
-    --surface: #14171c;
-    --surface-2: #1b1f26;
-    --surface-3: #242932;
-    --line: #262b33;
-    --line-strong: #353b45;
-    --ink: #f2f4f7;
-    --ink-2: #c9ced6;
-    --muted: #98a2b3;
-    --faint: #667085;
-    --accent: #7c9bff;
-    --accent-ink: #9db4ff;
-    --on-accent: #0b0d10;
-    --accent-soft: #1f2a4a;
-    --good: #3ccf7e;
-    --good-soft: #143424;
-    --warn: #f5b841;
-    --warn-soft: #3a2e14;
-    --danger: #ff5c70;
-    --danger-soft: #3a1d23;
+    --bg: #07090f;
+    --bg-glow: rgba(57, 135, 229, 0.1);
+    --surface: #0e121b;
+    --surface-2: #151a25;
+    --surface-3: #1d2331;
+    --seg-on: #262d3d;
+    --card-border: rgba(140, 160, 205, 0.075);
+    --tabbar: rgba(9, 12, 19, 0.93);
+    --scrim: rgba(2, 3, 8, 0.66);
+    --knob: #c3cad6;
+    --line: #1a1f2b;
+    --line-strong: #283042;
+    --ink: #f3f6fb;
+    --ink-2: #a2acbe;
+    --muted: #6c768a;
+    --faint: #5e6779;
+    --accent: #d4ff3f;
+    --on-accent: #0a0e02;
+    --accent-strong: #d4ff3f;
+    --accent-ink: #d4ff3f;
+    --accent-soft: rgba(212, 255, 63, 0.11);
+    --accent-glow: rgba(212, 255, 63, 0.28);
+    --heat: #d4ff3f;
+    --good: #c5f24a;
+    --good-soft: rgba(197, 242, 74, 0.12);
+    --warn: #f2be4a;
+    --warn-soft: rgba(242, 190, 74, 0.12);
+    --danger: #ff5c7a;
+    --danger-soft: rgba(255, 92, 122, 0.12);
+    --on-danger: #1a0308;
     --m-blue: #3987e5;
     --m-orange: #d95926;
     --m-aqua: #199e70;
@@ -104,34 +171,47 @@
     --m-green: #008300;
     --m-violet: #9085e9;
     --m-red: #e66767;
-    --grid: #22262d;
-    --axis: #383d46;
-    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-2: 0 12px 32px rgba(0, 0, 0, 0.5);
+    --glow-a: 1;
+    --chart-surface: #0e121b;
+    --grid: #171c28;
+    --axis: #283042;
+    --shadow-1: inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-2: 0 20px 44px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --shadow-accent: 0 10px 26px -10px rgba(212, 255, 63, 0.28);
   }
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #0b0d10;
-  --surface: #14171c;
-  --surface-2: #1b1f26;
-  --surface-3: #242932;
-  --line: #262b33;
-  --line-strong: #353b45;
-  --ink: #f2f4f7;
-  --ink-2: #c9ced6;
-  --muted: #98a2b3;
-  --faint: #667085;
-  --accent: #7c9bff;
-  --accent-ink: #9db4ff;
-  --on-accent: #0b0d10;
-  --accent-soft: #1f2a4a;
-  --good: #3ccf7e;
-  --good-soft: #143424;
-  --warn: #f5b841;
-  --warn-soft: #3a2e14;
-  --danger: #ff5c70;
-  --danger-soft: #3a1d23;
+  --bg: #07090f;
+  --bg-glow: rgba(57, 135, 229, 0.1);
+  --surface: #0e121b;
+  --surface-2: #151a25;
+  --surface-3: #1d2331;
+  --seg-on: #262d3d;
+  --card-border: rgba(140, 160, 205, 0.075);
+  --tabbar: rgba(9, 12, 19, 0.93);
+  --scrim: rgba(2, 3, 8, 0.66);
+  --knob: #c3cad6;
+  --line: #1a1f2b;
+  --line-strong: #283042;
+  --ink: #f3f6fb;
+  --ink-2: #a2acbe;
+  --muted: #6c768a;
+  --faint: #5e6779;
+  --accent: #d4ff3f;
+  --on-accent: #0a0e02;
+  --accent-strong: #d4ff3f;
+  --accent-ink: #d4ff3f;
+  --accent-soft: rgba(212, 255, 63, 0.11);
+  --accent-glow: rgba(212, 255, 63, 0.28);
+  --heat: #d4ff3f;
+  --good: #c5f24a;
+  --good-soft: rgba(197, 242, 74, 0.12);
+  --warn: #f2be4a;
+  --warn-soft: rgba(242, 190, 74, 0.12);
+  --danger: #ff5c7a;
+  --danger-soft: rgba(255, 92, 122, 0.12);
+  --on-danger: #1a0308;
   --m-blue: #3987e5;
   --m-orange: #d95926;
   --m-aqua: #199e70;
@@ -140,8 +220,54 @@
   --m-green: #008300;
   --m-violet: #9085e9;
   --m-red: #e66767;
-  --grid: #22262d;
-  --axis: #383d46;
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-2: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --glow-a: 1;
+  --chart-surface: #0e121b;
+  --grid: #171c28;
+  --axis: #283042;
+  --shadow-1: inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 20px 44px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --shadow-accent: 0 10px 26px -10px rgba(212, 255, 63, 0.28);
+}
+
+/* ==================================================================== `.night` island
+ * Hero workout card, rest timer, toasts: dark in both themes. Redeclares every derived token too,
+ * because var() aliases resolve where they are declared. */
+.night {
+  color-scheme: dark;
+  --surface: #0d111a;
+  --surface-2: #171d2a;
+  --surface-3: #212839;
+  --seg-on: #262d3d;
+  --card-border: rgba(160, 180, 220, 0.08);
+  --knob: #c3cad6;
+  --line: rgba(160, 180, 220, 0.1);
+  --line-strong: rgba(160, 180, 220, 0.18);
+  --ink: #f3f6fb;
+  --ink-2: #a7b0c2;
+  --muted: #727c90;
+  --faint: #5e6779;
+  --on-accent: #0a0e02;
+  --accent-strong: #d4ff3f;
+  --accent-ink: #d4ff3f;
+  --accent-soft: rgba(212, 255, 63, 0.12);
+  --accent-glow: rgba(212, 255, 63, 0.28);
+  --heat: #d4ff3f;
+  --good: #c5f24a;
+  --good-soft: rgba(197, 242, 74, 0.12);
+  --warn: #f2be4a;
+  --warn-soft: rgba(242, 190, 74, 0.12);
+  --danger: #ff5c7a;
+  --danger-soft: rgba(255, 92, 122, 0.12);
+  --on-danger: #1a0308;
+  --glow-a: 1;
+  --chart-surface: #0d111a;
+  --grid: rgba(160, 180, 220, 0.08);
+  --axis: rgba(160, 180, 220, 0.18);
+  --shadow-1: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 24px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(160, 180, 220, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  /* night backdrop gradient stops (hero, timer, toasts) */
+  --night-top: #141a27;
+  --night-bottom: #0b0f18;
+  color: var(--ink);
 }

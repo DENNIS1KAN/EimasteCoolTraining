@@ -1,25 +1,5 @@
+/* Self-hosted variable fonts (all subsets, including Greek). Loaded once, here. */
+@import '@fontsource-variable/manrope';
+@import '@fontsource-variable/sofia-sans-extra-condensed';
 @import './tokens.css';
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-html {
-  -webkit-text-size-adjust: 100%;
-}
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.45;
-}
-button,
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
-}
+@import './base.css';
