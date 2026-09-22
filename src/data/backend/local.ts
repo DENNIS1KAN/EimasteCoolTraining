@@ -43,7 +43,7 @@ export class LocalBackend implements Backend {
   }
 
   private seed(): Db {
-    const snap = createDemoSnapshot(todayISO())
+    const snap = createDemoSnapshot(todayISO(), Date.now())
     const db = { invites: {} } as unknown as Db
     const snapByTable = snap as unknown as Record<TableName, { id: string }[]>
     for (const t of TABLES) (db as unknown as Record<string, Record<string, unknown>>)[t] = Object.fromEntries(snapByTable[t].map((r) => [r.id, r]))

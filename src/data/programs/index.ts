@@ -39,12 +39,21 @@ export function exerciseVideo(e: ProgramExercise, v: number | undefined): string
 /** Number of prescribed working sets (at least 1). */
 export const workingSets = (e: ProgramExercise): number => Math.max(1, parseInt(e.s, 10) || 1)
 
-/** Rest in seconds, from strings like "2-3 min" (uses the lower bound); 90 s when unknown. */
+/**
+ * Rest in seconds, from strings like "2-3 min" (uses the lower bound); 90 s when unknown.
+ * Also understands "1:30", "90 s", "30s-1 min", "3-5'" and Greek "2 λεπτά" / "45 δευτ.". The unit is the
+ * first one written after the first number; a bare number counts as minutes below 10, else as seconds.
+ */
 export function restSeconds(rest: string | undefined): number {
-  const m = (rest || '').match(/(\d+(?:\.\d+)?)/)
+  const s = (rest || '').toLowerCase()
+  const clock = s.match(/(\d+):([0-5]\d)/)
+  if (clock) return Number(clock[1]) * 60 + Number(clock[2])
+  const m = s.match(/\d+(?:[.,]\d+)?/)
   if (!m) return 90
-  const n = parseFloat(m[1])
-  return /s(ec)?\b/i.test(rest || '') && !/min/i.test(rest || '') ? Math.round(n) : Math.round(n * 60)
+  const n = parseFloat(m[0].replace(',', '.'))
+  const unit = s.slice((m.index ?? 0) + m[0].length).match(/[a-zα-ωά-ώ'"′″]/)?.[0]
+  const seconds = unit ? /[sδ"″]/.test(unit) : n >= 10
+  return Math.round(seconds ? n : n * 60)
 }
 
 /** Number of warm-up sets to suggest (upper bound of "2-3", capped 1..4). */

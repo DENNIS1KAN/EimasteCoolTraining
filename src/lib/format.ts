@@ -32,11 +32,12 @@ export function fmtWeight(kg: number, unit: Unit, digits = 1): string {
 
 /** Training volume (kg) in tonnes when large: "18.4 t" / "950 kg" (or lb). */
 export function fmtVolume(kg: number, unit: Unit): string {
+  // Thresholds compare the rounded value, so 999.6 kg reads "1 t" rather than "1,000 kg".
   if (unit === 'lb') {
     const lb = kgToUnit(kg, 'lb')
-    return lb >= 10000 ? `${fmtNum(lb / 1000, 1)}k lb` : `${fmtNum(lb, 0)} lb`
+    return Math.round(lb) >= 10000 ? `${fmtNum(lb / 1000, 1)}k lb` : `${fmtNum(lb, 0)} lb`
   }
-  return kg >= 1000 ? `${fmtNum(kg / 1000, 1)} t` : `${fmtNum(kg, 0)} kg`
+  return Math.round(kg) >= 1000 ? `${fmtNum(kg / 1000, 1)} t` : `${fmtNum(kg, 0)} kg`
 }
 
 type DateStyle = 'short' | 'medium' | 'long' | 'weekday' | 'dayMonth'
@@ -69,12 +70,18 @@ export function fmtDayLabel(d: ISODate, now: Date = new Date()): string {
 export function fmtRelative(ms: number, now: number = Date.now()): string {
   const rtf = new Intl.RelativeTimeFormat(localeOf(getLang()), { numeric: 'auto', style: 'short' })
   const s = Math.round((ms - now) / 1000)
-  const a = Math.abs(s)
-  if (a < 60) return rtf.format(0, 'second')
-  if (a < 3600) return rtf.format(Math.round(s / 60), 'minute')
-  if (a < 86400) return rtf.format(Math.round(s / 3600), 'hour')
-  if (a < 86400 * 7) return rtf.format(Math.round(s / 86400), 'day')
-  if (a < 86400 * 35) return rtf.format(Math.round(s / (86400 * 7)), 'week')
+  if (Math.abs(s) < 60) return rtf.format(0, 'second')
+  // Pick the unit from the rounded amount, so 59 min 50 s reads "1 hr ago", not "60 min ago".
+  const units: [Intl.RelativeTimeFormatUnit, number, number][] = [
+    ['minute', 60, 60],
+    ['hour', 3600, 24],
+    ['day', 86400, 7],
+    ['week', 86400 * 7, 5],
+  ]
+  for (const [unit, secs, max] of units) {
+    const n = Math.round(s / secs)
+    if (Math.abs(n) < max) return rtf.format(n, unit)
+  }
   return rtf.format(Math.round(s / (86400 * 30)), 'month')
 }
 

@@ -16,8 +16,9 @@ export function fromISODate(s: ISODate): Date {
   return new Date(y, (m || 1) - 1, d || 1, 12, 0, 0, 0)
 }
 
+/** A well-formed, real calendar date ("2026-02-30" is rejected rather than rolled over to March). */
 export const isISODate = (s: unknown): s is ISODate =>
-  typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(fromISODate(s).getTime())
+  typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && toISODate(fromISODate(s)) === s
 
 /** Today's date; `now` is injectable for tests. */
 export const todayISO = (now: Date = new Date()): ISODate => toISODate(now)

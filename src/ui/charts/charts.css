@@ -1,0 +1,591 @@
+/*
+ * Chart kit. Colors come only from design tokens (tokens.css) and the series colors passed in as props,
+ * so every chart follows the light/dark theme without code.
+ */
+
+.ch {
+  position: relative;
+  min-width: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+}
+.ch-box {
+  position: relative;
+  width: 100%;
+}
+/* The plot is taken out of flow so its fixed-width SVG never props the container open: charts shrink on resize. */
+.ch-plot {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-xs);
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: crosshair;
+}
+.ch-plot--fit {
+  right: auto;
+  bottom: auto;
+  cursor: pointer;
+}
+.ch-plot:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.ch-svg {
+  display: block;
+  overflow: visible;
+}
+.ch-svg text {
+  font-family: var(--font-body);
+  font-size: 11px;
+  fill: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- chrome */
+.ch-grid,
+.ch-baseline,
+.ch-marker,
+.ch-ref,
+.ch-cross__line {
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+.ch-grid {
+  stroke: var(--grid);
+}
+.ch-baseline {
+  stroke: var(--axis);
+}
+.ch-marker {
+  stroke: var(--axis);
+}
+.ch-svg .ch-marker__label {
+  font-size: 10.5px;
+}
+.ch-ref {
+  stroke: var(--ink-2);
+  opacity: 0.75;
+}
+.ch-svg .ch-ref__label {
+  fill: var(--ink-2);
+  font-weight: 600;
+  font-size: 10.5px;
+}
+.ch-halo {
+  paint-order: stroke;
+  stroke: var(--chart-surface);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.ch-svg .ch-tick.is-active {
+  fill: var(--ink);
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- marks */
+.ch-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.ch-area {
+  stroke: none;
+  opacity: 0.1;
+}
+.ch-area.is-dim {
+  opacity: 0.04;
+}
+.ch-dot {
+  stroke: var(--chart-surface);
+  stroke-width: 2;
+}
+.ch-dot--ring {
+  fill: var(--chart-surface);
+  stroke-width: 2;
+}
+.ch-dot--hollow {
+  fill: var(--chart-surface);
+  stroke-width: 1.5;
+  opacity: 0.55;
+}
+.ch-series.is-dim {
+  opacity: 0.3;
+}
+.ch-cross__line {
+  stroke: var(--ink-2);
+  opacity: 0.45;
+}
+.ch-svg .ch-dl {
+  font-size: 11px;
+}
+.ch-svg .ch-dl__name {
+  fill: var(--ink-2);
+  font-weight: 600;
+}
+.ch-svg .ch-dl__value {
+  fill: var(--ink);
+  font-weight: 800;
+  font-size: 12px;
+}
+.ch-svg .ch-dl.is-dim tspan {
+  fill: var(--muted);
+}
+.ch-band {
+  fill: var(--ink);
+  opacity: 0.05;
+}
+.is-dim-soft {
+  opacity: 0.5;
+}
+.ch-cell--empty {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+.ch-cell__focus {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+/* ---------------------------------------------------------------- keys, legend, tooltip */
+.ch-key {
+  flex: none;
+  display: inline-block;
+  background: var(--ch-c);
+}
+.ch-key--line {
+  width: 12px;
+  height: 2px;
+  border-radius: 2px;
+}
+.ch-key--bar {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.ch-key--dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.ch-key--ring {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--ch-c);
+}
+
+.ch-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink-2);
+}
+.ch-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ch-tip {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  min-width: 92px;
+  padding: 7px 10px 8px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-2);
+  font-size: 12px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.ch-tip--right {
+  transform: translateX(10px);
+}
+.ch-tip--left {
+  transform: translateX(calc(-100% - 10px));
+}
+.ch-tip--center {
+  transform: translateX(-50%);
+}
+.ch-tip__title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.ch-tip__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.ch-tip__value {
+  font-weight: 800;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.ch-tip__label {
+  color: var(--ink-2);
+}
+.ch-tip__row.is-muted .ch-tip__value {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- footer: legend + data table */
+.ch-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+.ch-foot > .ch-legend {
+  flex: 1 1 auto;
+}
+.ch-table {
+  margin-left: auto;
+  font-size: 12px;
+}
+.ch-table[open] {
+  flex-basis: 100%;
+}
+.ch-table__toggle {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--muted);
+  font-weight: 600;
+  border-radius: var(--r-xs);
+}
+.ch-table__toggle::-webkit-details-marker {
+  display: none;
+}
+.ch-table__toggle::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform var(--dur-1) var(--ease);
+}
+.ch-table[open] > .ch-table__toggle::after {
+  transform: translateY(1px) rotate(225deg);
+}
+.ch-table__toggle:hover {
+  color: var(--ink-2);
+}
+.ch-table__toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.ch-table__scroll {
+  margin-top: 8px;
+  max-height: 280px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  -webkit-overflow-scrolling: touch;
+}
+.ch-table__t {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  color: var(--ink);
+}
+.ch-table__t th,
+.ch-table__t td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+.ch-table__t thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.ch-table__t tbody th {
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.ch-table__t .is-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ch-table__t tr:last-child > * {
+  border-bottom: 0;
+}
+
+.ch-sr {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ch-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 72px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------- sparkline, ring, meter */
+.ch-spark {
+  width: 100%;
+}
+.ch-spark > svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.ch-ring {
+  flex: none;
+}
+.ch-ring svg {
+  display: block;
+}
+.ch-ring__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+}
+.ch-ring__arc {
+  transition: stroke-dasharray var(--dur-2) var(--ease);
+  animation: ch-ring-in 700ms var(--ease) both;
+}
+
+.ch-meter__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.ch-meter__label {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.ch-meter__value {
+  color: var(--ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.ch-meter__track {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+}
+.ch-meter__fill {
+  height: 100%;
+  border-radius: var(--r-pill);
+  transition: width var(--dur-2) var(--ease);
+  animation: ch-grow-x 600ms var(--ease) both;
+  transform-origin: left center;
+}
+.ch-meter__limit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--chart-surface);
+}
+
+/* ---------------------------------------------------------------- heatmap scale */
+.ch-scale {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.ch-scale > span:first-child {
+  margin-right: 4px;
+}
+.ch-scale > span:last-child {
+  margin-left: 4px;
+}
+.ch-scale__step {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+/* ---------------------------------------------------------------- delta bar (tale of the tape) */
+.ch-delta {
+  padding: 6px 0;
+}
+.ch-delta__label {
+  margin-bottom: 5px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink-2);
+}
+.ch-delta__row {
+  display: grid;
+  grid-template-columns: var(--ch-delta-value-w, 4.2em) 1fr 1fr var(--ch-delta-value-w, 4.2em);
+  align-items: center;
+}
+.ch-delta__value {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ch-delta__value--a {
+  padding-right: 8px;
+}
+.ch-delta__value--b {
+  padding-left: 8px;
+  text-align: right;
+}
+.ch-delta__value.is-lead {
+  color: var(--ink);
+  font-weight: 800;
+}
+.ch-delta__value--a.is-lead::before,
+.ch-delta__value--b.is-lead::after {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border: 4px solid transparent;
+  vertical-align: 2px;
+}
+.ch-delta__value--a.is-lead::before {
+  margin-right: 4px;
+  border-left: 5px solid var(--ink);
+  border-right-width: 0;
+}
+.ch-delta__value--b.is-lead::after {
+  margin-left: 4px;
+  border-right: 5px solid var(--ink);
+  border-left-width: 0;
+}
+.ch-delta__half {
+  display: flex;
+  height: 6px;
+  background: var(--surface-2);
+}
+.ch-delta__half--a {
+  justify-content: flex-end;
+  margin-right: 1px;
+  border-radius: 3px 0 0 3px;
+}
+.ch-delta__half--b {
+  margin-left: 1px;
+  border-radius: 0 3px 3px 0;
+}
+.ch-delta__bar {
+  display: block;
+  height: 100%;
+  transition: width var(--dur-2) var(--ease);
+  animation: ch-grow-x 600ms var(--ease) both;
+}
+.ch-delta__half--a .ch-delta__bar {
+  border-radius: 3px 0 0 3px;
+  transform-origin: right center;
+}
+.ch-delta__half--b .ch-delta__bar {
+  border-radius: 0 3px 3px 0;
+  transform-origin: left center;
+}
+
+/* ---------------------------------------------------------------- motion (subtle, and none when reduced) */
+/* fill-mode backwards: the clip only exists while animating, so end dots are never clipped at rest. */
+.ch-anim-wipe {
+  animation: ch-wipe 650ms var(--ease) backwards;
+}
+.ch-anim-grow {
+  animation: ch-grow 500ms var(--ease) backwards;
+}
+.ch-anim-fade {
+  animation: ch-fade 400ms var(--ease) backwards;
+}
+@keyframes ch-wipe {
+  from {
+    clip-path: inset(-12px 100% -12px -12px);
+  }
+  to {
+    clip-path: inset(-12px -12px -12px -12px);
+  }
+}
+@keyframes ch-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes ch-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes ch-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ch-ring-in {
+  from {
+    stroke-dashoffset: var(--ch-len);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ch,
+  .ch * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -40,16 +40,19 @@ export function workoutsDueBy(p: Program, start: ISODate, date: ISODate): number
   return n
 }
 
-/** The workout scheduled on a date, or null for a rest day / outside the program. */
+/**
+ * The workout scheduled on a date, or null for a rest day / outside the program. Uses the same slot logic
+ * as scheduledDate, so days missing from an empty or partial schedule are found on their fallback slot.
+ */
 export function workoutOn(p: Program, start: ISODate, date: ISODate): WorkoutRef | null {
   const off = diffDays(start, date)
   if (off < 0) return null
   const week = Math.floor(off / 7) + 1
   if (week > p.weeks.length) return null
   const slot = off % 7
-  const day = p.schedule[slot]
-  if (day == null || day >= (p.weeks[week - 1]?.days.length ?? 0)) return null
-  return { week, day }
+  const days = p.weeks[week - 1]?.days.length ?? 0
+  for (let day = 0; day < days; day++) if (slotOfDay(p, day) === slot) return { week, day }
+  return null
 }
 
 /** Current program week (1-based) on a date: 0 before the start, capped at the last week. */

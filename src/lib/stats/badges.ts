@@ -4,7 +4,7 @@ import { addDays, fromISODate, isoFromMs, startOfWeek } from '../dates'
 import { weightSeries } from './body'
 import { logTime, personalRecords, sessionSummary } from './lifts'
 import { checkinsOf, logsOf, plansOf, weightsOf, type SquadData } from './member'
-import { checkinScore, currentPlan } from './nutrition'
+import { checkinPlan, checkinScore, currentPlan } from './nutrition'
 
 export type BadgeId =
   | 'first-workout'
@@ -124,14 +124,15 @@ export function earnedBadges(d: SquadData, memberId: string): EarnedBadge[] {
   add('first-pr', prs[0]?.at)
   add('prs-10', prs[9]?.at)
   add('prs-25', prs[24]?.at)
-  add('ten-tonnes', done.find((l) => sessionSummary(l, d.programs[l.programId]).volumeKg >= 10000)?.doneAt ?? null)
+  const tenTonnes = done.find((l) => sessionSummary(l, d.programs[l.programId]).volumeKg >= 10000)
+  add('ten-tonnes', tenTonnes ? logTime(tenTonnes) : null)
   add('early-bird', done.find((l) => l.doneAt != null && new Date(l.doneAt).getHours() < 8)?.doneAt ?? null)
   add('night-owl', done.find((l) => l.doneAt != null && new Date(l.doneAt).getHours() >= 22)?.doneAt ?? null)
   const weighDay = firstRunOf(weightsOf(d, memberId).map((w) => w.date), 7)
   add('weigh-in-7', weighDay ? endOfDay(weighDay) : null)
   const plan = currentPlan(plansOf(d, memberId), memberId)
   const goodDays = checkinsOf(d, memberId)
-    .filter((c) => checkinScore(c, plan) >= 0.8)
+    .filter((c) => checkinScore(c, checkinPlan(c, d.mealPlans, plan)) >= 0.8)
     .map((c) => c.date)
   const planDay = firstRunOf(goodDays, 7)
   add('on-plan-7', planDay ? endOfDay(planDay) : null)

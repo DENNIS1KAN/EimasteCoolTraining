@@ -2,7 +2,7 @@ import type { Cheer, MealPlan, Member, NutritionCheckin, Program, WeightEntry, W
 import type { ISODate } from '../dates'
 import { addDays, isoFromMs, startOfWeek } from '../dates'
 import { totalWorkouts } from '../../data/programs'
-import { adherence, checkinScore, currentPlan } from './nutrition'
+import { adherence, checkinPlan, checkinScore, currentPlan } from './nutrition'
 import { goalProgress, weightStats, type WeightStats } from './body'
 import { logTime, personalRecords, sessionSummary, strengthGain, type PR, type ProgramMap } from './lifts'
 import { nextWorkout, programWeekOn, scheduleStatus, type ScheduleStatus, type WorkoutRef } from './schedule'
@@ -166,7 +166,7 @@ export function points(d: SquadData, memberId: string, from?: ISODate, to?: ISOD
   }
   const weighIns = new Set(weightsOf(d, memberId).map((w) => w.date).filter(inRange)).size
   const plan = currentPlan(plansOf(d, memberId), memberId)
-  const onPlan = checkinsOf(d, memberId).filter((c) => inRange(c.date) && checkinScore(c, plan) >= 0.8).length
+  const onPlan = checkinsOf(d, memberId).filter((c) => inRange(c.date) && checkinScore(c, checkinPlan(c, d.mealPlans, plan)) >= 0.8).length
   const p = {
     workouts: done.length * POINTS.workout,
     prs: prs.length * POINTS.pr,

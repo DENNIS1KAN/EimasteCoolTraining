@@ -26,6 +26,7 @@
   --paper:#EBEDE9;  --paper-2:#E1E4DE;
   --card:#FFFFFF;   --card-2:#F3F4F1;  --card-3:#E9ECE6;
   --card-border: rgba(24,32,46,.05);
+  --seg-on:#FFFFFF;
 
   /* ink */
   --ink:#18202E; --ink-2:#465061; --ink-3:#5F6778; --ink-4:#8A919C;
@@ -63,6 +64,7 @@
     --paper:#0C0F13;  --paper-2:#161A21;
     --card:#151A21;   --card-2:#1C222B;  --card-3:#242B35;
     --card-border: rgba(255,255,255,.045);
+    --seg-on:#2A313C;
     --ink:#EDEFE8; --ink-2:#B2B8C2; --ink-3:#878E9A; --ink-4:#646C79;
     --rule:#232932; --rule-2:#2D343F; --grid:#1F252D;
     --accent:#CDEE3A; --accent-press:#BDE02A; --accent-edge:#CDEE3A; --on-accent:#10140A;
@@ -86,6 +88,7 @@
     --paper:#0C0F13;  --paper-2:#161A21;
     --card:#151A21;   --card-2:#1C222B;  --card-3:#242B35;
     --card-border: rgba(255,255,255,.045);
+    --seg-on:#2A313C;
     --ink:#EDEFE8; --ink-2:#B2B8C2; --ink-3:#878E9A; --ink-4:#646C79;
     --rule:#232932; --rule-2:#2D343F; --grid:#1F252D;
     --accent:#CDEE3A; --accent-press:#BDE02A; --accent-edge:#CDEE3A; --on-accent:#10140A;
@@ -152,7 +155,7 @@ b{font-weight:700}
 .home-ind{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);z-index:41;opacity:.9}
 
 /* tab bar */
-.tabbar{position:absolute;inset:auto 0 0 0;height:86px;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);padding:0 6px 30px;background:var(--tabbar);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-top:1px solid var(--rule)}
+.tabbar{position:absolute;inset:auto 0 0 0;height:83px;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);padding:0 6px 28px;background:var(--tabbar);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-top:1px solid var(--rule)}
 .tab{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;padding-top:7px;color:var(--ink-3);font:700 11px/1 var(--f-cond);letter-spacing:.03em;min-height:48px}
 .tab .ti{display:grid;place-items:center;width:54px;height:30px;border-radius:15px}
 .tab.on{color:var(--ink)}
@@ -170,13 +173,14 @@ b{font-weight:700}
 /* =========================================================
    LAYOUT HELPERS
    ========================================================= */
-.stack>*+*{margin-top:12px}
+.stack>*+*{margin-top:10px}
+.stack>.note+.hero{margin-top:12px}
 .row{display:flex;align-items:center}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .sp{flex:1}
 
 /* top bar */
-.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:6px 2px 4px}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:4px 2px 2px}
 .top .eyebrow{margin-bottom:6px}
 .top-act{display:flex;align-items:center;gap:6px}
 .icon-btn{position:relative;display:grid;place-items:center;width:44px;height:44px;border-radius:14px;color:var(--ink)}
@@ -197,12 +201,12 @@ b{font-weight:700}
 .av{display:inline-grid;place-items:center;flex:none;border-radius:50%;font:800 15px/1 var(--f-cond);letter-spacing:.02em;color:var(--on-member);width:36px;height:36px;position:relative}
 .av-s{background:var(--m-s)}.av-t{background:var(--m-t)}.av-d{background:var(--m-d)}
 .av::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(150deg,rgba(255,255,255,.28),rgba(255,255,255,0) 55%);pointer-events:none}
-.av-24{width:24px;height:24px;font-size:11px}.av-28{width:28px;height:28px;font-size:12px}.av-32{width:32px;height:32px;font-size:14px}.av-40{width:40px;height:40px;font-size:17px}.av-56{width:56px;height:56px;font-size:25px}
+.av-20{width:20px;height:20px;font-size:10px}.av-24{width:24px;height:24px;font-size:11px}.av-28{width:28px;height:28px;font-size:12px}.av-32{width:32px;height:32px;font-size:14px}.av-40{width:40px;height:40px;font-size:17px}.av-44{width:44px;height:44px;font-size:19px}.av-48{width:48px;height:48px;font-size:21px}.av-56{width:56px;height:56px;font-size:25px}
 .av-ring{box-shadow:0 0 0 2px var(--card)}
 
 /* buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 16px;border-radius:14px;font:700 15px/1 var(--f-body);letter-spacing:.005em;white-space:nowrap}
-.btn-lg{height:54px;border-radius:16px;font-size:17px;padding:0 18px}
+.btn-lg{height:52px;border-radius:16px;font-size:17px;padding:0 18px}
 .btn-sm{height:36px;padding:0 12px;border-radius:12px;font-size:13px}
 .btn-accent{background:var(--accent);color:var(--on-accent);box-shadow:inset 0 -2px 0 rgba(0,0,0,.08)}
 .btn-ink{background:var(--ink);color:var(--paper)}
@@ -210,7 +214,7 @@ b{font-weight:700}
 .btn-ghost{color:var(--ink-2)}
 
 /* chips / tags */
-.tag{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:8px;font:700 11.5px/1 var(--f-cond);letter-spacing:.04em;text-transform:uppercase;background:var(--card-2);color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--rule)}
+.tag{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 8px;border-radius:8px;font:700 11px/1 var(--f-cond);letter-spacing:.035em;text-transform:uppercase;background:var(--card-2);color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--rule)}
 .tag-ink{background:var(--ink);color:var(--paper);box-shadow:none}
 .pr{display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 7px 0 5px;border-radius:6px;background:var(--accent);color:var(--on-accent);font:900 11px/1 var(--f-cond);letter-spacing:.08em;box-shadow:inset 0 0 0 1px var(--accent-edge)}
 .pr .i{width:12px;height:12px;stroke-width:2.2}
@@ -218,7 +222,7 @@ b{font-weight:700}
 /* segmented */
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px;padding:3px;border-radius:14px;background:var(--paper-2);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 5%,transparent)}
 .seg button{height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;gap:5px;font:700 14px/1 var(--f-cond);letter-spacing:.03em;color:var(--ink-3)}
-.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08),0 2px 6px -2px rgba(0,0,0,.12)}
+.seg button.on{background:var(--seg-on);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08),0 2px 6px -2px rgba(0,0,0,.12)}
 .seg button.done{color:var(--ink-2)}
 .seg button .i{width:13px;height:13px;stroke-width:2.4}
 .seg-sm{padding:2px;border-radius:10px}
@@ -264,26 +268,27 @@ b{font-weight:700}
    01 HOME
    ========================================================= */
 .greet{font:800 34px/.95 var(--f-disp)}
-.note{display:flex;gap:12px;padding:14px 16px 14px 14px;position:relative}
+.note{position:relative;margin:12px 2px 0;padding:0 0 0 14px;border-left:2px solid var(--ink)}
+.note-by{display:flex;align-items:center;gap:7px;margin-top:6px;font:600 12px/1 var(--f-body);color:var(--ink-3)}
+.note-by b{color:var(--ink);font-weight:700}
 .note-meta{display:flex;align-items:center;gap:6px;font:600 12.5px/1 var(--f-body);color:var(--ink-3)}
 .note-meta b{color:var(--ink);font-weight:700}
-.note-q{margin-top:6px;font:italic 400 15px/1.36 var(--f-quote);color:var(--ink);letter-spacing:-.005em}
+.note-q{font:italic 400 15px/1.3 var(--f-quote);color:var(--ink);letter-spacing:-.005em}
 
-.hero{position:relative;overflow:hidden;border-radius:24px;background:var(--hero);color:var(--hero-ink);padding:16px 16px 16px;box-shadow:var(--shadow-2)}
-.hero::before{content:"03";position:absolute;right:-10px;top:-32px;font:900 190px/1 var(--f-disp);letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px var(--hero-rule);pointer-events:none}
+.hero{position:relative;overflow:hidden;border-radius:24px;background:var(--hero);color:var(--hero-ink);padding:15px 14px 14px 16px;box-shadow:var(--shadow-2)}
 .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 100% 0%,var(--accent-wash),transparent 55%);opacity:.35;pointer-events:none}
 .hero>*{position:relative;z-index:1}
 .hero .eyebrow{color:var(--hero-ink-2)}
 .hero-top{display:flex;justify-content:space-between;align-items:center}
 .hero-chip{height:24px;display:inline-flex;align-items:center;padding:0 9px;border-radius:8px;box-shadow:inset 0 0 0 1px var(--hero-rule);font:700 11px/1 var(--f-cond);letter-spacing:.08em;text-transform:uppercase;color:var(--hero-ink-2)}
 .hero-mid{display:flex;align-items:flex-end;justify-content:space-between;margin-top:4px}
-.hero-title{font:900 76px/.8 var(--f-disp);letter-spacing:-.01em;text-transform:uppercase;padding-top:6px}
+.hero-title{font:900 64px/.8 var(--f-disp);letter-spacing:-.01em;text-transform:uppercase;padding-top:7px}
 .hero-meta{display:flex;gap:0;padding-bottom:4px}
 .hero-meta div{display:flex;flex-direction:column;align-items:flex-end;padding:0 0 0 14px;margin-left:14px;border-left:1px solid var(--hero-rule)}
 .hero-meta div:first-child{border-left:0;margin-left:0}
 .hero-meta b{font:800 26px/1 var(--f-disp)}
 .hero-meta span{font:600 11px/1.2 var(--f-cond);letter-spacing:.06em;text-transform:uppercase;color:var(--hero-ink-2)}
-.wk5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:16px 0 14px}
+.wk5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:12px 2px 12px 0}
 .wk5 div{display:flex;flex-direction:column;gap:7px}
 .wk5 i{display:block;height:5px;border-radius:3px;background:var(--hero-rule)}
 .wk5 .done i{background:var(--accent)}
@@ -292,41 +297,44 @@ b{font-weight:700}
 .wk5 .done span,.wk5 .now span{color:var(--hero-ink)}
 .wk5 .i{width:12px;height:12px;stroke-width:2.6;color:var(--accent)}
 .hero .btn-lg{width:100%;justify-content:space-between;padding:0 8px 0 20px}
-.btn-go{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--on-accent);color:var(--accent)}
+.btn-go{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--on-accent);color:var(--accent)}
 
-.ledger{display:grid;grid-template-columns:repeat(3,1fr);padding:14px 0}
+.ledger{display:grid;grid-template-columns:repeat(3,1fr);padding:11px 0 10px}
 .lc{padding:0 16px;border-left:1px solid var(--rule)}
 .lc:first-child{border-left:0}
-.lc-v{font:800 34px/.9 var(--f-disp);letter-spacing:-.01em}
+.lc-v{font:800 32px/.9 var(--f-disp);letter-spacing:-.01em}
 .lc-v small{font:700 13px/1 var(--f-cond);color:var(--ink-3);margin-left:2px;letter-spacing:.02em}
-.lc-l{display:flex;align-items:center;gap:5px;margin-top:6px;font:700 11px/1.1 var(--f-cond);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.lc-l{display:flex;align-items:center;gap:5px;margin-top:5px;font:700 11px/1.1 var(--f-cond);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
 .lc-l .i{width:13px;height:13px;stroke-width:2;color:var(--ink-2)}
 
-.tile{padding:14px 16px 14px;display:flex;flex-direction:column}
+.tile{padding:12px 16px 11px;display:flex;flex-direction:column}
 .tile-h{display:flex;align-items:center;justify-content:space-between;color:var(--ink-3)}
 .tile-h .i{width:16px;height:16px}
-.tile-v{margin-top:8px;font:800 34px/.9 var(--f-disp);letter-spacing:-.01em}
-.tile-v small{font:700 13px/1 var(--f-cond);color:var(--ink-3);margin-left:3px;letter-spacing:.03em;text-transform:uppercase}
+.tile-v{margin-top:7px;font:800 32px/.9 var(--f-disp);letter-spacing:-.01em}
+.tile-vr{display:flex;align-items:flex-end;justify-content:space-between;gap:6px}
+.tile-vr .st{margin:0 0 1px}
+.tile-v small{font:700 14px/1 var(--f-cond);color:var(--ink-3);margin-left:3px;letter-spacing:.02em}
 .tile .st{margin-top:8px;align-self:flex-start}
 .tile .spark{margin-top:auto}
-.meals5{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:12px}
-.meals5 i{height:22px;border-radius:5px;background:var(--track)}
+.meals5{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:10px}
+.meals5 i{height:14px;border-radius:4px;background:var(--track)}
 .meals5 i.on{background:var(--meter)}
 .meals5 i.next{background:transparent;box-shadow:inset 0 0 0 1.5px var(--meter)}
-.tile-f{margin-top:10px;font:600 12.5px/1.3 var(--f-body);color:var(--ink-3)}
+.tile-f{margin-top:8px;font:600 12.5px/1.3 var(--f-body);color:var(--ink-3)}
 .tile-f b{color:var(--ink);font-family:var(--f-cond);font-size:14px;font-weight:800}
 
-.pulse{padding:14px 16px}
-.pulse-h{display:flex;gap:12px;align-items:flex-start}
-.pulse-t{font:500 14.5px/1.3 var(--f-body);color:var(--ink-2)}
+.pulse{padding:10px 14px 10px 14px}
+.pulse-h{display:flex;gap:12px;align-items:center}
+.pulse-t{font:500 14.5px/1.25 var(--f-body);color:var(--ink-2)}
 .pulse-t b{color:var(--ink)}
-.pulse-s{margin-top:2px;font:600 12px/1.2 var(--f-body);color:var(--ink-3)}
-.pr-line{display:flex;align-items:center;gap:8px;margin:12px 0 0 48px;padding:9px 10px;border-radius:12px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule);font:600 13.5px/1 var(--f-body);color:var(--ink-2)}
-.pr-line b{margin-left:auto;font:800 17px/1 var(--f-cond);color:var(--ink);letter-spacing:.01em}
-.react{display:flex;gap:6px;align-items:center;margin:10px 0 0 48px}
-.rx{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px;border-radius:16px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule);font:700 13px/1 var(--f-cond);color:var(--ink)}
+.pulse-pr{display:flex;align-items:center;gap:7px;margin-top:5px;font:600 13px/1 var(--f-body);color:var(--ink-2)}
+.pulse-pr b{font:800 16px/1 var(--f-cond);color:var(--ink);letter-spacing:.01em}
+.react{display:flex;gap:6px;align-items:center;margin:8px 0 0 48px}
+.rx{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 11px;border-radius:16px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule);font:700 13.5px/1 var(--f-cond);color:var(--ink)}
 .rx.mine{box-shadow:inset 0 0 0 1.5px var(--ink)}
 .react .btn{margin-left:auto}
+.sec.tight{margin:12px 2px 7px}
+.stack>.sec.tight{margin-top:12px}
 
 /* =========================================================
    02 TRAIN
@@ -334,12 +342,12 @@ b{font-weight:700}
 .h-tag{display:inline-block;vertical-align:middle;margin-left:4px;transform:translateY(-4px)}
 .clock{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 10px;border-radius:12px;background:var(--card);box-shadow:var(--shadow-1);border:1px solid var(--card-border);font:800 16px/1 var(--f-cond);letter-spacing:.02em}
 .rec{width:8px;height:8px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 3px var(--danger-bg)}
-.weeks{margin:14px -16px 0;padding:0 16px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
-.weeks-lab{display:flex;gap:0;margin-bottom:6px;white-space:nowrap}
+.weeks{margin:10px -16px 0;padding:0 16px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+.weeks-lab{display:flex;gap:0;margin-bottom:5px;white-space:nowrap}
 .weeks-lab span{font:700 10.5px/1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
 .weeks-lab span:first-child{width:238px}
 .wks{display:flex;gap:6px;width:max-content}
-.wk{position:relative;width:40px;height:50px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:var(--card);border:1px solid var(--card-border);box-shadow:var(--shadow-1);font:800 18px/1 var(--f-cond);color:var(--ink)}
+.wk{position:relative;width:40px;height:48px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:var(--card);border:1px solid var(--card-border);box-shadow:var(--shadow-1);font:800 18px/1 var(--f-cond);color:var(--ink)}
 .wk i{display:block;width:20px;height:3px;border-radius:2px;background:var(--track);overflow:hidden}
 .wk i::after{content:"";display:block;height:100%;width:var(--p,0%);background:var(--meter)}
 .wk.done{color:var(--ink-2)}
@@ -348,35 +356,35 @@ b{font-weight:700}
 .wk.cur i::after{background:var(--accent)}
 .wk.fut{background:transparent;box-shadow:inset 0 0 0 1px var(--rule-2);color:var(--ink-3);border-color:transparent}
 .wk-div{width:1px;align-self:stretch;background:var(--rule-2);margin:0 3px}
-.days{margin-top:12px}
-.prog{display:flex;align-items:center;gap:10px;margin:12px 2px 10px}
+.days{margin-top:10px}
+.prog{display:flex;align-items:center;gap:10px;margin:11px 2px 9px}
 .prog .eyebrow{color:var(--ink-2)}
 .prog-seg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;flex:1}
-.prog-seg i{height:4px;border-radius:2px;background:var(--track)}
+.prog-seg i{height:4px;border-radius:2px;background:var(--rule-2)}
 .prog-seg i.d{background:var(--meter)}
-.prog-seg i.c{background:linear-gradient(90deg,var(--meter) 50%,var(--track) 50%)}
+.prog-seg i.c{background:linear-gradient(90deg,var(--meter) 50%,var(--rule-2) 50%)}
 
-.ex{padding:16px 16px 4px}
+.ex{padding:14px 16px 2px}
 .ex-h{display:flex;gap:12px;align-items:flex-start}
 .ex-idx{font:900 30px/.85 var(--f-disp);color:var(--ink-4);letter-spacing:-.01em;padding-top:2px;width:26px}
 .ex-t{flex:1;min-width:0}
-.ex-t h3{font:800 23px/1 var(--f-cond);letter-spacing:-.005em;color:var(--ink)}
-.ex-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.ex-t h3{font:800 22px/1 var(--f-cond);letter-spacing:-.005em;color:var(--ink)}
+.ex-tags{display:flex;gap:5px;margin-top:8px;flex-wrap:nowrap}
 .ex-tags .i{width:12px;height:12px;stroke-width:2}
 .play{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule);color:var(--ink);flex:none}
-.rxs{display:grid;grid-template-columns:.8fr 1fr 1.35fr 1fr;margin-top:14px;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule)}
-.rxs div{padding:8px 0 9px 10px;border-left:1px solid var(--rule)}
+.rxs{display:grid;grid-template-columns:.8fr 1fr 1.35fr 1fr;margin-top:12px;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule)}
+.rxs div{padding:7px 0 8px 10px;border-left:1px solid var(--rule)}
 .rxs div:first-child{border-left:0;padding-left:0}
 .rxs span{display:block;font:700 10px/1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
 .rxs b{display:block;margin-top:5px;font:800 19px/1 var(--f-cond);letter-spacing:.005em;white-space:nowrap}
 .rxs b em{font-style:normal;color:var(--ink-3);font-weight:700;font-size:15px}
-.prev{display:flex;align-items:center;gap:6px;margin:10px 0 6px;font:600 12.5px/1 var(--f-body);color:var(--ink-3)}
+.prev{display:flex;align-items:center;gap:6px;margin:9px 0 4px;font:600 12.5px/1 var(--f-body);color:var(--ink-3)}
 .prev b{margin-left:auto;font:700 14px/1 var(--f-cond);color:var(--ink-2);letter-spacing:.02em}
 .prev .i{width:14px;height:14px}
 .sets-h,.set{display:grid;grid-template-columns:34px 1fr 82px 64px 52px;gap:6px;align-items:center}
 .sets-h{padding:6px 0 6px;font:700 10px/1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
 .sets-h span:nth-child(3),.sets-h span:nth-child(4){text-align:center}
-.set{margin:0 -8px;padding:4px 8px;border-radius:14px;min-height:60px}
+.set{margin:0 -8px;padding:3px 8px;border-radius:14px;min-height:58px}
 .set+.set{margin-top:2px}
 .set-n{display:flex;flex-direction:column;align-items:flex-start;gap:4px;font:800 18px/1 var(--f-cond);color:var(--ink)}
 .set-n .fl{font:800 9.5px/1 var(--f-cond);letter-spacing:.08em;padding:3px 4px;border-radius:4px;background:var(--ink);color:var(--paper)}
@@ -393,23 +401,24 @@ b{font-weight:700}
 .set.active{background:var(--card-2)}
 .set.active .inp{background:var(--card)}
 .set.active .inp.focus{background:var(--card)}
-.hint{display:flex;align-items:center;gap:7px;margin:8px 0 2px;font:500 12.5px/1.25 var(--f-body);color:var(--ink-2)}
+.hint{display:flex;align-items:center;gap:7px;margin:7px 0 0;font:500 12.5px/1.25 var(--f-body);color:var(--ink-2)}
 .hint b{color:var(--ink);font-family:var(--f-cond);font-size:14px;font-weight:800}
 .hint .i{width:15px;height:15px;color:var(--ink)}
-.expand{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;margin-top:10px;border-top:1px solid var(--rule);text-align:left}
+.expand{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;margin-top:8px;border-top:1px solid var(--rule);text-align:left}
 .expand .t{font:700 14px/1.1 var(--f-body);color:var(--ink)}
 .expand .s{font:500 12px/1.1 var(--f-body);color:var(--ink-3);margin-top:3px}
 .expand .i{margin-left:auto;color:var(--ink-2)}
 .ex-next{display:flex;align-items:center;gap:12px;padding:14px 16px;opacity:.9}
 
-.timer{position:absolute;left:10px;right:10px;bottom:94px;z-index:45;border-radius:24px;background:var(--accent);color:var(--on-accent);padding:12px 12px 12px 18px;box-shadow:var(--shadow-timer);overflow:hidden}
+.scrim{position:absolute;left:0;right:0;bottom:83px;height:64px;z-index:44;pointer-events:none;background:linear-gradient(color-mix(in srgb,var(--paper) 0%,transparent),var(--paper) 55%)}
+.timer{position:absolute;left:10px;right:10px;bottom:91px;z-index:45;border-radius:24px;background:var(--accent);color:var(--on-accent);padding:12px 12px 12px 18px;box-shadow:var(--shadow-timer);overflow:hidden}
 .timer-bar{position:absolute;left:0;right:0;top:0;height:4px;background:rgba(0,0,0,.1)}
 .timer-bar i{display:block;height:100%;width:29%;background:var(--on-accent)}
 .timer-row{display:flex;align-items:center;gap:8px}
 .timer-l{flex:1}
 .timer-k{display:flex;align-items:center;gap:6px;font:800 11px/1 var(--f-cond);letter-spacing:.12em;text-transform:uppercase;opacity:.8}
 .timer-k .i{width:14px;height:14px;stroke-width:2.2}
-.timer-v{font:900 54px/.86 var(--f-disp);letter-spacing:-.01em;margin-top:4px;font-variant-numeric:tabular-nums}
+.timer-v{font:900 52px/.86 var(--f-disp);letter-spacing:-.01em;margin-top:4px;font-variant-numeric:tabular-nums}
 .timer-v small{font:700 13px/1 var(--f-cond);letter-spacing:.06em;margin-left:6px;opacity:.7;text-transform:uppercase}
 .timer-ctl{display:flex;gap:6px}
 .tbtn{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:rgba(0,0,0,.09);font:800 16px/1 var(--f-cond);letter-spacing:.02em;color:var(--on-accent)}
@@ -422,147 +431,149 @@ b{font-weight:700}
 .avstack{display:flex}
 .avstack .av{box-shadow:0 0 0 2px var(--paper)}
 .avstack .av+.av{margin-left:-8px}
-.vs{padding:14px 16px 16px}
-.vs-top{display:flex;align-items:center;justify-content:space-between}
-.vs-top .btn-sm{margin-right:-6px}
-.vs-main{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin-top:8px}
-.vs-side{display:flex;align-items:center;gap:10px}
-.vs-side.r{flex-direction:row-reverse;text-align:right}
-.vs-name{font:800 22px/1 var(--f-cond)}
-.vs-sub{margin-top:3px;font:600 12px/1 var(--f-body);color:var(--ink-3)}
+.fight{padding:12px 16px 12px}
+.vs-top{display:flex;align-items:center;justify-content:space-between;height:20px}
+.vs-top .btn-sm{margin-right:-8px;height:44px}
+.vs-main{display:grid;grid-template-columns:92px 1fr 92px;align-items:center;margin-top:2px}
+.vs-side{display:flex;flex-direction:column;align-items:center;text-align:center}
+.vs-side .av{margin-bottom:7px}
+.vs-name{font:800 19px/1 var(--f-cond);letter-spacing:.005em}
+.vs-sub{margin-top:4px;font:600 11.5px/1 var(--f-body);color:var(--ink-3)}
 .vs-score{text-align:center}
-.score{display:flex;align-items:baseline;justify-content:center;gap:4px;font:900 50px/.85 var(--f-disp);letter-spacing:-.01em}
-.score em{font-style:normal;color:var(--ink-4);font-weight:700;font-size:34px;transform:translateY(-6px)}
-.score-l{margin-top:4px;font:700 11px/1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
-.tally{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:14px}
+.score{display:flex;align-items:baseline;justify-content:center;gap:6px;font:900 64px/.8 var(--f-disp);letter-spacing:-.01em}
+.score em{font-style:normal;color:var(--ink-4);font-weight:700;font-size:40px;transform:translateY(-10px)}
+.score-l{margin-top:7px;font:800 11px/1 var(--f-cond);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.tally{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:12px}
 .tally i{height:6px}
 .tally i:first-child{border-radius:3px 0 0 3px}.tally i:last-child{border-radius:0 3px 3px 0}
-.tape{padding:6px 16px 10px}
-.tape-h{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:8px 0 8px;border-bottom:1px solid var(--ink)}
-.tape-h .l,.tape-h .r{display:flex;align-items:center;gap:6px;font:800 12px/1 var(--f-cond);letter-spacing:.08em;text-transform:uppercase}
-.tape-h .r{justify-content:flex-end}
-.tr{display:grid;grid-template-columns:52px 1fr 104px 1fr 52px;align-items:center;height:33px;border-bottom:1px solid var(--rule)}
+.tape-h{display:flex;align-items:center;gap:10px;margin:11px 0 0}
+.tape-h::before,.tape-h::after{content:"";flex:1;height:1px;background:var(--ink)}
+.tape-h .eyebrow{color:var(--ink)}
+.tr{display:grid;grid-template-columns:50px 1fr 108px 1fr 50px;align-items:center;height:29px;border-bottom:1px solid var(--rule)}
 .tr:last-of-type{border-bottom:0}
 .tv{font:700 16px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.01em;white-space:nowrap}
 .tv.r{text-align:right}
 .tv.lead{color:var(--ink);font-weight:800}
-.tv.lead::before{content:"";display:inline-block;width:0;height:0;margin-right:4px;border:4px solid transparent;border-left:5px solid var(--ink);transform:translateY(-1px)}
-.tv.r.lead::before{display:none}
-.tv.r.lead::after{content:"";display:inline-block;width:0;height:0;margin-left:4px;border:4px solid transparent;border-right:5px solid var(--ink);transform:translateY(-1px)}
 .tl{text-align:center;font:600 12px/1 var(--f-body);color:var(--ink-2)}
-.tb{display:flex;height:6px}
-.tb.l{justify-content:flex-end;padding-right:2px}
-.tb.r{padding-left:2px}
+.tb{display:flex;align-items:center;height:6px}
+.tb.l{justify-content:flex-end;padding-right:3px}
+.tb.r{padding-left:3px}
 .tb i{display:block;height:6px}
 .tb.l i{border-radius:3px 0 0 3px;background:var(--m-s)}
 .tb.r i{border-radius:0 3px 3px 0;background:var(--m-t)}
-.tape-note{margin-top:6px;padding-top:8px;border-top:1px solid var(--rule);font:500 11.5px/1.35 var(--f-body);color:var(--ink-3)}
-.charts2{padding:14px 16px 14px}
-.charts2-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.tb i.lo{height:3px}
+.tape-note{display:flex;gap:6px;align-items:flex-start;margin-top:4px;padding-top:8px;border-top:1px solid var(--rule);font:500 11.5px/1.3 var(--f-body);color:var(--ink-3)}
+.charts2{padding:12px 16px 12px}
+.charts2-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .charts2-g{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.ch-t{font:700 12.5px/1.2 var(--f-body);color:var(--ink);margin-bottom:8px}
+.ch-t{font:700 12.5px/1.2 var(--f-body);color:var(--ink);margin-bottom:4px}
 .ch-t span{color:var(--ink-3);font-weight:500}
 
 /* =========================================================
    04 BODY
    ========================================================= */
-.bh{display:grid;grid-template-columns:1fr auto;align-items:end;gap:12px;padding:10px 2px 0}
-.bh-v{font:900 92px/.78 var(--f-disp);letter-spacing:-.02em;margin-top:10px}
+.bh{display:grid;grid-template-columns:1fr 122px;align-items:start;gap:14px;margin:12px 2px 0;padding-top:10px;border-top:1.5px solid var(--ink)}
+.bh-v{font:900 88px/.78 var(--f-disp);letter-spacing:-.02em;margin-top:8px}
 .bh-v small{font:800 22px/1 var(--f-cond);color:var(--ink-3);margin-left:4px;letter-spacing:.02em}
-.bh-sub{margin-top:10px;font:500 13px/1.2 var(--f-body);color:var(--ink-3)}
+.bh-sub{margin-top:8px;font:500 13px/1.2 var(--f-body);color:var(--ink-3)}
 .bh-sub b{color:var(--ink-2);font-family:var(--f-cond);font-weight:800;font-size:14px}
-.bh-r{display:flex;flex-direction:column;gap:0;padding-bottom:2px;min-width:118px}
-.mini{padding:9px 0;border-top:1px solid var(--rule-2)}
-.mini:first-child{border-top:1px solid var(--ink)}
-.mini b{display:flex;align-items:center;gap:4px;margin-top:5px;font:800 22px/1 var(--f-disp);letter-spacing:0}
-.mini b small{font:700 12px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.03em}
-.mini .i{width:15px;height:15px;stroke-width:2.4;color:var(--good)}
-.goal{padding:14px 16px 12px;margin-top:16px}
+.bh-r{display:flex;flex-direction:column}
+.mini{padding:8px 0 9px;border-top:1px solid var(--rule-2)}
+.mini:first-child{border-top:0;padding-top:0}
+.mini b{display:flex;align-items:center;gap:3px;margin-top:6px;font:800 24px/1 var(--f-disp);letter-spacing:0}
+.mini b small{font:700 12px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.03em;margin-left:2px}
+.mini .i{width:16px;height:16px;stroke-width:2.4;color:var(--good)}
+.goal{margin:12px 2px 0;padding-top:10px;border-top:1px solid var(--rule-2)}
 .goal-h{display:flex;align-items:baseline;justify-content:space-between}
 .goal-h .v{font:600 12.5px/1 var(--f-body);color:var(--ink-3)}
 .goal-h .v b{color:var(--ink);font:800 15px/1 var(--f-cond)}
-.gtrack{position:relative;height:10px;margin:12px 0 8px;border-radius:5px;background:var(--track)}
-.gtrack i{position:absolute;left:0;top:0;bottom:0;width:34%;border-radius:5px;background:var(--m-s)}
-.gtrack .knob{position:absolute;top:50%;left:34%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--m-s);box-shadow:0 0 0 3px var(--card)}
+.gtrack{position:relative;height:8px;margin:10px 0 7px;border-radius:4px;background:var(--rule-2)}
+.gtrack i{position:absolute;left:0;top:0;bottom:0;width:34%;border-radius:4px;background:var(--m-s)}
+.gtrack .knob{position:absolute;top:50%;left:34%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--m-s);box-shadow:0 0 0 3px var(--paper)}
 .gticks{display:flex;justify-content:space-between;font:600 12px/1 var(--f-body);color:var(--ink-3)}
 .gticks b{color:var(--ink);font:800 14px/1 var(--f-cond)}
-.wcard{padding:14px 16px 12px}
+.wcard{padding:12px 16px 12px}
 .wcard-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.wcard .legend{margin-top:10px;font-size:11.5px}
-.logc{padding:12px 12px 12px 16px}
-.logc-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;padding-right:4px}
+.wcard .legend{margin-top:8px;font-size:11.5px}
+.logc{padding:11px 11px 11px 16px}
+.logc-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px;padding-right:4px}
 .logc-h .muted{font:500 12.5px/1 var(--f-body)}
 .stepper{display:flex;align-items:center;gap:8px}
-.stp{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule);color:var(--ink)}
+.stp{display:grid;place-items:center;width:50px;height:50px;border-radius:15px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule);color:var(--ink)}
 .stp .i{width:22px;height:22px;stroke-width:2.4}
 .stp-v{flex:1;text-align:center;font:900 40px/.9 var(--f-disp);letter-spacing:-.01em}
 .stp-v small{font:800 14px/1 var(--f-cond);color:var(--ink-3);margin-left:3px}
-.stepper .btn{height:52px;border-radius:16px;padding:0 18px}
+.stepper .btn{height:50px;border-radius:15px;padding:0 18px}
 .hist{padding:2px 16px}
-.hr{display:grid;grid-template-columns:1fr auto 64px;align-items:center;height:46px;border-bottom:1px solid var(--rule);font:600 14px/1 var(--f-body);color:var(--ink-2)}
+.hr{display:grid;grid-template-columns:1fr auto 64px;align-items:center;height:50px;border-bottom:1px solid var(--rule);font:600 14px/1 var(--f-body);color:var(--ink-2)}
 .hr:last-child{border-bottom:0}
 .hr .w{font:800 18px/1 var(--f-cond);color:var(--ink)}
 .hr .w small{font-size:12px;color:var(--ink-3);margin-left:2px}
 .hr .d{text-align:right;font:700 13px/1 var(--f-cond);color:var(--ink-3)}
-.hr .dt small{display:block;margin-top:3px;font:500 11.5px/1 var(--f-body);color:var(--ink-3)}
+.hr .dt{color:var(--ink);font-weight:700}
+.hr .dt small{display:block;margin-top:4px;font-weight:500;font:500 11.5px/1 var(--f-body);color:var(--ink-3)}
 
 /* =========================================================
    05 FUEL
    ========================================================= */
-.plan{padding:16px}
-.plan-by{display:flex;align-items:center;gap:8px;margin-top:8px;font:600 12.5px/1.2 var(--f-body);color:var(--ink-3)}
-.plan-by b{color:var(--ink)}
-.plan-t{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:6px}
-.tgt{display:grid;grid-template-columns:108px 1fr;gap:18px;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--rule)}
+.plan{padding:13px 16px 14px}
+.plan-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.plan-by{display:flex;align-items:center;gap:8px;font:500 11.5px/1.15 var(--f-body);color:var(--ink-3);text-align:left}
+.plan-by b{display:block;color:var(--ink);font-weight:700;font-size:12.5px}
+.plan-top{align-items:center}
+.h-card{margin-top:6px}
+.att{display:grid;grid-template-columns:30px 1fr auto;gap:12px;align-items:center;margin-top:12px;padding:4px 4px 4px 10px;border-radius:14px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule)}
+.pdf-ic{position:relative;width:30px;height:36px;border-radius:5px 11px 5px 5px;background:var(--card);box-shadow:inset 0 0 0 1px var(--rule-2);display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px}
+.pdf-ic::before{content:"";position:absolute;top:0;right:0;width:10px;height:10px;border-radius:0 10px 0 3px;background:var(--rule-2)}
+.pdf-ic span{font:900 8.5px/1 var(--f-cond);letter-spacing:.06em;padding:2px 3px;border-radius:2px;background:var(--ink);color:var(--paper)}
+.att-n{font:700 13.5px/1.2 var(--f-body);color:var(--ink)}
+.att-m{margin-top:3px;font:500 11.5px/1.2 var(--f-body);color:var(--ink-3)}
+.att .btn{height:44px;width:44px;padding:0;border-radius:12px;background:var(--card);box-shadow:inset 0 0 0 1px var(--rule-2)}
+.today{padding:14px 16px 0}
+.today-h{display:flex;align-items:baseline;justify-content:space-between}
+.today-h .v{font:600 12px/1 var(--f-body);color:var(--ink-3)}
+.today-h .v b{font:800 15px/1 var(--f-cond);color:var(--ink)}
+.tgt{display:grid;grid-template-columns:88px 1fr;gap:20px;align-items:center;margin-top:2px}
 .ring{display:block}
 .ring-track{fill:none;stroke:var(--track)}
 .ring-val{fill:none;stroke:var(--meter);stroke-linecap:round}
-.ringbox{position:relative;width:108px;height:108px}
+.ringbox{position:relative;width:88px;height:88px}
+.ringbox svg{width:88px;height:88px}
 .ringbox .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ringbox .c b{font:900 30px/.85 var(--f-disp);letter-spacing:-.01em}
-.ringbox .c span{margin-top:4px;font:700 10px/1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
-.mac{display:flex;flex-direction:column;gap:11px}
-.mac-r{display:grid;grid-template-columns:1fr auto;align-items:baseline;row-gap:6px}
+.ringbox .c b{font:900 28px/.85 var(--f-disp);letter-spacing:-.01em}
+.ringbox .c span{margin-top:4px;font:700 9.5px/1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.mac{display:flex;flex-direction:column;gap:10px}
+.mac-r{display:grid;grid-template-columns:1fr auto;align-items:baseline;row-gap:5px}
 .mac-r .k{font:700 12px/1 var(--f-cond);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
 .mac-r .v{font:600 12px/1 var(--f-body);color:var(--ink-3)}
 .mac-r .v b{font:800 15px/1 var(--f-cond);color:var(--ink)}
 .mac-r .bar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--track);overflow:hidden}
 .mac-r .bar i{display:block;height:100%;border-radius:3px;background:var(--meter)}
-.kcal-t{margin-top:10px;display:flex;justify-content:space-between;font:600 12px/1 var(--f-body);color:var(--ink-3)}
-.kcal-t b{color:var(--ink);font:800 14px/1 var(--f-cond)}
-.meals{padding:4px 16px 4px}
-.meals-h{display:flex;align-items:center;justify-content:space-between;padding:10px 0 8px;border-bottom:1px solid var(--ink)}
-.meal{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:6px;min-height:48px;border-bottom:1px solid var(--rule)}
+.meals-h{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:0 0 7px;border-bottom:1px solid var(--ink)}
+.meal{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:6px;min-height:44px;padding:0;border-bottom:1px solid var(--rule)}
 .meal:last-child{border-bottom:0}
-.mchk{display:grid;place-items:center;width:44px;height:44px;margin-left:-8px}
-.mchk span{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;box-shadow:inset 0 0 0 2px var(--rule-2);color:transparent}
-.mchk span .i{width:16px;height:16px;stroke-width:2.8}
+.mchk{display:grid;place-items:center;width:44px;height:44px;margin-left:-9px}
+.mchk span{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;box-shadow:inset 0 0 0 2px var(--rule-2);color:transparent}
+.mchk span .i{width:15px;height:15px;stroke-width:2.8}
 .meal.on .mchk span{background:var(--ink);box-shadow:none;color:var(--paper)}
-.meal .n{font:700 14.5px/1.1 var(--f-body);color:var(--ink)}
-.meal .n small{display:block;margin-top:3px;font:500 12px/1.2 var(--f-body);color:var(--ink-3)}
+.meal .n{font:700 14px/1.1 var(--f-body);color:var(--ink)}
+.meal .n small{display:block;margin-top:3px;font:500 11.5px/1.2 var(--f-body);color:var(--ink-3)}
 .meal.on .n{color:var(--ink-2)}
 .meal .tm{font:700 13px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.03em;text-align:right}
 .meal.next{margin:0 -8px;padding:0 8px;border-radius:12px;background:var(--card-2);border-bottom-color:transparent}
-.meal.next .tm{display:flex;align-items:center;gap:8px}
-.pdf{padding:14px;display:flex;flex-direction:column}
-.pdf-ic{position:relative;width:40px;height:48px;border-radius:6px 14px 6px 6px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule-2);display:flex;align-items:flex-end;justify-content:center;padding-bottom:7px}
-.pdf-ic::before{content:"";position:absolute;top:0;right:0;width:13px;height:13px;border-radius:0 12px 0 4px;background:var(--rule-2)}
-.pdf-ic span{font:900 10px/1 var(--f-cond);letter-spacing:.08em;padding:2px 4px;border-radius:3px;background:var(--ink);color:var(--paper)}
-.pdf-n{margin-top:10px;font:700 13.5px/1.2 var(--f-body);color:var(--ink);word-break:break-all}
-.pdf-m{margin-top:3px;font:500 11.5px/1.2 var(--f-body);color:var(--ink-3)}
-.pdf .btn{margin-top:auto;width:100%}
-.adh{padding:14px 14px 12px}
-.adh-v{display:flex;align-items:baseline;gap:6px;margin-top:6px}
-.adh-v b{font:900 32px/.85 var(--f-disp)}
-.adh-v span{font:600 11.5px/1 var(--f-body);color:var(--ink-3)}
-.hm{margin-top:10px;display:flex;flex-direction:column;gap:3px}
+.meal.next .tm{display:flex;align-items:center;gap:8px;color:var(--ink)}
+.adh{display:grid;grid-template-columns:1fr 146px;gap:14px;align-items:end;padding:12px 16px 12px}
+.adh-v{margin-top:7px;font:900 36px/.8 var(--f-disp);letter-spacing:-.01em}
+.adh-s{margin-top:5px;font:500 12px/1.3 var(--f-body);color:var(--ink-3)}
+.adh-s b{color:var(--ink-2)}
+.hm{display:flex;flex-direction:column;gap:3px}
 .hm-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.hm-head span{text-align:center;font:700 9.5px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.04em;padding-bottom:1px}
-.hm i{display:block;aspect-ratio:1;border-radius:4px}
+.hm-head span{text-align:center;font:700 9.5px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.04em;padding-bottom:2px}
+.hm i{display:block;height:13px;border-radius:3.5px}
 .hm .q0{background:var(--q0)}.hm .q1{background:var(--q1)}.hm .q2{background:var(--q2)}.hm .q3{background:var(--q3)}.hm .q4{background:var(--q4)}.hm .q5{background:var(--q5)}
 .hm .qx{background:transparent;box-shadow:inset 0 0 0 1px var(--rule-2)}
 .hm .today{box-shadow:0 0 0 1.5px var(--card),0 0 0 3px var(--ink)}
-.hm-leg{display:flex;align-items:center;gap:3px;margin-top:9px;font:600 10.5px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.03em}
+.hm-leg{display:flex;align-items:center;gap:3px;margin-top:8px;font:600 10.5px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.03em}
 .hm-leg i{width:10px;height:10px;border-radius:3px}
 .hm-leg span{margin:0 3px}
 
@@ -616,7 +627,7 @@ b{font-weight:700}
 <main class="page">
   <header class="page-h">
     <div>
-      <div class="wordmark"><span class="wm-mark"><svg class="i i-18" style="stroke-width:2.4"><use href="#i-train"/></svg></span>Είμαστε Cool <em>Training</em></div>
+      <div class="wordmark"><span class="wm-mark"><svg class="i i-18" style="stroke-width:2.4"><use href="#i-train"/></svg></span><span><span lang="el">ΕΙΜΑΣΤΕ</span> COOL <em>Training</em></span></div>
       <p class="page-sub"><b>Direction — Logbook Pro.</b> The owner’s paper-and-ink logbook, grown into a sports-magazine training journal: condensed display numerals, ruled tables, hairline structure and generous whitespace. One signal colour — <b>Volt</b> — is reserved for “go” moments: Start, PRs and the rest timer. Member hues only ever mark identity.</p>
     </div>
     <div class="switches">
@@ -645,16 +656,13 @@ b{font-weight:700}
           </div>
         </header>
 
-        <article class="card note">
-          <span class="av av-d av-32" aria-label="Coach Dennis">D</span>
-          <div>
-            <div class="note-meta"><b>Coach Dennis</b><span>· note for today · 07:48</span></div>
-            <p class="note-q">“Pulldowns: last set to true failure. And 180&nbsp;g protein today — no excuses.”</p>
-          </div>
-        </article>
+        <figure class="note">
+          <blockquote class="note-q">“Pulldowns: last set to true failure. And 180&nbsp;g protein today — no excuses.”</blockquote>
+          <figcaption class="note-by"><span class="av av-d av-20">D</span><b>Coach Dennis</b>· note for today · 07:48</figcaption>
+        </figure>
 
         <section class="hero">
-          <div class="hero-top"><span class="eyebrow" data-el="Σήμερα · Εβδ. 3 · Προπόνηση 3/5">Today · Week 3 · Session 3/5</span><span class="hero-chip">Hypertrophy</span></div>
+          <div class="hero-top"><span class="eyebrow" data-el="Σήμερα · Εβδ. 3 · Υπερτροφία">Today · Week 3 · Hypertrophy</span><span class="eyebrow">3 / 5</span></div>
           <div class="hero-mid">
             <div class="hero-title">Pull</div>
             <div class="hero-meta">
@@ -680,35 +688,33 @@ b{font-weight:700}
 
         <div class="g2">
           <article class="card tile">
-            <div class="tile-h"><span class="eyebrow" data-el="Βάρος">Weight</span><svg class="i"><use href="#i-chev"/></svg></div>
-            <div class="tile-v">80.9<small>kg</small></div>
-            <span class="st st-good"><svg class="i"><use href="#i-down"/></svg>1.5 kg since start</span>
-            <div style="margin-top:8px"><svg class="ch spark" viewBox="0 0 139 44" width="139" height="44" role="img" aria-label="Trend weight since 7 Sep: 82.4 to 80.9 kg">
-  <path class="area-s" d="M1,8.04 C2.39,8.27 5.93,8.83 8.71,9.35 C11.48,9.86 13.64,10.35 16.41,10.92 C19.19,11.48 21.34,11.92 24.12,12.48 C26.89,13.05 29.05,13.49 31.82,14.05 C34.6,14.62 36.76,15.06 39.53,15.62 C42.3,16.19 44.46,16.62 47.24,17.19 C50.01,17.75 52.17,18.19 54.94,18.76 C57.72,19.32 59.87,19.76 62.65,20.33 C65.42,20.89 67.58,21.33 70.35,21.9 C73.13,22.46 75.28,22.9 78.06,23.46 C80.83,24.03 82.99,24.47 85.76,25.03 C88.54,25.6 90.7,26.04 93.47,26.6 C96.24,27.17 98.4,27.61 101.18,28.17 C103.95,28.73 106.11,29.17 108.88,29.74 C111.66,30.3 113.81,30.74 116.59,31.31 C119.36,31.87 121.52,32.31 124.29,32.88 C127.07,33.44 130.61,34.16 132,34.44 L132,44 L1,44 Z"/>
-  <path class="ln ln-s" d="M1,8.04 C2.39,8.27 5.93,8.83 8.71,9.35 C11.48,9.86 13.64,10.35 16.41,10.92 C19.19,11.48 21.34,11.92 24.12,12.48 C26.89,13.05 29.05,13.49 31.82,14.05 C34.6,14.62 36.76,15.06 39.53,15.62 C42.3,16.19 44.46,16.62 47.24,17.19 C50.01,17.75 52.17,18.19 54.94,18.76 C57.72,19.32 59.87,19.76 62.65,20.33 C65.42,20.89 67.58,21.33 70.35,21.9 C73.13,22.46 75.28,22.9 78.06,23.46 C80.83,24.03 82.99,24.47 85.76,25.03 C88.54,25.6 90.7,26.04 93.47,26.6 C96.24,27.17 98.4,27.61 101.18,28.17 C103.95,28.73 106.11,29.17 108.88,29.74 C111.66,30.3 113.81,30.74 116.59,31.31 C119.36,31.87 121.52,32.31 124.29,32.88 C127.07,33.44 130.61,34.16 132,34.44"/>
-  <circle class="end end-s" cx="132" cy="34.44" r="4"/>
+            <div class="tile-h"><span class="eyebrow" data-el="Βάρος">Weight · trend</span><svg class="i"><use href="#i-chev"/></svg></div>
+            <div class="tile-vr"><div class="tile-v">80.9<small>kg</small></div><span class="st st-good"><svg class="i"><use href="#i-down"/></svg>1.5</span></div>
+            <div style="margin-top:8px"><svg class="ch spark" viewBox="0 0 140 34" width="140" height="34" role="img" aria-label="Trend weight since 7 Sep: 82.4 to 80.9 kg">
+  <path class="area-s" d="M1,6.43 C2.49,6.33 6.28,5.61 9.25,5.86 C12.22,6.1 14.53,7.29 17.5,7.8 C20.47,8.3 22.78,8.51 25.75,8.67 C28.72,8.82 31.03,8.3 34,8.67 C36.97,9.05 39.28,10.37 42.25,10.74 C45.22,11.11 47.53,10.5 50.5,10.74 C53.47,10.97 55.78,11.5 58.75,12.05 C61.72,12.59 64.03,12.97 67,13.78 C69.97,14.59 72.28,15.83 75.25,16.54 C78.22,17.25 80.53,17.09 83.5,17.71 C86.47,18.34 88.78,19.03 91.75,20.03 C94.72,21.03 97.03,22.67 100,23.25 C102.97,23.83 105.28,22.97 108.25,23.25 C111.22,23.53 113.53,23.99 116.5,24.8 C119.47,25.61 121.78,26.95 124.75,27.76 C127.72,28.56 131.51,29.01 133,29.28 L133,34 L1,34 Z"/>
+  <path class="ln ln-s" d="M1,6.43 C2.49,6.33 6.28,5.61 9.25,5.86 C12.22,6.1 14.53,7.29 17.5,7.8 C20.47,8.3 22.78,8.51 25.75,8.67 C28.72,8.82 31.03,8.3 34,8.67 C36.97,9.05 39.28,10.37 42.25,10.74 C45.22,11.11 47.53,10.5 50.5,10.74 C53.47,10.97 55.78,11.5 58.75,12.05 C61.72,12.59 64.03,12.97 67,13.78 C69.97,14.59 72.28,15.83 75.25,16.54 C78.22,17.25 80.53,17.09 83.5,17.71 C86.47,18.34 88.78,19.03 91.75,20.03 C94.72,21.03 97.03,22.67 100,23.25 C102.97,23.83 105.28,22.97 108.25,23.25 C111.22,23.53 113.53,23.99 116.5,24.8 C119.47,25.61 121.78,26.95 124.75,27.76 C127.72,28.56 131.51,29.01 133,29.28"/>
+  <circle class="end end-s" cx="133" cy="29.28" r="4"/>
 </svg></div>
           </article>
           <article class="card tile">
             <div class="tile-h"><span class="eyebrow" data-el="Διατροφή σήμερα">Fuel today</span><svg class="i"><use href="#i-chev"/></svg></div>
             <div class="tile-v">3<small>/ 5 meals</small></div>
             <div class="meals5" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="next"></i><i></i></div>
-            <div class="tile-f"><b>1,630</b> / 2,400 kcal<br>Next: pre-workout 17:30</div>
+            <div class="tile-f"><b>1,630</b> / 2,400 kcal</div>
           </article>
         </div>
 
-        <div class="sec"><span class="sec-t" data-el="Παλμός ομάδας">Squad pulse</span><span class="sec-r"></span><span class="sec-a">You lead 5–2<svg class="i i-16"><use href="#i-chev"/></svg></span></div>
+        <div class="sec tight"><span class="sec-t" data-el="Παλμός ομάδας">Squad pulse</span><span class="sec-r"></span><span class="sec-a">You lead Thanos 5–2<svg class="i i-16"><use href="#i-chev"/></svg></span></div>
         <article class="card pulse" style="margin-top:0">
           <div class="pulse-h">
             <span class="av av-t av-36">T</span>
             <div>
               <div class="pulse-t"><b>Thanos</b> finished <b>Push</b> · 2h ago</div>
-              <div class="pulse-s">Week 3 · 6 exercises · 21.1 t volume</div>
+              <div class="pulse-pr"><span class="pr"><svg class="i"><use href="#i-trophy"/></svg>PR</span>Bench press <b class="tnum">80 kg × 8</b></div>
             </div>
           </div>
-          <div class="pr-line"><span class="pr"><svg class="i"><use href="#i-trophy"/></svg>PR</span>Bench press<b class="tnum">80 kg × 8</b></div>
           <div class="react">
-            <span class="rx">🔥 3</span><span class="rx mine">💪 2</span>
+            <span class="rx">🔥 3</span><span class="rx mine">💪 2</span><span class="rx">👏 1</span>
             <button class="btn btn-soft btn-sm"><svg class="i i-16"><use href="#i-thumb"/></svg>Kudos</button>
           </div>
         </article>
@@ -796,16 +802,13 @@ b{font-weight:700}
             <div class="inp tnum"><span class="ph">9</span></div>
             <button class="chk" aria-label="Mark set 2 done"><svg class="i"><use href="#i-check"/></svg></button>
           </div>
-          <div class="hint"><svg class="i"><use href="#i-target"/></svg>Beat 55 × 9 — aim&nbsp;<b>57.5 × 9+</b>, then to failure</div>
+          <div class="hint"><svg class="i"><use href="#i-target"/></svg><span>Beat 55 × 9 — aim for <b>57.5 × 9+</b>, then go to failure</span></div>
           <button class="expand"><div><div class="t">Warm-up, swaps &amp; notes</div><div class="s">2 swaps · 1 coach note · 2 warm-up sets</div></div><svg class="i"><use href="#i-chevd"/></svg></button>
         </article>
 
-        <article class="card ex-next" style="margin-top:12px">
-          <div class="ex-idx">03</div>
-          <div class="ex-t"><h3 style="font-size:20px">Chest-Supported Row</h3><div class="muted" style="font:600 12.5px/1 var(--f-body);margin-top:5px">3 × 8–10 · RPE ~8–9 / 10 · Last set: Myo-reps</div></div>
-        </article>
       </div>
 
+      <div class="scrim" aria-hidden="true"></div>
       <div class="timer" role="timer" aria-label="Rest timer 1:47 remaining">
         <div class="timer-bar"><i></i></div>
         <div class="timer-row">
@@ -841,33 +844,30 @@ b{font-weight:700}
         </header>
         <div class="seg"><button>Board</button><button class="on" data-el="Μονομαχία">Head-to-head</button><button>Feed</button></div>
 
-        <section class="card vs">
-          <div class="vs-top"><span class="eyebrow">Block 1 · Weeks 1–3</span><button class="btn btn-ghost btn-sm"><svg class="i i-16"><use href="#i-swap"/></svg>Change</button></div>
+        <section class="card fight" aria-label="Head-to-head">
+          <div class="vs-top"><span class="eyebrow">Block 1 · Weeks 1–3</span><button class="btn btn-ghost btn-sm"><svg class="i i-16"><use href="#i-swap"/></svg>Change rival</button></div>
           <div class="vs-main">
-            <div class="vs-side"><span class="av av-s av-56">S</span><div><div class="vs-name">Stelios</div><div class="vs-sub">Cut · you</div></div></div>
+            <div class="vs-side"><span class="av av-s av-44">S</span><div class="vs-name">Stelios</div><div class="vs-sub">Cut · you</div></div>
             <div class="vs-score"><div class="score"><span>5</span><em>–</em><span>2</span></div><div class="score-l">Stelios leads</div></div>
-            <div class="vs-side r"><span class="av av-t av-56">T</span><div><div class="vs-name">Thanos</div><div class="vs-sub">Lean bulk</div></div></div>
+            <div class="vs-side"><span class="av av-t av-44">T</span><div class="vs-name">Thanos</div><div class="vs-sub">Lean bulk</div></div>
           </div>
           <div class="tally" aria-label="Categories won: Stelios 5, Thanos 2"><i class="bg-s"></i><i class="bg-s"></i><i class="bg-s"></i><i class="bg-s"></i><i class="bg-s"></i><i class="bg-t"></i><i class="bg-t"></i></div>
-        </section>
-
-        <section class="card tape" aria-label="Tale of the tape">
-          <div class="tape-h"><span class="l"><i class="sw-dot bg-s"></i>Stelios</span><span class="eyebrow" data-el="Σύγκριση">Tale of the tape</span><span class="r">Thanos<i class="sw-dot bg-t"></i></span></div>
-          <div class="tr"><span class="tv lead tnum">13</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">Workouts done</span><span class="tb r"><i style="width:84.6%"></i></span><span class="tv r tnum">11</span></div>
-          <div class="tr"><span class="tv lead tnum">92%</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">On schedule</span><span class="tb r"><i style="width:85.9%"></i></span><span class="tv r tnum">79%</span></div>
-          <div class="tr"><span class="tv lead tnum">3 wk</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">Week streak</span><span class="tb r"><i style="width:33.3%"></i></span><span class="tv r tnum">1 wk</span></div>
-          <div class="tr"><span class="tv tnum">18.4t</span><span class="tb l"><i style="width:87.2%"></i></span><span class="tl">Volume this week</span><span class="tb r"><i style="width:100%"></i></span><span class="tv r lead tnum">21.1t</span></div>
-          <div class="tr"><span class="tv lead tnum">9</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">PRs</span><span class="tb r"><i style="width:77.8%"></i></span><span class="tv r tnum">7</span></div>
-          <div class="tr"><span class="tv lead tnum">+8.2%</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">Strength gain</span><span class="tb r"><i style="width:84.1%"></i></span><span class="tv r tnum">+6.9%</span></div>
-          <div class="tr"><span class="tv tnum">−1.5</span><span class="tb l"><i style="width:85%"></i></span><span class="tl">Weight → goal</span><span class="tb r"><i style="width:100%"></i></span><span class="tv r lead tnum">+0.8</span></div>
-          <p class="tape-note">Weight compares progress toward each athlete’s own goal (Stelios 34% of cut, Thanos 40% of bulk). Bars scale to the row leader.</p>
+          <div class="tape-h"><span class="eyebrow" data-el="Σύγκριση">Tale of the tape</span></div>
+          <div class="tr"><span class="tv lead tnum">13</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">Workouts done</span><span class="tb r"><i class="lo" style="width:84.6%"></i></span><span class="tv r tnum">11</span></div>
+          <div class="tr"><span class="tv lead tnum">92%</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">On schedule</span><span class="tb r"><i class="lo" style="width:85.9%"></i></span><span class="tv r tnum">79%</span></div>
+          <div class="tr"><span class="tv lead tnum">3 wk</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">Week streak</span><span class="tb r"><i class="lo" style="width:33.3%"></i></span><span class="tv r tnum">1 wk</span></div>
+          <div class="tr"><span class="tv tnum">18.4t</span><span class="tb l"><i class="lo" style="width:87.2%"></i></span><span class="tl">Volume this week</span><span class="tb r"><i style="width:100%"></i></span><span class="tv r lead tnum">21.1t</span></div>
+          <div class="tr"><span class="tv lead tnum">9</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">PRs</span><span class="tb r"><i class="lo" style="width:77.8%"></i></span><span class="tv r tnum">7</span></div>
+          <div class="tr"><span class="tv lead tnum">+8.2%</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">Strength gain</span><span class="tb r"><i class="lo" style="width:84.1%"></i></span><span class="tv r tnum">+6.9%</span></div>
+          <div class="tr"><span class="tv tnum">−1.5 kg</span><span class="tb l"><i class="lo" style="width:85%"></i></span><span class="tl">Weight → goal</span><span class="tb r"><i style="width:100%"></i></span><span class="tv r lead tnum">+0.8 kg</span></div>
+          <p class="tape-note">Weight → goal: % of each athlete’s own goal reached (34 vs 40).</p>
         </section>
 
         <section class="card charts2">
           <div class="charts2-h"><span class="eyebrow">The race</span><span class="legend"><span><i class="sw-dot bg-s"></i>Stelios</span><span><i class="sw-dot bg-t"></i>Thanos</span></span></div>
           <div class="charts2-g">
-            <div><div class="ch-t">Sessions <span>· cumulative</span></div><svg class="ch" viewBox="0 0 155 126" width="155" height="126" role="img" aria-label="Cumulative sessions: Stelios 13, Thanos 11"><line class="base" x1="16" x2="139" y1="108" y2="108"/><text class="yt" x="11" y="111.5" text-anchor="end">0</text><line class="grid" x1="16" x2="139" y1="74.67" y2="74.67"/><text class="yt" x="11" y="78.17" text-anchor="end">5</text><line class="grid" x1="16" x2="139" y1="41.33" y2="41.33"/><text class="yt" x="11" y="44.83" text-anchor="end">10</text><line class="grid" x1="16" x2="139" y1="8" y2="8"/><text class="yt" x="11" y="11.5" text-anchor="end">15</text><line class="grid" x1="63.06" x2="63.06" y1="8" y2="108"/><line class="grid" x1="110.11" x2="110.11" y1="8" y2="108"/><text class="xt" x="39.53" y="121" text-anchor="middle">W1</text><text class="xt" x="86.58" y="121" text-anchor="middle">W2</text><text class="xt" x="123.56" y="121" text-anchor="middle">W3</text><path class="ln ln-t" d="M16,108 H22.72 V101.33 H29.44 V94.67 H36.17 V94.67 H42.89 V94.67 H49.61 V88 H56.33 V81.33 H63.06 V81.33 H69.78 V74.67 H76.5 V74.67 H83.22 V68 H89.94 V68 H96.67 V61.33 H103.39 V61.33 H110.11 V61.33 H116.83 V54.67 H123.56 V48 H130.28 V41.33 H137 V34.67"/><path class="ln ln-s" d="M16,108 H22.72 V101.33 H29.44 V94.67 H36.17 V94.67 H42.89 V88 H49.61 V81.33 H56.33 V74.67 H63.06 V74.67 H69.78 V68 H76.5 V61.33 H83.22 V61.33 H89.94 V54.67 H96.67 V48 H103.39 V41.33 H110.11 V34.67 H116.83 V28 H123.56 V21.33 H130.28 V21.33 H137 V21.33"/><circle class="end end-t" cx="137" cy="34.67" r="4"><title>Thanos: 11 sessions</title></circle><circle class="end end-s" cx="137" cy="21.33" r="4"><title>Stelios: 13 sessions</title></circle><text class="dl" x="144" y="24.83">13</text><text class="dl dl-2" x="144" y="39.67">11</text></svg></div>
-            <div><div class="ch-t">Bench e1RM <span>· kg</span></div><svg class="ch" viewBox="0 0 155 126" width="155" height="126" role="img" aria-label="Bench press estimated 1RM by week: Stelios 84, 87, 89; Thanos 95, 98, 101 kg"><line class="base" x1="18" x2="153" y1="108" y2="108"/><text class="yt" x="13" y="111.5" text-anchor="end">0</text><line class="grid" x1="18" x2="153" y1="76.67" y2="76.67"/><text class="yt" x="13" y="80.17" text-anchor="end">40</text><line class="grid" x1="18" x2="153" y1="45.33" y2="45.33"/><text class="yt" x="13" y="48.83" text-anchor="end">80</text><line class="grid" x1="18" x2="153" y1="14" y2="14"/><text class="yt" x="13" y="17.5" text-anchor="end">120</text><path class="bar-s" d="M25.5,108 V46.2 Q25.5,42.2 29.5,42.2 H35.5 Q39.5,42.2 39.5,46.2 V108 Z"><title>Stelios W1: 84 kg</title></path><path class="bar-t" d="M41.5,108 V37.58 Q41.5,33.58 45.5,33.58 H51.5 Q55.5,33.58 55.5,37.58 V108 Z"><title>Thanos W1: 95 kg</title></path><text class="xt" x="40.5" y="121" text-anchor="middle">W1</text><path class="bar-s" d="M70.5,108 V43.85 Q70.5,39.85 74.5,39.85 H80.5 Q84.5,39.85 84.5,43.85 V108 Z"><title>Stelios W2: 87 kg</title></path><path class="bar-t" d="M86.5,108 V35.23 Q86.5,31.23 90.5,31.23 H96.5 Q100.5,31.23 100.5,35.23 V108 Z"><title>Thanos W2: 98 kg</title></path><text class="xt" x="85.5" y="121" text-anchor="middle">W2</text><path class="bar-s" d="M115.5,108 V42.28 Q115.5,38.28 119.5,38.28 H125.5 Q129.5,38.28 129.5,42.28 V108 Z"><title>Stelios W3: 89 kg</title></path><path class="bar-t" d="M131.5,108 V32.88 Q131.5,28.88 135.5,28.88 H141.5 Q145.5,28.88 145.5,32.88 V108 Z"><title>Thanos W3: 101 kg</title></path><text class="xt" x="130.5" y="121" text-anchor="middle">W3</text><text class="dl" x="122.5" y="34.28" text-anchor="middle">89</text><text class="dl" x="138.5" y="24.88" text-anchor="middle">101</text></svg></div>
+            <div><div class="ch-t">Sessions <span>· cumulative</span></div><svg class="ch" viewBox="0 0 155 94" width="155" height="94" role="img" aria-label="Cumulative sessions: Stelios 13, Thanos 11"><line class="base" x1="16" x2="139" y1="76" y2="76"/><text class="yt" x="11" y="79.5" text-anchor="end">0</text><line class="grid" x1="16" x2="139" y1="52.67" y2="52.67"/><text class="yt" x="11" y="56.17" text-anchor="end">5</text><line class="grid" x1="16" x2="139" y1="29.33" y2="29.33"/><text class="yt" x="11" y="32.83" text-anchor="end">10</text><line class="grid" x1="16" x2="139" y1="6" y2="6"/><text class="yt" x="11" y="9.5" text-anchor="end">15</text><line class="grid" x1="63.06" x2="63.06" y1="6" y2="76"/><line class="grid" x1="110.11" x2="110.11" y1="6" y2="76"/><text class="xt" x="39.53" y="89" text-anchor="middle">W1</text><text class="xt" x="86.58" y="89" text-anchor="middle">W2</text><text class="xt" x="123.56" y="89" text-anchor="middle">W3</text><path class="ln ln-t" d="M16,76 H22.72 V71.33 H29.44 V66.67 H36.17 V66.67 H42.89 V66.67 H49.61 V62 H56.33 V57.33 H63.06 V57.33 H69.78 V52.67 H76.5 V52.67 H83.22 V48 H89.94 V48 H96.67 V43.33 H103.39 V43.33 H110.11 V43.33 H116.83 V38.67 H123.56 V34 H130.28 V29.33 H137 V24.67"/><path class="ln ln-s" d="M16,76 H22.72 V71.33 H29.44 V66.67 H36.17 V66.67 H42.89 V62 H49.61 V57.33 H56.33 V52.67 H63.06 V52.67 H69.78 V48 H76.5 V43.33 H83.22 V43.33 H89.94 V38.67 H96.67 V34 H103.39 V29.33 H110.11 V24.67 H116.83 V20 H123.56 V15.33 H130.28 V15.33 H137 V15.33"/><circle class="end end-t" cx="137" cy="24.67" r="4"><title>Thanos: 11 sessions</title></circle><circle class="end end-s" cx="137" cy="15.33" r="4"><title>Stelios: 13 sessions</title></circle><text class="dl" x="144" y="18.83">13</text><text class="dl dl-2" x="144" y="29.67">11</text></svg></div>
+            <div><div class="ch-t">Bench e1RM <span>· kg</span></div><svg class="ch" viewBox="0 0 155 94" width="155" height="94" role="img" aria-label="Bench press estimated 1RM by week: Stelios 84, 87, 89; Thanos 95, 98, 101 kg"><line class="base" x1="18" x2="133" y1="76" y2="76"/><text class="yt" x="13" y="79.5" text-anchor="end">80</text><line class="grid" x1="18" x2="133" y1="48.8" y2="48.8"/><text class="yt" x="13" y="52.3" text-anchor="end">90</text><line class="grid" x1="18" x2="133" y1="21.6" y2="21.6"/><text class="yt" x="13" y="25.1" text-anchor="end">100</text><text class="xt" x="26" y="89" text-anchor="middle">W1</text><text class="xt" x="73.5" y="89" text-anchor="middle">W2</text><text class="xt" x="121" y="89" text-anchor="middle">W3</text><path class="ln ln-t" d="M26,35.2 L73.5,27.04 L121,18.88"/><circle class="end end-t" cx="26" cy="35.2" r="4"><title>Thanos W1: 95 kg</title></circle><circle class="end end-t" cx="73.5" cy="27.04" r="4"><title>Thanos W2: 98 kg</title></circle><circle class="end end-t" cx="121" cy="18.88" r="4"><title>Thanos W3: 101 kg</title></circle><path class="ln ln-s" d="M26,65.12 L73.5,56.96 L121,51.52"/><circle class="end end-s" cx="26" cy="65.12" r="4"><title>Stelios W1: 84 kg</title></circle><circle class="end end-s" cx="73.5" cy="56.96" r="4"><title>Stelios W2: 87 kg</title></circle><circle class="end end-s" cx="121" cy="51.52" r="4"><title>Stelios W3: 89 kg</title></circle><text class="dl" x="129" y="22.88">101</text><text class="dl" x="129" y="55.52">89</text></svg></div>
           </div>
         </section>
       </div>
@@ -895,24 +895,24 @@ b{font-weight:700}
           <div>
             <div class="eyebrow">Trend weight · today</div>
             <div class="bh-v">80.9<small>kg</small></div>
-            <div class="bh-sub">Scale this morning <b class="tnum">80.6 kg</b> · 07:12</div>
+            <div class="bh-sub">Last weigh-in <b class="tnum">80.5 kg</b> · yesterday</div>
           </div>
           <div class="bh-r">
-            <div class="mini"><span class="eyebrow">Since start</span><b><svg class="i"><use href="#i-down"/></svg>1.5<small>kg</small></b></div>
+            <div class="mini"><span class="eyebrow">Since 7 Sep</span><b><svg class="i"><use href="#i-down"/></svg>1.5<small>kg</small></b></div>
             <div class="mini"><span class="eyebrow">Weekly rate</span><b>−0.6<small>kg / wk</small></b></div>
           </div>
         </section>
 
-        <section class="card goal">
-          <div class="goal-h"><span class="eyebrow">Goal progress</span><span class="v"><b>34%</b> · 2.9 kg to go · ETA 12 Nov</span></div>
+        <section class="goal">
+          <div class="goal-h"><span class="eyebrow">Goal progress</span><span class="v"><b>34%</b> · 2.9 kg to go · ETA 27 Oct</span></div>
           <div class="gtrack" aria-label="34% of the way from 82.4 to 78.0 kg"><i></i><span class="knob"></span></div>
           <div class="gticks"><span><b class="tnum">82.4</b> start</span><span>goal <b class="tnum">78.0</b></span></div>
         </section>
 
         <section class="card wcard" style="margin-top:12px">
           <div class="wcard-h"><span class="eyebrow">Last 30 days</span><div class="seg seg-sm"><button class="on">1M</button><button>3M</button><button>All</button></div></div>
-          <svg class="ch wchart" viewBox="0 0 326 188" width="326" height="188" role="img" aria-label="Daily weigh-ins and trend weight, last 30 days, with goal line at 78 kg"><line class="grid" x1="2" x2="296" y1="151.17" y2="151.17"/><line class="grid" x1="2" x2="296" y1="99.83" y2="99.83"/><text class="yt" x="326" y="103.33" text-anchor="end">80</text><line class="grid" x1="2" x2="296" y1="48.5" y2="48.5"/><text class="yt" x="326" y="52" text-anchor="end">82</text><line class="goal" x1="2" x2="296" y1="151.17" y2="151.17"/><text class="yt yt-goal" x="326" y="154.67" text-anchor="end">78</text><g class="goal-tag" transform="translate(6,129.17)"><rect width="72" height="16" rx="8"/><text x="36" y="11.5" text-anchor="middle">Goal 78.0 kg</text></g><line class="mark" x1="127.67" x2="127.67" y1="10" y2="164"/><text class="mk" x="132.67" y="18">Program start</text><path class="area-s" d="M2,29.25 C3.74,29.29 8.19,29.39 11.67,29.49 C15.15,29.59 17.85,29.67 21.33,29.82 C24.81,29.97 27.52,30.1 31,30.32 C34.48,30.53 37.19,30.73 40.67,31.02 C44.15,31.31 46.85,31.57 50.33,31.92 C53.81,32.27 56.52,32.59 60,32.98 C63.48,33.38 66.19,33.72 69.67,34.13 C73.15,34.54 75.85,34.87 79.33,35.27 C82.81,35.66 85.52,35.96 89,36.3 C92.48,36.65 95.19,36.9 98.67,37.17 C102.15,37.45 104.85,37.63 108.33,37.84 C111.81,38.04 114.52,38.16 118,38.3 C121.48,38.44 124.19,38.21 127.67,38.61 C131.15,39 133.85,39.75 137.33,40.5 C140.81,41.25 143.52,41.95 147,42.76 C150.48,43.58 153.19,44.21 156.67,45.03 C160.15,45.84 162.85,46.48 166.33,47.29 C169.81,48.11 172.52,48.74 176,49.56 C179.48,50.37 182.19,51.01 185.67,51.82 C189.15,52.64 191.85,53.27 195.33,54.09 C198.81,54.9 201.52,55.54 205,56.35 C208.48,57.17 211.19,57.8 214.67,58.62 C218.15,59.43 220.85,60.07 224.33,60.88 C227.81,61.7 230.52,62.33 234,63.15 C237.48,63.96 240.19,64.59 243.67,65.41 C247.15,66.23 249.85,66.86 253.33,67.67 C256.81,68.49 259.52,69.12 263,69.94 C266.48,70.75 269.19,71.39 272.67,72.2 C276.15,73.02 278.85,73.65 282.33,74.47 C285.81,75.28 290.26,76.33 292,76.73 L292,164 L2,164 Z"/><circle class="wpt" cx="2" cy="22.83" r="3.25"><title>25 Aug: 83.0 kg</title></circle><circle class="wpt" cx="11.67" cy="33.1" r="3.25"><title>26 Aug: 82.6 kg</title></circle><circle class="wpt" cx="21.33" cy="20.27" r="3.25"><title>27 Aug: 83.1 kg</title></circle><circle class="wpt" cx="31" cy="27.97" r="3.25"><title>28 Aug: 82.8 kg</title></circle><circle class="wpt" cx="40.67" cy="38.23" r="3.25"><title>29 Aug: 82.4 kg</title></circle><circle class="wpt" cx="60" cy="22.83" r="3.25"><title>31 Aug: 83.0 kg</title></circle><circle class="wpt" cx="69.67" cy="35.67" r="3.25"><title>1 Sept: 82.5 kg</title></circle><circle class="wpt" cx="79.33" cy="30.53" r="3.25"><title>2 Sept: 82.7 kg</title></circle><circle class="wpt" cx="89" cy="45.93" r="3.25"><title>3 Sept: 82.1 kg</title></circle><circle class="wpt" cx="98.67" cy="30.53" r="3.25"><title>4 Sept: 82.7 kg</title></circle><circle class="wpt" cx="108.33" cy="35.67" r="3.25"><title>5 Sept: 82.5 kg</title></circle><circle class="wpt" cx="127.67" cy="35.67" r="3.25"><title>7 Sept: 82.5 kg</title></circle><circle class="wpt" cx="137.33" cy="33.1" r="3.25"><title>8 Sept: 82.6 kg</title></circle><circle class="wpt" cx="147" cy="48.5" r="3.25"><title>9 Sept: 82.0 kg</title></circle><circle class="wpt" cx="156.67" cy="43.37" r="3.25"><title>10 Sept: 82.2 kg</title></circle><circle class="wpt" cx="166.33" cy="38.23" r="3.25"><title>11 Sept: 82.4 kg</title></circle><circle class="wpt" cx="176" cy="51.07" r="3.25"><title>12 Sept: 81.9 kg</title></circle><circle class="wpt" cx="195.33" cy="48.5" r="3.25"><title>14 Sept: 82.0 kg</title></circle><circle class="wpt" cx="205" cy="53.63" r="3.25"><title>15 Sept: 81.8 kg</title></circle><circle class="wpt" cx="214.67" cy="63.9" r="3.25"><title>16 Sept: 81.4 kg</title></circle><circle class="wpt" cx="224.33" cy="53.63" r="3.25"><title>17 Sept: 81.8 kg</title></circle><circle class="wpt" cx="234" cy="63.9" r="3.25"><title>18 Sept: 81.4 kg</title></circle><circle class="wpt" cx="243.67" cy="74.17" r="3.25"><title>19 Sept: 81.0 kg</title></circle><circle class="wpt" cx="263" cy="63.9" r="3.25"><title>21 Sept: 81.4 kg</title></circle><circle class="wpt" cx="272.67" cy="76.73" r="3.25"><title>22 Sept: 80.9 kg</title></circle><circle class="wpt" cx="282.33" cy="74.17" r="3.25"><title>23 Sept: 81.0 kg</title></circle><path class="ln ln-s" d="M2,29.25 C3.74,29.29 8.19,29.39 11.67,29.49 C15.15,29.59 17.85,29.67 21.33,29.82 C24.81,29.97 27.52,30.1 31,30.32 C34.48,30.53 37.19,30.73 40.67,31.02 C44.15,31.31 46.85,31.57 50.33,31.92 C53.81,32.27 56.52,32.59 60,32.98 C63.48,33.38 66.19,33.72 69.67,34.13 C73.15,34.54 75.85,34.87 79.33,35.27 C82.81,35.66 85.52,35.96 89,36.3 C92.48,36.65 95.19,36.9 98.67,37.17 C102.15,37.45 104.85,37.63 108.33,37.84 C111.81,38.04 114.52,38.16 118,38.3 C121.48,38.44 124.19,38.21 127.67,38.61 C131.15,39 133.85,39.75 137.33,40.5 C140.81,41.25 143.52,41.95 147,42.76 C150.48,43.58 153.19,44.21 156.67,45.03 C160.15,45.84 162.85,46.48 166.33,47.29 C169.81,48.11 172.52,48.74 176,49.56 C179.48,50.37 182.19,51.01 185.67,51.82 C189.15,52.64 191.85,53.27 195.33,54.09 C198.81,54.9 201.52,55.54 205,56.35 C208.48,57.17 211.19,57.8 214.67,58.62 C218.15,59.43 220.85,60.07 224.33,60.88 C227.81,61.7 230.52,62.33 234,63.15 C237.48,63.96 240.19,64.59 243.67,65.41 C247.15,66.23 249.85,66.86 253.33,67.67 C256.81,68.49 259.52,69.12 263,69.94 C266.48,70.75 269.19,71.39 272.67,72.2 C276.15,73.02 278.85,73.65 282.33,74.47 C285.81,75.28 290.26,76.33 292,76.73"/><circle class="wpt wpt-today" cx="292" cy="84.43" r="3.25"><title>Today: 80.6 kg</title></circle><circle class="end end-s" cx="292" cy="76.73" r="4.5"><title>Trend today: 80.9 kg</title></circle><text class="xt" x="2" y="182" text-anchor="start">25 Aug</text><text class="xt" x="69.67" y="182" text-anchor="middle">1 Sep</text><text class="xt" x="137.33" y="182" text-anchor="middle">8 Sep</text><text class="xt" x="205" y="182" text-anchor="middle">15 Sep</text><text class="xt" x="296" y="182" text-anchor="end">Today</text><line class="base" x1="2" x2="296" y1="164" y2="164"/></svg>
-          <div class="legend"><span><i class="sw-ring"></i>Daily weigh-in</span><span><i class="sw-line bg-s"></i>Trend</span><span><i class="sw-line" style="background:var(--ink-2);height:1.5px"></i>Goal</span></div>
+          <svg class="ch wchart" viewBox="0 0 324 134" width="324" height="134" role="img" aria-label="Daily weigh-ins and trend weight, last 30 days, with goal line at 78 kg"><line class="grid" x1="2" x2="298" y1="103.5" y2="103.5"/><line class="grid" x1="2" x2="298" y1="69.5" y2="69.5"/><text class="yt" x="324" y="73" text-anchor="end">80</text><line class="grid" x1="2" x2="298" y1="35.5" y2="35.5"/><text class="yt" x="324" y="39" text-anchor="end">82</text><line class="goal" x1="2" x2="298" y1="103.5" y2="103.5"/><text class="yt yt-goal" x="324" y="107" text-anchor="end">78</text><g class="goal-tag" transform="translate(6,81.5)"><rect width="72" height="16" rx="8"/><text x="36" y="11.5" text-anchor="middle">Goal 78.0 kg</text></g><line class="mark" x1="128.53" x2="128.53" y1="10" y2="112"/><text class="mk" x="133.53" y="18">Program start</text><path class="area-s" d="M2,27 C3.75,27.24 8.23,28.23 11.73,28.36 C15.24,28.49 17.96,27.76 21.47,27.75 C24.97,27.73 27.7,27.86 31.2,28.28 C34.7,28.7 37.43,29.74 40.93,30.06 C44.44,30.38 47.16,30.23 50.67,30.06 C54.17,29.89 56.9,29.11 60.4,29.11 C63.9,29.11 66.63,29.87 70.13,30.05 C73.64,30.23 76.36,29.79 79.87,30.12 C83.37,30.45 86.1,31.67 89.6,31.87 C93.1,32.08 95.83,31.32 99.33,31.24 C102.84,31.16 105.56,31.38 109.07,31.41 C112.57,31.44 115.3,31.39 118.8,31.41 C122.3,31.44 125.03,31.63 128.53,31.55 C132.04,31.47 134.76,30.74 138.27,30.98 C141.77,31.22 144.5,32.4 148,32.9 C151.5,33.4 154.23,33.61 157.73,33.76 C161.24,33.92 163.96,33.4 167.47,33.77 C170.97,34.14 173.7,35.45 177.2,35.82 C180.7,36.18 183.43,35.58 186.93,35.82 C190.44,36.05 193.16,36.57 196.67,37.11 C200.17,37.66 202.9,38.03 206.4,38.83 C209.9,39.63 212.63,40.86 216.13,41.56 C219.64,42.27 222.36,42.11 225.87,42.73 C229.37,43.35 232.1,44.04 235.6,45.03 C239.1,46.01 241.83,47.65 245.33,48.22 C248.84,48.8 251.56,47.94 255.07,48.22 C258.57,48.5 261.3,48.95 264.8,49.76 C268.3,50.56 271.03,51.88 274.53,52.68 C278.04,53.48 282.51,53.93 284.27,54.2 L284.27,112 L2,112 Z"/><circle class="wpt" cx="2" cy="27" r="3.25"><title>25 Aug: 82.5 kg</title></circle><circle class="wpt" cx="11.73" cy="33.8" r="3.25"><title>26 Aug: 82.1 kg</title></circle><circle class="wpt" cx="21.47" cy="25.3" r="3.25"><title>27 Aug: 82.6 kg</title></circle><circle class="wpt" cx="31.2" cy="30.4" r="3.25"><title>28 Aug: 82.3 kg</title></circle><circle class="wpt" cx="40.93" cy="37.2" r="3.25"><title>29 Aug: 81.9 kg</title></circle><circle class="wpt" cx="60.4" cy="25.3" r="3.25"><title>31 Aug: 82.6 kg</title></circle><circle class="wpt" cx="70.13" cy="33.8" r="3.25"><title>1 Sep: 82.1 kg</title></circle><circle class="wpt" cx="79.87" cy="30.4" r="3.25"><title>2 Sep: 82.3 kg</title></circle><circle class="wpt" cx="89.6" cy="38.9" r="3.25"><title>3 Sep: 81.8 kg</title></circle><circle class="wpt" cx="99.33" cy="28.7" r="3.25"><title>4 Sep: 82.4 kg</title></circle><circle class="wpt" cx="109.07" cy="32.1" r="3.25"><title>5 Sep: 82.2 kg</title></circle><circle class="wpt" cx="128.53" cy="32.1" r="3.25"><title>7 Sep: 82.2 kg</title></circle><circle class="wpt" cx="138.27" cy="28.7" r="3.25"><title>8 Sep: 82.4 kg</title></circle><circle class="wpt" cx="148" cy="40.6" r="3.25"><title>9 Sep: 81.7 kg</title></circle><circle class="wpt" cx="157.73" cy="37.2" r="3.25"><title>10 Sep: 81.9 kg</title></circle><circle class="wpt" cx="167.47" cy="33.8" r="3.25"><title>11 Sep: 82.1 kg</title></circle><circle class="wpt" cx="177.2" cy="44" r="3.25"><title>12 Sep: 81.5 kg</title></circle><circle class="wpt" cx="196.67" cy="42.3" r="3.25"><title>14 Sep: 81.6 kg</title></circle><circle class="wpt" cx="206.4" cy="45.7" r="3.25"><title>15 Sep: 81.4 kg</title></circle><circle class="wpt" cx="216.13" cy="52.5" r="3.25"><title>16 Sep: 81.0 kg</title></circle><circle class="wpt" cx="225.87" cy="47.4" r="3.25"><title>17 Sep: 81.3 kg</title></circle><circle class="wpt" cx="235.6" cy="54.2" r="3.25"><title>18 Sep: 80.9 kg</title></circle><circle class="wpt" cx="245.33" cy="61" r="3.25"><title>19 Sep: 80.5 kg</title></circle><circle class="wpt" cx="264.8" cy="55.9" r="3.25"><title>21 Sep: 80.8 kg</title></circle><circle class="wpt" cx="274.53" cy="64.4" r="3.25"><title>22 Sep: 80.3 kg</title></circle><circle class="wpt" cx="284.27" cy="61" r="3.25"><title>23 Sep: 80.5 kg</title></circle><path class="ln ln-s" d="M2,27 C3.75,27.24 8.23,28.23 11.73,28.36 C15.24,28.49 17.96,27.76 21.47,27.75 C24.97,27.73 27.7,27.86 31.2,28.28 C34.7,28.7 37.43,29.74 40.93,30.06 C44.44,30.38 47.16,30.23 50.67,30.06 C54.17,29.89 56.9,29.11 60.4,29.11 C63.9,29.11 66.63,29.87 70.13,30.05 C73.64,30.23 76.36,29.79 79.87,30.12 C83.37,30.45 86.1,31.67 89.6,31.87 C93.1,32.08 95.83,31.32 99.33,31.24 C102.84,31.16 105.56,31.38 109.07,31.41 C112.57,31.44 115.3,31.39 118.8,31.41 C122.3,31.44 125.03,31.63 128.53,31.55 C132.04,31.47 134.76,30.74 138.27,30.98 C141.77,31.22 144.5,32.4 148,32.9 C151.5,33.4 154.23,33.61 157.73,33.76 C161.24,33.92 163.96,33.4 167.47,33.77 C170.97,34.14 173.7,35.45 177.2,35.82 C180.7,36.18 183.43,35.58 186.93,35.82 C190.44,36.05 193.16,36.57 196.67,37.11 C200.17,37.66 202.9,38.03 206.4,38.83 C209.9,39.63 212.63,40.86 216.13,41.56 C219.64,42.27 222.36,42.11 225.87,42.73 C229.37,43.35 232.1,44.04 235.6,45.03 C239.1,46.01 241.83,47.65 245.33,48.22 C248.84,48.8 251.56,47.94 255.07,48.22 C258.57,48.5 261.3,48.95 264.8,49.76 C268.3,50.56 271.03,51.88 274.53,52.68 C278.04,53.48 282.51,53.93 284.27,54.2"/><circle class="end end-s" cx="284.27" cy="54.2" r="4.5"><title>Trend: 80.9 kg</title></circle><text class="dl" x="276.27" y="45.2" text-anchor="end">80.9</text><text class="xt" x="2" y="129" text-anchor="start">25 Aug</text><text class="xt" x="70.13" y="129" text-anchor="middle">1 Sep</text><text class="xt" x="138.27" y="129" text-anchor="middle">8 Sep</text><text class="xt" x="206.4" y="129" text-anchor="middle">15 Sep</text><text class="xt" x="298" y="129" text-anchor="end">Today</text><line class="base" x1="2" x2="298" y1="112" y2="112"/></svg>
+          <div class="legend"><span><i class="sw-ring"></i>Daily weigh-in</span><span><i class="sw-line bg-s"></i>Trend (smoothed)</span><span><i class="sw-line" style="background:var(--ink-2);height:1.5px"></i>Goal</span></div>
         </section>
 
         <section class="card logc" style="margin-top:12px">
@@ -925,11 +925,11 @@ b{font-weight:700}
           </div>
         </section>
 
-        <div class="sec"><span class="sec-t" data-el="Ιστορικό">History</span><span class="sec-r"></span><span class="sec-a">Export<svg class="i i-16"><use href="#i-chev"/></svg></span></div>
+        <div class="sec tight"><span class="sec-t" data-el="Ιστορικό">History</span><span class="sec-r"></span><span class="sec-a">Export<svg class="i i-16"><use href="#i-chev"/></svg></span></div>
         <section class="card hist">
-          <div class="hr"><span class="dt">Wed 23 Sep</span><span class="w tnum">80.9<small>kg</small></span><span class="d tnum">−0.3</span></div>
-          <div class="hr"><span class="dt">Tue 22 Sep</span><span class="w tnum">81.2<small>kg</small></span><span class="d tnum">+0.2</span></div>
-          <div class="hr"><span class="dt">Mon 21 Sep</span><span class="w tnum">81.0<small>kg</small></span><span class="d tnum">−0.4</span></div>
+<div class="hr"><span class="dt">Wed 23 Sep<small>Trend 80.9 kg</small></span><span class="w tnum">80.5<small>kg</small></span><span class="d tnum">+0.2</span></div>
+<div class="hr"><span class="dt">Tue 22 Sep<small>Trend 81.0 kg</small></span><span class="w tnum">80.3<small>kg</small></span><span class="d tnum">−0.5</span></div>
+<div class="hr"><span class="dt">Mon 21 Sep<small>Trend 81.2 kg</small></span><span class="w tnum">80.8<small>kg</small></span><span class="d tnum">+0.3</span></div>
         </section>
       </div>
       <nav class="tabbar" aria-label="Main"><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-home"/></svg></span><span data-el="Αρχική">Home</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-train"/></svg></span><span data-el="Προπόνηση">Train</span></button><button class="tab on" aria-current="page"><span class="ti"><svg class="i i-24"><use href="#i-body"/></svg></span><span data-el="Σώμα">Body</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-fuel"/></svg></span><span data-el="Διατροφή">Fuel</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-squad"/></svg></span><span data-el="Ομάδα">Squad</span></button></nav>
@@ -953,13 +953,25 @@ b{font-weight:700}
         </header>
 
         <section class="card plan">
-          <div class="row" style="justify-content:space-between"><span class="eyebrow">Active plan · since 14 Sep</span><span class="tag">v2</span></div>
-          <div class="plan-t"><h2 class="h-card">Cut phase — v2</h2></div>
-          <div class="plan-by"><span class="av av-d av-24">D</span>From <b>Coach Dennis</b> · updated 18 Sep</div>
+          <div class="plan-top">
+            <div>
+              <div class="eyebrow">Active plan · updated 18 Sep</div>
+              <h2 class="h-card">Cut phase — v2</h2>
+            </div>
+            <div class="plan-by"><span class="av av-d av-32" aria-label="Coach Dennis">D</span><span>From<b>Coach Dennis</b></span></div>
+          </div>
+          <div class="att">
+            <div class="pdf-ic"><span>PDF</span></div>
+            <div><div class="att-n">meal-plan-stelios.pdf</div><div class="att-m">4 pages · 312 KB · attached by Dennis</div></div>
+            <button class="btn" aria-label="Open PDF"><svg class="i"><use href="#i-dl"/></svg></button>
+          </div>
+        </section>
+
+        <section class="card today">
           <div class="tgt">
             <div class="ringbox"><svg class="ring" viewBox="0 0 108 108" width="108" height="108" role="img" aria-label="1,630 of 2,400 kcal eaten">
-  <circle class="ring-track" cx="54" cy="54" r="44" stroke-width="10"/>
-  <circle class="ring-val" cx="54" cy="54" r="44" stroke-width="10" stroke-dasharray="187.76 276.46" transform="rotate(-90 54 54)"/>
+  <circle class="ring-track" cx="54" cy="54" r="45" stroke-width="9.5"/>
+  <circle class="ring-val" cx="54" cy="54" r="45" stroke-width="9.5" stroke-dasharray="192.03 282.74" transform="rotate(-90 54 54)"/>
 </svg><div class="c"><b class="tnum">770</b><span>kcal left</span></div></div>
             <div class="mac">
               <div class="mac-r"><span class="k">Protein</span><span class="v"><b class="tnum">132</b> / 180 g</span><span class="bar"><i style="width:73%"></i></span></div>
@@ -967,11 +979,7 @@ b{font-weight:700}
               <div class="mac-r"><span class="k">Fat</span><span class="v"><b class="tnum">41</b> / 70 g</span><span class="bar"><i style="width:58.6%"></i></span></div>
             </div>
           </div>
-          <div class="kcal-t"><span><b class="tnum">1,630</b> eaten</span><span>Target <b class="tnum">2,400</b> kcal</span></div>
-        </section>
-
-        <section class="card meals">
-          <div class="meals-h"><span class="sec-t" data-el="Σημερινά γεύματα">Today’s meals</span><span class="eyebrow tnum">3 of 5</span></div>
+          <div class="meals-h"><span class="sec-t" data-el="Σημερινά γεύματα">Today’s meals</span><span class="eyebrow tnum">3 of 5 · 1,630 / 2,400 kcal</span></div>
           <div class="meal on"><button class="mchk" aria-label="Breakfast eaten"><span><svg class="i"><use href="#i-check"/></svg></span></button><div class="n">Breakfast<small>Oats, whey, berries · 520 kcal</small></div><span class="tm tnum">08:00</span></div>
           <div class="meal on"><button class="mchk" aria-label="Snack eaten"><span><svg class="i"><use href="#i-check"/></svg></span></button><div class="n">Snack<small>Greek yogurt, walnuts · 290 kcal</small></div><span class="tm tnum">11:00</span></div>
           <div class="meal on"><button class="mchk" aria-label="Lunch eaten"><span><svg class="i"><use href="#i-check"/></svg></span></button><div class="n">Lunch<small>Chicken, rice, horiatiki · 820 kcal</small></div><span class="tm tnum">14:00</span></div>
@@ -979,20 +987,15 @@ b{font-weight:700}
           <div class="meal"><button class="mchk" aria-label="Mark dinner eaten"><span><svg class="i"><use href="#i-check"/></svg></span></button><div class="n">Dinner<small>Salmon, potatoes, greens · 460 kcal</small></div><span class="tm tnum">21:00</span></div>
         </section>
 
-        <div class="g2">
-          <article class="card pdf">
-            <div class="pdf-ic"><span>PDF</span></div>
-            <div class="pdf-n">meal-plan-stelios.pdf</div>
-            <div class="pdf-m">4 pages · 312 KB</div>
-            <button class="btn btn-soft btn-sm" style="margin-top:10px;height:40px"><svg class="i i-16"><use href="#i-dl"/></svg>Open</button>
-          </article>
-          <article class="card adh">
-            <div class="eyebrow">Adherence · 4 wk</div>
-            <div class="adh-v"><b>87%</b><span>meals ticked</span></div>
-            <div class="hm" role="img" aria-label="Meal plan adherence, last 4 weeks"><div class="hm-row hm-head"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q3" title="3/5 meals"></i><i class="q4" title="4/5 meals"></i></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q2" title="2/5 meals"></i><i class="q4" title="4/5 meals"></i></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q3" title="3/5 meals"></i></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q3 today" title="3/5 meals"></i><i class="qx" title="Upcoming"></i><i class="qx" title="Upcoming"></i><i class="qx" title="Upcoming"></i></div></div>
+        <section class="card adh">
+          <div>
+            <div class="eyebrow">Adherence · 4 weeks</div>
+            <div class="adh-v">87%</div>
+            <div class="adh-s">of meals ticked</div>
             <div class="hm-leg"><span style="margin-left:0">0</span><i style="background:var(--q1)"></i><i style="background:var(--q2)"></i><i style="background:var(--q3)"></i><i style="background:var(--q4)"></i><i style="background:var(--q5)"></i><span>5 meals</span></div>
-          </article>
-        </div>
+          </div>
+          <div class="hm" role="img" aria-label="Meal plan adherence, last 4 weeks"><div class="hm-row hm-head"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q3" title="3/5 meals"></i><i class="q4" title="4/5 meals"></i></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q2" title="2/5 meals"></i><i class="q4" title="4/5 meals"></i></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q3" title="3/5 meals"></i></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q3 today" title="3/5 meals"></i><i class="qx" title="Upcoming"></i><i class="qx" title="Upcoming"></i><i class="qx" title="Upcoming"></i></div></div>
+        </section>
       </div>
       <nav class="tabbar" aria-label="Main"><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-home"/></svg></span><span data-el="Αρχική">Home</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-train"/></svg></span><span data-el="Προπόνηση">Train</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-body"/></svg></span><span data-el="Σώμα">Body</span></button><button class="tab on" aria-current="page"><span class="ti"><svg class="i i-24"><use href="#i-fuel"/></svg></span><span data-el="Διατροφή">Fuel</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-squad"/></svg></span><span data-el="Ομάδα">Squad</span></button></nav>
       <div class="home-ind"></div>

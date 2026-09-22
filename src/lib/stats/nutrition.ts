@@ -8,15 +8,25 @@ export function currentPlan(plans: MealPlan[], memberId: string): MealPlan | nul
   return mine.find((p) => p.active) ?? mine.sort((a, b) => (a.startDate < b.startDate ? 1 : -1))[0] ?? null
 }
 
-/** 0..1 for one day: fraction of planned meals ticked; otherwise the overall rating (on 1 / mostly 0.5 / off 0). */
+/**
+ * 0..1 for one day: fraction of the plan's meals ticked; otherwise (nothing ticked, a plan without meals, or
+ * ticks that all belong to another plan) the overall rating (on 1 / mostly 0.5 / off 0).
+ */
 export function checkinScore(c: NutritionCheckin | undefined, plan: MealPlan | null): number {
   if (!c) return 0
-  const planned = plan?.meals.length ?? 0
-  if (planned > 0 && c.meals.length > 0) {
-    const ids = new Set(plan!.meals.map((m) => m.id))
-    return Math.min(1, c.meals.filter((id) => ids.has(id)).length / planned)
-  }
+  const planned = new Set(plan?.meals.map((m) => m.id) ?? [])
+  const ticked = new Set(c.meals.filter((id) => planned.has(id)))
+  if (ticked.size > 0) return Math.min(1, ticked.size / planned.size)
   return c.rating === 'on' ? 1 : c.rating === 'mostly' ? 0.5 : 0
+}
+
+/**
+ * The plan a check-in was logged against, else `fallback` (usually the current plan). Scoring past days
+ * against their own plan keeps them stable when the coach issues a new plan with new meal ids.
+ */
+export function checkinPlan(c: NutritionCheckin, plans: Record<string, MealPlan>, fallback: MealPlan | null): MealPlan | null {
+  const own = c.planId ? plans[c.planId] : undefined
+  return own && own.memberId === c.memberId ? own : fallback
 }
 
 export interface Adherence {

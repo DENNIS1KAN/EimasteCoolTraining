@@ -18,7 +18,9 @@ export const setKg = (s: SetLog, unit: Unit): number | null => {
 }
 export const setReps = (s: SetLog): number | null => {
   const n = parseNum(s.r)
-  return n == null || n <= 0 ? null : Math.round(n)
+  // Round before checking, so "0.4" is no set rather than a counted set of 0 reps.
+  const reps = n == null ? 0 : Math.round(n)
+  return reps > 0 ? reps : null
 }
 
 /** A set counts once ticked, or when the whole workout is marked done and the set has reps. */

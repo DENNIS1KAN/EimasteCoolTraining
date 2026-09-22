@@ -355,14 +355,38 @@ function hookWindow() {
   windowHooked = true
   window.addEventListener('online', () => {
     setSync({ online: true })
+    if (pendingResume) {
+      void resumeSession()
+      return
+    }
     void flush()
     void refresh()
   })
   window.addEventListener('offline', () => setSync({ online: false }))
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && Date.now() - lastRefresh > 20000) void refresh()
+    if (document.visibilityState === 'visible' && pendingResume) void resumeSession()
+    else if (document.visibilityState === 'visible' && Date.now() - lastRefresh > 20000) void refresh()
     if (document.visibilityState === 'hidden') void flush()
   })
+}
+
+/** True after an offline start from the cache: the backend session still has to be (re)connected. */
+let pendingResume = false
+
+/** Finish an offline start once the network is back: restore the session, subscribe, merge, flush. */
+async function resumeSession() {
+  if (!backend || !pendingResume) return
+  try {
+    const meId = await backend.init()
+    pendingResume = false
+    if (!meId) await handleSignedOut()
+    else await startSession(meId)
+  } catch (e) {
+    if (!isRetryable(e)) {
+      pendingResume = false
+      await handleSignedOut()
+    }
+  }
 }
 
 async function startSession(meId: string) {
@@ -404,7 +428,8 @@ export async function boot(b: Backend, namespace: string): Promise<void> {
     await startSession(meId)
   } catch (e) {
     if (cached?.meId && isRetryable(e)) {
-      // Offline at the gym: keep working from the cache; the outbox syncs later.
+      // Offline at the gym: keep working from the cache; connect when the network returns.
+      pendingResume = true
       setSync({ online: false, pending: outbox.size })
       return
     }
