@@ -206,7 +206,8 @@ export class LocalBackend implements Backend {
       coachNote: '',
       coachNoteAt: null,
       settings: { unit: 'kg', machines: {}, weightVisibility: 'change' },
-      joined: true,
+      // Shows as "invite pending" in the coach console, like a real new member (demo sign-in still works).
+      joined: false,
       updatedAt: Date.now(),
     }
     this.db.members[id] = m

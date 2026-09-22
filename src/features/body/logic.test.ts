@@ -196,8 +196,8 @@ describe('changeSeries', () => {
     expect(s.map((p) => p.date)).toEqual(['2026-09-07', '2026-09-08', '2026-09-09'])
     expect(s[0]).toMatchObject({ trendKg: 0, rawKg: 0, pct: 0 })
     expect(s[1].rawKg).toBeCloseTo(-1, 10)
-    expect(s[1].trendKg).toBeCloseTo(-0.1, 10)
-    expect(s[1].pct).toBeCloseTo(-0.1 / 80, 10)
+    expect(s[1].trendKg).toBeCloseTo(-0.2, 10)
+    expect(s[1].pct).toBeCloseTo(-0.2 / 80, 10)
   })
 })
 

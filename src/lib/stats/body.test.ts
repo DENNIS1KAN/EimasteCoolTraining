@@ -18,16 +18,16 @@ describe('weightSeries', () => {
     expect(s[0].trendKg).toBe(80)
   })
 
-  it('smooths 10% per day and weighs a gap as several days', () => {
+  it('smooths 20% per day and weighs a gap as several days', () => {
     const s = weightSeries([W('2026-01-01', 80), W('2026-01-02', 81), W('2026-01-05', 81)])
-    expect(s[1].trendKg).toBeCloseTo(80.1, 10)
-    // 3-day gap: alpha = 1 - 0.9^3 = 0.271
-    expect(s[2].trendKg).toBeCloseTo(80.1 + 0.271 * 0.9, 10)
+    expect(s[1].trendKg).toBeCloseTo(80.2, 10)
+    // 3-day gap: alpha = 1 - 0.8^3 = 0.488
+    expect(s[2].trendKg).toBeCloseTo(80.2 + 0.488 * 0.8, 10)
   })
 
   it('counts calendar days across DST, not 23/25 hour periods', () => {
     const s = weightSeries([W('2026-03-28', 80), W('2026-03-30', 82), W('2026-10-24', 80), W('2026-10-26', 82)])
-    const alpha2 = 1 - 0.81
+    const alpha2 = 1 - 0.64
     expect(s[1].trendKg).toBeCloseTo(80 + alpha2 * 2, 10)
   })
 })

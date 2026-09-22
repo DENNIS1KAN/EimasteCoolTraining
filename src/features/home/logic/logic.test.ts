@@ -67,6 +67,12 @@ describe('onboarding', () => {
     expect(currentStep(s)).toBeNull()
   })
 
+  it('highlights nothing when only steps waiting on the coach are left', () => {
+    const s = athleteSteps({ ...fresh, programStart: '2026-01-05', weighIns: 1 })
+    expect(allDone(s)).toBe(false)
+    expect(currentStep(s)).toBeNull()
+  })
+
   it('tracks the coach set-up across athletes', () => {
     const a = mkMember({ id: 'a', programStart: '2026-01-05' })
     const b = mkMember({ id: 'b', joined: false })

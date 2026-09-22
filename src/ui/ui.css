@@ -207,9 +207,12 @@
 }
 
 /* ==================================================================== Card */
+/* zero-specificity default so layout utilities (.stack, .row, .grid-2) on a card win */
+:where(.ui-card) {
+  display: block;
+}
 .ui-card {
   position: relative;
-  display: block;
   min-width: 0;
   padding: 16px;
   background: var(--surface);

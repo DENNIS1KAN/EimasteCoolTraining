@@ -6,9 +6,12 @@ export interface TrendPoint {
   date: ISODate
   /** The weigh-in as entered. */
   kg: number
-  /** Smoothed trend (exponential moving average, 10% per day, time-aware). */
+  /** Smoothed trend (exponential moving average, 20% per day, time-aware: close to a 7-day average). */
   trendKg: number
 }
+
+/** Daily smoothing factor of the weight trend: responsive enough to feel current, calm enough to hide water swings. */
+export const TREND_ALPHA = 0.2
 
 /** Weigh-ins sorted by date with a smoothed trend line (Hacker's Diet style, robust to gaps). */
 export function weightSeries(entries: WeightEntry[]): TrendPoint[] {
@@ -20,7 +23,7 @@ export function weightSeries(entries: WeightEntry[]): TrendPoint[] {
     if (prev == null) trend = e.kg
     else {
       const gap = Math.max(1, diffDays(prev, e.date))
-      const alpha = 1 - Math.pow(0.9, gap)
+      const alpha = 1 - Math.pow(1 - TREND_ALPHA, gap)
       trend = trend + alpha * (e.kg - trend)
     }
     out.push({ date: e.date, kg: e.kg, trendKg: trend })

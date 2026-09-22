@@ -56,8 +56,7 @@ export function coachSteps(members: Member[], plans: MealPlan[]): Step<CoachStep
 export const doneCount = (steps: Step<string>[]): number => steps.filter((s) => s.done).length
 export const allDone = (steps: Step<string>[]): boolean => steps.every((s) => s.done)
 
-/** The step to highlight: the first one not done that the viewer can act on (else the first not done). */
+/** The step to highlight: the first one not done that the viewer can act on (null when only waiting ones are left). */
 export function currentStep<Id extends string>(steps: Step<Id>[]): Id | null {
-  const open = steps.filter((s) => !s.done)
-  return (open.find((s) => !s.waiting) ?? open[0])?.id ?? null
+  return steps.find((s) => !s.done && !s.waiting)?.id ?? null
 }

@@ -129,15 +129,15 @@ describe('earnedBadges', () => {
   it('goal reached when the trend crosses a weight-loss goal', () => {
     const weights = [mkWeight(S, '2026-03-01', 90), ...Array.from({ length: 20 }, (_, i) => mkWeight(S, addDays('2026-03-02', i), 84))]
     const b = badgeMap(squad({ members: [member({ goalWeightKg: 86 })], weights }))
-    // trend = 84 + 6 * 0.9^n <= 86 once 0.9^n <= 1/3 -> n = 11 -> 2026-03-12
-    expect(b['goal-reached']).toBe(endOfDay('2026-03-12'))
+    // trend = 84 + 6 * 0.8^n <= 86 once 0.8^n <= 1/3 -> n = 5 -> 2026-03-06
+    expect(b['goal-reached']).toBe(endOfDay('2026-03-06'))
   })
 
   it('goal reached for a weight-gain goal', () => {
     const weights = [mkWeight(S, '2026-03-01', 70), ...Array.from({ length: 20 }, (_, i) => mkWeight(S, addDays('2026-03-02', i), 74))]
     const b = badgeMap(squad({ members: [member({ goalWeightKg: 72 })], weights }))
-    // trend = 74 - 4 * 0.9^n >= 72 once 0.9^n <= 0.5 -> n = 7 -> 2026-03-08
-    expect(b['goal-reached']).toBe(endOfDay('2026-03-08'))
+    // trend = 74 - 4 * 0.8^n >= 72 once 0.8^n <= 0.5 -> n = 4 -> 2026-03-05
+    expect(b['goal-reached']).toBe(endOfDay('2026-03-05'))
   })
 
   it('no goal badge for a noisy single dip, a tiny goal, or a single weigh-in', () => {

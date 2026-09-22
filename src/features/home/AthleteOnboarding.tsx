@@ -58,7 +58,7 @@ export function AthleteOnboarding({ me, coach }: { me: Member; coach: Member | n
             ? t('obStartDone', { date: fmtDate(me.programStart!, 'long') })
             : s.waiting
               ? t('obStartWaiting', { coach: coachName })
-              : t('obStartBody', { program: program?.name ?? '' }),
+              : t('obStartBody'),
           onClick: () => setSheet('start'),
         }
       case 'weigh':
