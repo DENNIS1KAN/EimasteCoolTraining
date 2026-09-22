@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Night Session Mockups</title>
+<meta name="description" content="Eimaste Cool Training, design direction 'Night Session': five mobile screens in light and dark.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Sofia+Sans+Extra+Condensed:wght@600;700;800;900&display=swap&subset=greek" rel="stylesheet">
+<style>
+/* =========================================================
+   NIGHT SESSION - tokens
+   Light = "daylight gym"  |  Dark = "night session" (primary)
+   ========================================================= */
+:root{
+  color-scheme: light;
+  --f-ui: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num: "Sofia Sans Extra Condensed", "Manrope", system-ui, sans-serif;
+
+  --page:#E3E7EE; --page-2:#D8DDE6; --page-ink:#0B1020; --page-ink-2:#566074;
+  --bezel:#0E1116; --bezel-edge:#2B3039;
+
+  --bg:#F3F5F8;
+  --bg-glow: rgba(42,120,214,0);
+  --surface-1:#FFFFFF;
+  --surface-2:#F0F2F6;
+  --surface-3:#E4E8EE;
+  --seg-on:#FFFFFF;
+  --hairline:#E5E8EE;
+  --hairline-strong:#D3D9E2;
+  --grid:#E8EBF0;
+  --ink-1:#0B1020;
+  --ink-2:#4A5467;
+  --ink-3:#737D91;
+  --ink-ph:#8A93A3;
+
+  --accent:#D4FF3F;           /* volt: fills only on light */
+  --accent-ink:#0B1020;       /* text/icons on volt */
+  --accent-strong:#557D00;    /* volt's deep step: strokes, rings, text on light */
+  --accent-soft:rgba(110,160,0,.12);
+  --accent-glow:rgba(150,200,0,.45);
+  --heat:#557D00;
+
+  --m-stelios:#2a78d6; --m-thanos:#eb6834; --m-dennis:#1baf7a;
+
+  --good:#4F7F00;  --good-soft:rgba(79,127,0,.11);
+  --warn:#9C6500;  --warn-soft:rgba(196,132,0,.13);
+  --danger:#D6334F; --danger-soft:rgba(214,51,79,.1);
+
+  --tabbar:rgba(255,255,255,.88);
+  --card-border:rgba(16,24,40,.045);
+  --shadow-1:0 1px 2px rgba(16,24,40,.05), 0 8px 22px -12px rgba(16,24,40,.16);
+  --shadow-2:0 18px 40px -12px rgba(16,24,40,.28), 0 2px 6px rgba(16,24,40,.06);
+  --glow-a:0;   /* member glow strength */
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --page:#030409; --page-2:#0A0D14; --page-ink:#EEF2F8; --page-ink-2:#8A94A8;
+    --bezel:#171A21; --bezel-edge:#2C313B;
+    --bg:#07090F;
+    --bg-glow: rgba(57,135,229,.10);
+    --surface-1:#0E121B;
+    --surface-2:#151A25;
+    --surface-3:#1D2331;
+    --seg-on:#262D3D;
+    --hairline:#1A1F2B;
+    --hairline-strong:#283042;
+    --grid:#171C28;
+    --ink-1:#F3F6FB;
+    --ink-2:#A2ACBE;
+    --ink-3:#6C768A;
+    --ink-ph:#5E6779;
+    --accent:#D4FF3F;
+    --accent-ink:#0A0E02;
+    --accent-strong:#D4FF3F;
+    --accent-soft:rgba(212,255,63,.11);
+    --accent-glow:rgba(212,255,63,.28);
+    --heat:#D4FF3F;
+    --m-stelios:#3987e5; --m-thanos:#d95926; --m-dennis:#199e70;
+    --good:#C5F24A;  --good-soft:rgba(197,242,74,.12);
+    --warn:#F2BE4A;  --warn-soft:rgba(242,190,74,.12);
+    --danger:#FF5C7A; --danger-soft:rgba(255,92,122,.12);
+    --tabbar:rgba(9,12,19,.84);
+    --card-border:rgba(140,160,205,.075);
+    --shadow-1:inset 0 1px 0 rgba(255,255,255,.035), 0 1px 2px rgba(0,0,0,.5);
+    --shadow-2:0 20px 44px -12px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.06);
+    --glow-a:1;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#030409; --page-2:#0A0D14; --page-ink:#EEF2F8; --page-ink-2:#8A94A8;
+  --bezel:#171A21; --bezel-edge:#2C313B;
+  --bg:#07090F;
+  --bg-glow: rgba(57,135,229,.10);
+  --surface-1:#0E121B;
+  --surface-2:#151A25;
+  --surface-3:#1D2331;
+  --seg-on:#262D3D;
+  --hairline:#1A1F2B;
+  --hairline-strong:#283042;
+  --grid:#171C28;
+  --ink-1:#F3F6FB;
+  --ink-2:#A2ACBE;
+  --ink-3:#6C768A;
+  --ink-ph:#5E6779;
+  --accent:#D4FF3F;
+  --accent-ink:#0A0E02;
+  --accent-strong:#D4FF3F;
+  --accent-soft:rgba(212,255,63,.11);
+  --accent-glow:rgba(212,255,63,.28);
+  --heat:#D4FF3F;
+  --m-stelios:#3987e5; --m-thanos:#d95926; --m-dennis:#199e70;
+  --good:#C5F24A;  --good-soft:rgba(197,242,74,.12);
+  --warn:#F2BE4A;  --warn-soft:rgba(242,190,74,.12);
+  --danger:#FF5C7A; --danger-soft:rgba(255,92,122,.12);
+  --tabbar:rgba(9,12,19,.84);
+  --card-border:rgba(140,160,205,.075);
+  --shadow-1:inset 0 1px 0 rgba(255,255,255,.035), 0 1px 2px rgba(0,0,0,.5);
+  --shadow-2:0 20px 44px -12px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.06);
+  --glow-a:1;
+}
+/* "Night" island: hero cards + live sheets stay dark in both themes */
+.night{
+  --surface-1:#0D111A; --surface-2:#171D2A; --surface-3:#212839;
+  --hairline:rgba(160,180,220,.10); --hairline-strong:rgba(160,180,220,.18);
+  --ink-1:#F3F6FB; --ink-2:#A7B0C2; --ink-3:#727C90;
+  --accent-strong:#D4FF3F; --accent-soft:rgba(212,255,63,.12); --accent-ink:#0A0E02;
+  color:var(--ink-1);
+}
+
+/* =========================================================
+   Page shell (presentation only)
+   ========================================================= */
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--page);
+  background-image:radial-gradient(1200px 500px at 50% -120px, var(--page-2), transparent 70%);
+  color:var(--page-ink); font-family:var(--f-ui); font-size:14px; line-height:1.4;
+  -webkit-font-smoothing:antialiased; min-height:100vh; padding:36px 16px 64px;
+}
+button,input{font:inherit;color:inherit;background:none;border:0;outline:0}
+button{cursor:pointer}
+ol,ul{list-style:none}
+.page-head{max-width:2110px;margin:0 auto 34px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:16px}
+.brand-mark{width:52px;height:52px;border-radius:16px;background:#0B0F17;display:grid;place-items:center;box-shadow:0 0 0 1px rgba(255,255,255,.06) inset, 0 10px 30px -10px rgba(0,0,0,.5)}
+.brand-mark svg{width:30px;height:30px}
+.brand h1{font:800 26px/1.1 var(--f-ui);letter-spacing:-.02em}
+.brand h1 em{font-style:normal;color:var(--page-ink-2);font-weight:600}
+.brand p{color:var(--page-ink-2);font-weight:600;font-size:14px;margin-top:4px;max-width:720px}
+.dir{display:inline-flex;align-items:center;gap:8px;font:800 12px/1 var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--page-ink-2);margin-bottom:8px}
+.dir i{width:8px;height:8px;border-radius:2px;background:var(--accent);box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.head-r{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.key{display:flex;gap:14px;font:700 12px var(--f-ui);color:var(--page-ink-2)}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{width:10px;height:10px;border-radius:50%}
+.key .acc{border-radius:3px;background:var(--accent);box-shadow:0 0 0 1px rgba(0,0,0,.2)}
+.theme-switch{display:flex;padding:4px;border-radius:14px;background:color-mix(in oklab, var(--page-ink) 8%, transparent);gap:4px}
+.theme-switch button{height:40px;padding:0 16px;border-radius:10px;display:flex;align-items:center;gap:8px;font:700 14px var(--f-ui);color:var(--page-ink-2)}
+.theme-switch button[aria-pressed="true"]{background:var(--page-ink);color:var(--page)}
+.theme-switch .ic{width:18px;height:18px}
+
+.frames{display:flex;flex-wrap:wrap;justify-content:center;gap:48px 40px;max-width:2110px;margin:0 auto}
+.shot{width:390px}
+.cap{display:flex;align-items:baseline;gap:10px;margin:0 0 18px 4px}
+.cap-k{font:800 13px var(--f-ui);letter-spacing:.1em;color:var(--page-ink-2)}
+.cap b{font:800 17px var(--f-ui);letter-spacing:-.01em}
+.cap span{color:var(--page-ink-2);font-weight:600;font-size:13px}
+
+/* =========================================================
+   Device
+   ========================================================= */
+.phone{
+  position:relative;width:390px;height:844px;border-radius:56px;overflow:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(420px 300px at 85% -60px, var(--bg-glow), transparent 70%);
+  box-shadow:0 0 0 7px var(--bezel), 0 0 0 8.5px var(--bezel-edge), 0 50px 90px -30px rgba(0,0,0,.55);
+  color:var(--ink-1);
+  isolation:isolate;
+}
+.sb{position:absolute;top:0;left:0;right:0;height:50px;padding:16px 30px 0 52px;display:flex;justify-content:space-between;align-items:flex-start;z-index:8;pointer-events:none}
+.sb-t{font:700 16px/20px var(--f-ui);letter-spacing:-.01em}
+.sb-r{display:flex;gap:6px;align-items:center;height:20px}
+.sbi{height:12px;width:auto;fill:currentColor}
+.sbi.bat{height:13px}
+.island{position:absolute;top:11px;left:50%;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000;z-index:9}
+.homebar{position:absolute;bottom:8px;left:50%;width:136px;height:5px;margin-left:-68px;border-radius:3px;background:var(--ink-1);z-index:12}
+.content{position:absolute;top:54px;left:0;right:0;bottom:0;padding:0 16px 96px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.content>*{flex:none}
+
+/* Tab bar */
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:84px;padding:7px 10px 34px;display:grid;grid-template-columns:repeat(5,1fr);background:var(--tabbar);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border-top:1px solid var(--hairline);z-index:10}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:44px;color:var(--ink-3);text-decoration:none}
+.tab-i{position:relative;width:52px;height:28px;border-radius:14px;display:grid;place-items:center;transition:background .2s}
+.tab-l{font:700 10.5px/12px var(--f-ui);letter-spacing:.01em}
+.tab.on{color:var(--ink-1)}
+.tab.on .tab-i{background:var(--accent);color:var(--accent-ink);box-shadow:0 6px 16px -6px var(--accent-glow)}
+.badge-dot{position:absolute;top:2px;right:12px;width:8px;height:8px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 2px var(--surface-1)}
+
+/* =========================================================
+   Primitives
+   ========================================================= */
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;display:block}
+.ic.sm{width:16px;height:16px}
+.ic.xs{width:12px;height:12px;stroke-width:2.2}
+.ic.lg{width:22px;height:22px}
+.num{font-family:var(--f-num);font-weight:800;font-variant-numeric:tabular-nums lining-nums;letter-spacing:-.005em}
+.eyebrow{font:800 11px/14px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.card{background:var(--surface-1);border-radius:22px;padding:16px;border:1px solid var(--card-border);box-shadow:var(--shadow-1)}
+.row{display:flex;align-items:center}
+.sp{flex:1}
+.h-sec{font:800 15px/20px var(--f-ui);letter-spacing:-.01em}
+.link{font:700 12px var(--f-ui);color:var(--ink-2);display:inline-flex;align-items:center;gap:2px}
+.link .ic{width:14px;height:14px}
+
+.btn{height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:10px;font:800 16px var(--f-ui);letter-spacing:-.005em;width:100%}
+.btn-primary{background:var(--accent);color:var(--accent-ink);box-shadow:0 10px 26px -10px var(--accent-glow), inset 0 -2px 0 rgba(0,0,0,.08)}
+.btn-primary .ic{fill:currentColor;stroke:none}
+.btn-sm{height:40px;border-radius:12px;font-size:14px;padding:0 14px;width:auto}
+.btn-ghost{background:transparent;box-shadow:inset 0 0 0 1.5px var(--hairline-strong);color:var(--ink-1)}
+.btn-tonal{background:var(--surface-3);color:var(--ink-1)}
+.btn-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--surface-2);color:var(--ink-2);position:relative;flex:none}
+.btn-icon.clear{background:transparent}
+.has-dot::after{content:"";position:absolute;top:10px;right:11px;width:8px;height:8px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 2px var(--surface-2)}
+
+.av{--c:var(--m-stelios);width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;
+  font:800 15px/1 var(--f-ui);color:#fff;letter-spacing:-.01em;
+  background:linear-gradient(145deg, color-mix(in oklab, var(--c) 88%, white) 0%, var(--c) 45%, color-mix(in oklab, var(--c) 72%, black) 100%);
+  box-shadow:0 0 0 2px var(--surface-1), 0 0 calc(18px * var(--glow-a)) calc(-2px * var(--glow-a)) color-mix(in srgb, var(--c) 55%, transparent);
+  text-shadow:0 1px 1px rgba(0,0,0,.18)}
+.av-s{--c:var(--m-stelios)} .av-t{--c:var(--m-thanos)} .av-d{--c:var(--m-dennis)}
+.av.sm{width:32px;height:32px;font-size:13px}
+.av.xs{width:24px;height:24px;font-size:10px}
+.av.xl{width:60px;height:60px;font-size:22px}
+
+.chip{height:28px;padding:0 10px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);font:700 12px/1 var(--f-ui);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.chip .ic{width:14px;height:14px}
+.chip.acc{background:var(--accent-soft);color:var(--ink-1)}
+.chip.acc .ic{color:var(--accent-strong)}
+.delta{display:inline-flex;align-items:center;gap:3px;height:22px;padding:0 8px 0 6px;border-radius:999px;font:800 12px/1 var(--f-ui);white-space:nowrap}
+.delta.good{background:var(--good-soft);color:var(--good)}
+.delta.warn{background:var(--warn-soft);color:var(--warn)}
+.pr{display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 7px 0 5px;border-radius:7px;background:var(--accent);color:var(--accent-ink);font:900 11px/1 var(--f-ui);letter-spacing:.04em;box-shadow:0 4px 12px -4px var(--accent-glow)}
+.pr .ic{width:12px;height:12px;stroke-width:2.2}
+
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px;background:var(--surface-2);border-radius:14px;padding:4px;height:44px}
+.seg>*{border-radius:10px;font:700 13px/1 var(--f-ui);color:var(--ink-3);display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
+.seg>.on{background:var(--seg-on);color:var(--ink-1);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.seg.sm{height:36px;border-radius:12px;padding:3px}
+.seg.sm>*{border-radius:9px;font-size:12px}
+
+/* Charts */
+.chart{display:block;overflow:visible}
+.chart .grid{stroke:var(--grid);stroke-width:1;shape-rendering:crispEdges}
+.chart .grid.strong{stroke:var(--hairline-strong)}
+.chart .grid.base{stroke:var(--hairline-strong)}
+.chart .ax{font:600 10px var(--f-ui);fill:var(--ink-3)}
+.chart .ax.tag{font-weight:800;font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.chart .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chart .end{stroke:var(--surface-1);stroke-width:2}
+.chart .pt{fill:var(--m-stelios);fill-opacity:.38}
+.chart .lab{font:800 13px var(--f-num);fill:var(--ink-1)}
+.chart .lab.dim{fill:var(--ink-2)}
+.chart .lab.sm{font-size:12px}
+.chart .goal{stroke:var(--ink-2);stroke-width:1.25}
+.chart .goal-t{fill:var(--ink-1);font-weight:800}
+.chart .goal-l{font:800 10px var(--f-ui);fill:var(--ink-2);letter-spacing:.02em}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font:700 11px/14px var(--f-ui);color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.legend i.ln{width:14px;height:2px;border-radius:2px}
+.legend i.dt{width:6px;height:6px;opacity:.5}
+
+/* =========================================================
+   A. HOME
+   ========================================================= */
+.hdr{display:flex;align-items:flex-end;justify-content:space-between;padding:6px 0 0}
+.greet{font:800 33px/1 var(--f-num);letter-spacing:-.005em;margin-top:5px}
+.hdr-act{display:flex;align-items:center;gap:10px}
+.note{display:flex;gap:12px;padding:12px 14px;align-items:flex-start;border-radius:18px}
+.note-meta{font:700 12px/16px var(--f-ui);color:var(--ink-3)}
+.note-meta b{color:var(--ink-1);font-weight:800}
+.note-text{font:600 13px/18px var(--f-ui);color:var(--ink-2);margin-top:1px}
+.note .ic{color:var(--ink-3);margin-left:auto;margin-top:6px}
+
+.hero{position:relative;border-radius:26px;padding:16px 16px 16px;overflow:hidden;
+  background:
+    radial-gradient(260px 200px at 100% 0%, color-mix(in srgb, var(--m-stelios) 30%, transparent), transparent 70%),
+    radial-gradient(200px 140px at 0% 100%, rgba(212,255,63,.07), transparent 70%),
+    linear-gradient(160deg, #141A27 0%, #0B0F18 60%);
+  box-shadow:0 22px 44px -18px rgba(5,10,25,.55), inset 0 1px 0 rgba(255,255,255,.07), 0 0 0 1px rgba(160,180,220,.08)}
+.hero::after{content:"W3";position:absolute;right:-8px;bottom:-34px;font:900 190px/1 var(--f-num);color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.06);letter-spacing:-.02em;pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.hero-top{display:flex;align-items:center;justify-content:space-between}
+.pill-live{display:inline-flex;align-items:center;gap:7px;font:800 11px/1 var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.pill-live i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.wdots{display:flex;gap:5px;align-items:center}
+.wdots li{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:800 11px/1 var(--f-ui);color:var(--ink-3);box-shadow:inset 0 0 0 1.5px var(--hairline-strong)}
+.wdots li.done{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+.wdots li.now{color:var(--ink-1);box-shadow:inset 0 0 0 2px var(--accent)}
+.wdots .wd-l{font:700 11px/1 var(--f-ui);color:var(--ink-3);margin-right:4px;width:auto;height:auto;box-shadow:none;border-radius:0}
+.hero-mid{display:flex;align-items:flex-end;justify-content:space-between;margin:12px 0 16px}
+.hero-title{font:900 70px/.8 var(--f-num);letter-spacing:-.01em;text-transform:uppercase}
+.hero-sub{font:700 13px/16px var(--f-ui);color:var(--ink-2);margin-top:8px}
+.hero-meta{display:flex;flex-direction:column;gap:7px;align-items:flex-end;padding-bottom:2px}
+.hero-meta li{display:flex;align-items:center;gap:6px;font:700 13px/1 var(--f-ui);color:var(--ink-1)}
+.hero-meta .ic{width:16px;height:16px;color:var(--ink-3)}
+.hero .btn{height:50px}
+.hero .btn .go{margin-left:auto}
+
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{background:var(--surface-1);border:1px solid var(--card-border);box-shadow:var(--shadow-1);border-radius:18px;padding:12px 12px 11px;position:relative}
+.tile .ic{position:absolute;top:12px;right:11px;width:16px;height:16px;color:var(--ink-3)}
+.tile-v{font:800 40px/.9 var(--f-num);font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:2px}
+.tile-v small{font:800 17px var(--f-num);color:var(--ink-2);margin-left:2px;letter-spacing:0}
+.tile-l{font:700 12px/15px var(--f-ui);color:var(--ink-2);margin-top:6px}
+.tile-s{font:600 11px/14px var(--f-ui);color:var(--ink-3)}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mini{padding:13px 14px 12px;border-radius:20px}
+.mini .row{justify-content:space-between}
+.big-v{font:800 34px/.9 var(--f-num);letter-spacing:-.01em;font-variant-numeric:tabular-nums;margin-top:8px}
+.big-v small{font:800 16px var(--f-num);color:var(--ink-2);margin-left:3px}
+.mini .spark{margin-top:6px}
+.fuel-mini{display:flex;align-items:center;gap:12px;margin-top:10px}
+.ring{position:relative;flex:none}
+.ring svg{display:block;transform:rotate(-90deg)}
+.ring .trk{stroke:var(--surface-3)}
+.ring .val{stroke:var(--accent-strong);stroke-linecap:round}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font:800 18px/1 var(--f-num)}
+.fm-v{font:800 26px/.9 var(--f-num);font-variant-numeric:tabular-nums}
+.fm-s{font:700 11px/14px var(--f-ui);color:var(--ink-3);margin-top:3px}
+.next{font:700 11.5px/14px var(--f-ui);color:var(--ink-2);margin-top:10px;display:flex;align-items:center;gap:6px}
+.next .ic{width:14px;height:14px;color:var(--ink-3)}
+
+.pulse{padding:14px 14px 12px}
+.pulse-item{display:flex;gap:12px;align-items:center;margin-top:12px}
+.pulse-t{font:600 14px/18px var(--f-ui);color:var(--ink-2)}
+.pulse-t b{color:var(--ink-1);font-weight:800}
+.pulse-s{display:flex;align-items:center;gap:8px;margin-top:4px;font:700 12px/1 var(--f-ui);color:var(--ink-3)}
+.pulse-s .pr-l{font:800 15px/1 var(--f-num);color:var(--ink-1);letter-spacing:.01em}
+.reacts{display:flex;gap:6px;margin-top:12px;align-items:center}
+.react{height:34px;padding:0 11px;border-radius:12px;background:var(--surface-2);display:inline-flex;align-items:center;gap:6px;font:800 13px/1 var(--f-ui);color:var(--ink-1)}
+.react.me{box-shadow:inset 0 0 0 1.5px var(--accent-strong);background:var(--accent-soft)}
+.react.add{color:var(--ink-2);margin-left:auto;background:transparent;box-shadow:inset 0 0 0 1.5px var(--hairline-strong)}
+.react.add .ic{width:16px;height:16px}
+
+/* =========================================================
+   B. TRAIN
+   ========================================================= */
+.appbar{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding-top:4px}
+.appbar h2{font:900 32px/.95 var(--f-num);letter-spacing:.005em;text-transform:uppercase}
+.appbar .eyebrow{margin-bottom:4px}
+.live{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 11px;border-radius:999px;background:var(--surface-2);font:800 15px/1 var(--f-num);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--accent-strong);box-shadow:0 0 8px var(--accent-glow)}
+
+.weeks-wrap{margin:0 -16px;padding:0 16px;position:relative}
+.blocks{display:flex;gap:6px;margin-bottom:6px}
+.blocks span{font:800 9.5px/12px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.blocks span::after{content:"";flex:1;height:1px;background:var(--hairline-strong)}
+.blocks .b1{width:calc(5 * 44px + 4 * 6px)}
+.blocks .b2{flex:1}
+.weeks{display:flex;gap:6px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,#000 80%,transparent);mask-image:linear-gradient(90deg,#000 80%,transparent)}
+.wk{flex:none;width:44px;height:52px;border-radius:14px;background:var(--surface-1);border:1px solid var(--card-border);box-shadow:var(--shadow-1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.wk b{font:800 21px/1 var(--f-num);font-variant-numeric:tabular-nums;color:var(--ink-3)}
+.wk .bar{width:22px;height:3px;border-radius:2px;background:var(--surface-3);overflow:hidden}
+.wk .bar i{display:block;height:100%;background:var(--accent-strong);border-radius:2px}
+.wk.done b{color:var(--ink-1)}
+.wk.cur{background:var(--accent);border-color:transparent;box-shadow:0 8px 20px -8px var(--accent-glow)}
+.wk.cur b{color:var(--accent-ink)}
+.wk.cur .bar{background:rgba(10,14,2,.18)}
+.wk.cur .bar i{background:var(--accent-ink)}
+
+.days>*{flex-direction:column;gap:3px}
+.days small{font:700 9.5px/1 var(--f-ui);letter-spacing:.06em;color:var(--ink-3);display:flex;align-items:center;gap:2px;text-transform:uppercase}
+.days small .ic{width:11px;height:11px;stroke-width:2.6;color:var(--accent-strong)}
+.days>.on small{color:var(--ink-2)}
+.seg.days{height:50px}
+
+.ex{padding:14px 14px 4px;border-radius:24px}
+.ex-h{display:flex;gap:10px;align-items:flex-start}
+.ex-n{font:800 11px/1 var(--f-ui);color:var(--ink-3);letter-spacing:.08em}
+.ex-name{font:800 18px/22px var(--f-ui);letter-spacing:-.015em;margin-top:3px}
+.ex-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.spec{display:grid;grid-template-columns:.8fr 1fr 1.45fr 1fr;margin-top:12px;background:var(--surface-2);border-radius:14px;padding:9px 0}
+.spec>div{padding:0 10px;border-left:1px solid var(--hairline-strong)}
+.spec>div:first-child{border-left:0}
+.spec small{display:block;font:800 9.5px/12px var(--f-ui);letter-spacing:.1em;color:var(--ink-3)}
+.spec b{display:block;font:800 21px/1 var(--f-num);font-variant-numeric:tabular-nums;margin-top:3px;white-space:nowrap}
+.spec b em{font-style:normal;color:var(--ink-3);font-weight:700}
+.last{display:flex;align-items:center;gap:8px;margin-top:10px;font:700 12px/16px var(--f-ui);color:var(--ink-3)}
+.last .ic{width:15px;height:15px}
+.last b{font:800 16px/1 var(--f-num);color:var(--ink-2);letter-spacing:.01em}
+.last .chip{margin-left:auto;height:26px}
+.sets{margin-top:10px}
+.sets-h{display:grid;grid-template-columns:44px 1fr 1fr 52px;gap:8px;padding:0 0 6px;font:800 9.5px/12px var(--f-ui);letter-spacing:.12em;color:var(--ink-3)}
+.sets-h span:nth-child(2),.sets-h span:nth-child(3){padding-left:2px;text-align:center}
+.set{display:grid;grid-template-columns:44px 1fr 1fr 52px;gap:8px;align-items:center;padding:6px 0}
+.set-n{display:flex;flex-direction:column;align-items:center;gap:4px}
+.set-n b{font:800 24px/1 var(--f-num)}
+.set-n .tq{font:800 8.5px/1 var(--f-ui);letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase}
+.fld{height:56px;border-radius:14px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;position:relative;box-shadow:inset 0 0 0 1px var(--hairline-strong)}
+.fld input{width:100%;height:100%;text-align:center;font:800 28px/1 var(--f-num);font-variant-numeric:tabular-nums;color:var(--ink-1);letter-spacing:.01em}
+.fld input::placeholder{color:var(--ink-ph)}
+.fld.focus{box-shadow:inset 0 0 0 2px var(--accent-strong), 0 0 0 4px var(--accent-soft);background:var(--surface-1)}
+.fld.focus::after{content:"";position:absolute;left:calc(50% + 9px);top:15px;width:2px;height:26px;border-radius:1px;background:var(--accent-strong);animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.set.done .fld{background:transparent;box-shadow:none}
+.set.done{background:var(--accent-soft);border-radius:16px;margin:0 -8px;padding:6px 8px}
+.chk{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;box-shadow:inset 0 0 0 1.5px var(--hairline-strong);color:var(--ink-3)}
+.chk .ic{width:22px;height:22px;stroke-width:2.4}
+.set.done .chk{background:var(--accent);color:var(--accent-ink);box-shadow:0 6px 16px -6px var(--accent-glow)}
+.xpand{display:flex;align-items:center;gap:10px;height:48px;margin-top:6px;border-top:1px solid var(--hairline);font:700 13px var(--f-ui);color:var(--ink-1);cursor:pointer;list-style:none}
+.xpand::-webkit-details-marker{display:none}
+.xpand .ic{color:var(--ink-3)}
+.xpand span{color:var(--ink-3);font-weight:600;margin-left:auto;font-size:12px}
+details[open] .xpand .chev{transform:rotate(180deg)}
+.xp-body{padding:4px 0 12px;display:grid;gap:10px;font:600 13px/18px var(--f-ui);color:var(--ink-2)}
+.xp-body b{color:var(--ink-1)}
+.ex2{display:flex;align-items:center;gap:12px;padding:14px;border-radius:20px}
+.ex2 .t{font:800 15px/19px var(--f-ui);letter-spacing:-.01em}
+.ex2 .s{font:600 12px/16px var(--f-ui);color:var(--ink-3);margin-top:2px}
+
+.rest{position:absolute;left:10px;right:10px;bottom:92px;z-index:11;border-radius:24px;padding:14px 12px 12px 18px;overflow:hidden;
+  background:linear-gradient(180deg,#171D2B,#0E121C);
+  box-shadow:0 24px 50px -12px rgba(0,0,0,.7), 0 0 0 1px rgba(160,180,220,.12), inset 0 1px 0 rgba(255,255,255,.07);
+  display:flex;align-items:center;gap:10px}
+.rest-bar{position:absolute;left:0;right:0;top:0;height:3px;background:rgba(255,255,255,.07)}
+.rest-bar i{display:block;height:100%;width:71%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.rest-t{font:900 46px/.85 var(--f-num);font-variant-numeric:tabular-nums;letter-spacing:.005em}
+.rest-l{font:800 10px/12px var(--f-ui);letter-spacing:.12em;color:var(--accent-strong);text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.rest-s{font:700 11.5px/14px var(--f-ui);color:var(--ink-3);margin-top:5px;white-space:nowrap}
+.rest-btns{margin-left:auto;display:flex;gap:6px}
+.rb{height:48px;min-width:48px;padding:0 10px;border-radius:14px;background:var(--surface-3);font:800 17px/1 var(--f-num);letter-spacing:.02em;display:grid;place-items:center;color:var(--ink-1)}
+.rb.x{background:transparent;box-shadow:inset 0 0 0 1.5px var(--hairline-strong);color:var(--ink-2);min-width:44px;width:44px}
+
+/* =========================================================
+   C. SQUAD / H2H
+   ========================================================= */
+.stack{display:flex}
+.stack .av{margin-left:-8px}
+.vs{position:relative;overflow:hidden;padding:16px 16px 10px;border-radius:26px}
+.vs::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(160px 130px at 0% 12%, color-mix(in srgb, var(--m-stelios) calc(22% * var(--glow-a)), transparent), transparent 70%),
+             radial-gradient(160px 130px at 100% 12%, color-mix(in srgb, var(--m-thanos) calc(18% * var(--glow-a)), transparent), transparent 70%)}
+.vs>*{position:relative}
+.vs-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+.who{display:flex;flex-direction:column;align-items:center;gap:6px}
+.who b{font:800 14px/1 var(--f-ui)}
+.who span{font:700 11px/1 var(--f-ui);color:var(--ink-3)}
+.score{text-align:center}
+.score-v{font:900 58px/.85 var(--f-num);letter-spacing:.01em;font-variant-numeric:tabular-nums}
+.score-v em{font-style:normal;color:var(--ink-3);font-weight:700;margin:0 1px}
+.score-l{font:800 11px/14px var(--f-ui);color:var(--ink-2);margin-top:6px;letter-spacing:.02em}
+.wins{display:flex;gap:2px;justify-content:center;margin-top:8px}
+.wins i{width:12px;height:5px;border-radius:2px;background:var(--c)}
+.period{display:flex;justify-content:center;margin-bottom:12px}
+.tape{margin-top:14px;border-top:1px solid var(--hairline)}
+.tr{display:grid;grid-template-columns:70px 1fr 70px;align-items:center;padding:8px 0 7px;border-bottom:1px solid var(--hairline)}
+.tr:last-child{border-bottom:0}
+.tr .v{font:800 19px/1 var(--f-num);font-variant-numeric:tabular-nums;color:var(--ink-3);letter-spacing:.01em}
+.tr .v.r{text-align:right}
+.tr .v.lead{color:var(--ink-1)}
+.tr .v.lead::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ink-1);margin:0 0 3px 6px;vertical-align:middle}
+.tr .v.r.lead::after{display:none}
+.tr .v.r.lead::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ink-1);margin:0 6px 3px 0;vertical-align:middle}
+.tr .l{text-align:center;font:700 12px/14px var(--f-ui);color:var(--ink-2)}
+.tb{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px}
+.tb>div{height:6px;display:flex}
+.tb>div:first-child{justify-content:flex-end}
+.tb i{display:block;height:6px;background:var(--c);opacity:.3}
+.tb>div:first-child i{border-radius:4px 0 0 4px}
+.tb>div:last-child i{border-radius:0 4px 4px 0}
+.tb i.lead{opacity:1}
+.charts2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cc{padding:12px 13px 11px;border-radius:20px}
+.cc-t{font:800 13px/16px var(--f-ui);letter-spacing:-.005em}
+.cc-s{font:600 11px/14px var(--f-ui);color:var(--ink-3);margin-bottom:8px}
+.cc .legend{margin-top:8px;gap:10px;font-size:10.5px}
+
+/* =========================================================
+   D. BODY
+   ========================================================= */
+.bw{display:flex;align-items:flex-end;justify-content:space-between;margin-top:2px}
+.bw-v{font:900 108px/.78 var(--f-num);letter-spacing:-.015em;font-variant-numeric:tabular-nums}
+.bw-v small{font:800 26px var(--f-num);color:var(--ink-2);letter-spacing:0;margin-left:4px}
+.bw-side{display:flex;flex-direction:column;gap:10px;align-items:flex-end;padding-bottom:2px}
+.bw-side .k{font:700 11px/14px var(--f-ui);color:var(--ink-3);text-align:right;margin-top:3px}
+.bw-rate{font:800 22px/1 var(--f-num);text-align:right}
+.bw-rate small{font-size:14px;color:var(--ink-2);margin-left:2px}
+.goal{padding:14px 16px 13px;border-radius:20px}
+.gbar{position:relative;height:8px;border-radius:4px;background:var(--surface-3);margin:22px 0 8px}
+.gbar i{position:absolute;left:0;top:0;bottom:0;width:34%;border-radius:4px;background:var(--m-stelios)}
+.gbar b{position:absolute;left:34%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--m-stelios);box-shadow:0 0 0 3px var(--surface-1)}
+.gbar em{position:absolute;left:34%;bottom:14px;transform:translateX(-50%);font:800 14px/1 var(--f-num);font-style:normal;white-space:nowrap}
+.gends{display:flex;justify-content:space-between;font:700 11px/14px var(--f-ui);color:var(--ink-3)}
+.gends b{font:800 14px var(--f-num);color:var(--ink-2)}
+.wc{padding:14px 16px 12px;border-radius:22px}
+.wc .chart{margin:10px 0 6px -2px}
+.dock{position:absolute;left:10px;right:10px;bottom:92px;z-index:11;border-radius:24px;padding:10px 10px 10px 16px;display:flex;align-items:center;gap:10px;
+  background:var(--surface-1);box-shadow:var(--shadow-2);border:1px solid var(--card-border)}
+.dock .k{font:800 13px/16px var(--f-ui)}
+.dock .k span{display:block;font:600 11px/14px var(--f-ui);color:var(--ink-3)}
+.step{display:flex;align-items:center;gap:2px;margin-left:auto;background:var(--surface-2);border-radius:14px;padding:3px}
+.step button{width:44px;height:44px;border-radius:11px;display:grid;place-items:center;color:var(--ink-1)}
+.step button:active{background:var(--surface-3)}
+.step output{min-width:62px;text-align:center;font:900 28px/1 var(--f-num);font-variant-numeric:tabular-nums}
+.step output small{font:800 12px var(--f-num);color:var(--ink-3);margin-left:1px}
+.save{width:52px;height:50px;border-radius:14px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 8px 20px -8px var(--accent-glow)}
+.save .ic{stroke-width:2.4}
+.hist li{display:grid;grid-template-columns:1fr auto 64px;align-items:center;height:46px;border-bottom:1px solid var(--hairline)}
+.h-d{font:600 13px var(--f-ui);color:var(--ink-2)}
+.h-d b{color:var(--ink-1);font-weight:800;margin-right:4px}
+.h-v{font:800 20px/1 var(--f-num);font-variant-numeric:tabular-nums}
+.h-v small{font-size:12px;color:var(--ink-3);margin-left:2px}
+.h-x{justify-self:end;display:inline-flex;align-items:center;gap:2px;font:800 13px/1 var(--f-num);color:var(--ink-2)}
+.h-x.dn .ic{color:var(--good)}
+.h-x.up .ic{color:var(--warn)}
+
+/* =========================================================
+   E. FUEL
+   ========================================================= */
+.plan{padding:14px;border-radius:22px}
+.plan-h{display:flex;gap:12px;align-items:center}
+.plan-t{font:800 17px/21px var(--f-ui);letter-spacing:-.015em}
+.plan-s{font:600 12px/16px var(--f-ui);color:var(--ink-3)}
+.status{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:999px;background:var(--good-soft);color:var(--good);font:800 11px/1 var(--f-ui);letter-spacing:.04em;margin-left:auto;align-self:flex-start}
+.status .ic{width:12px;height:12px;stroke-width:2.6}
+.pdf{display:flex;align-items:center;gap:12px;margin-top:12px;padding:8px 8px 8px 10px;border-radius:16px;background:var(--surface-2)}
+.pdf-i{width:40px;height:44px;border-radius:10px;background:var(--surface-1);box-shadow:inset 0 0 0 1px var(--hairline-strong);display:grid;place-items:center;position:relative;flex:none;color:var(--ink-2)}
+.pdf-i em{position:absolute;bottom:5px;font:900 8px/1 var(--f-ui);font-style:normal;letter-spacing:.08em;color:var(--ink-1)}
+.pdf-i .ic{width:18px;height:18px;margin-top:-8px}
+.pdf-n{font:800 13px/17px var(--f-ui)}
+.pdf-s{font:600 11px/14px var(--f-ui);color:var(--ink-3)}
+.pdf .btn-icon{margin-left:auto;background:var(--surface-1);color:var(--ink-1)}
+.tg{display:flex;gap:16px;align-items:center;padding:14px 16px;border-radius:22px}
+.tg .ring b{flex-direction:column;display:flex;align-items:center;justify-content:center;gap:2px}
+.tg .ring b span{font:800 34px/.85 var(--f-num)}
+.tg .ring b small{font:700 10px/12px var(--f-ui);color:var(--ink-3);letter-spacing:.02em}
+.macros{flex:1;display:grid;gap:11px}
+.mc-h{display:flex;justify-content:space-between;align-items:baseline}
+.mc-h span{font:700 12px var(--f-ui);color:var(--ink-2);display:flex;align-items:center;gap:6px}
+.mc-h span b{font:900 11px var(--f-ui);width:18px;height:18px;border-radius:6px;background:var(--surface-2);display:grid;place-items:center;color:var(--ink-1)}
+.mc-h em{font:800 16px/1 var(--f-num);font-style:normal;font-variant-numeric:tabular-nums}
+.mc-h em small{color:var(--ink-3);font-size:13px;font-weight:700}
+.mbar{height:8px;border-radius:4px;background:var(--surface-3);margin-top:6px;overflow:hidden}
+.mbar i{display:block;height:100%;border-radius:4px;background:var(--accent-strong)}
+.meals{padding:12px 14px 6px;border-radius:22px}
+.meal{display:flex;align-items:center;gap:10px;height:46px;border-top:1px solid var(--hairline)}
+.meal:first-of-type{border-top:0}
+.tick{width:44px;height:44px;margin:0 -6px 0 -8px;display:grid;place-items:center;flex:none}
+.tick i{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;box-shadow:inset 0 0 0 1.75px var(--hairline-strong)}
+.meal.ok .tick i{background:var(--accent-strong);box-shadow:none;color:var(--surface-1)}
+.night .meal.ok .tick i, .meal.ok .tick i{color:var(--accent-ink)}
+.meal.ok .tick i{background:var(--accent)}
+.meal.ok .tick .ic{width:15px;height:15px;stroke-width:2.8}
+.meal .mn{font:800 13.5px/17px var(--f-ui)}
+.meal .mn span{font-weight:600;color:var(--ink-3);margin-left:4px;font-variant-numeric:tabular-nums}
+.meal .md{font:600 11.5px/15px var(--f-ui);color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px}
+.meal .kc{margin-left:auto;font:800 16px/1 var(--f-num);font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.meal .kc small{font-size:11px;color:var(--ink-3);margin-left:2px;font-weight:700}
+.meal.ok .mn{color:var(--ink-2)}
+.meal.nx{background:var(--accent-soft);margin:0 -8px;padding:0 8px;border-radius:14px;border-top-color:transparent}
+.meal.nx + .meal{border-top-color:transparent}
+.meal.nx .tick i{box-shadow:inset 0 0 0 2px var(--accent-strong)}
+.nx-tag{font:900 9px/1 var(--f-ui);letter-spacing:.1em;color:var(--accent-ink);background:var(--accent);padding:3px 5px;border-radius:5px;margin-left:6px;vertical-align:2px}
+.adh{display:flex;gap:14px;padding:12px 14px;border-radius:22px;align-items:center}
+.adh-v{font:900 44px/.85 var(--f-num)}
+.adh-v small{font-size:22px;color:var(--ink-2)}
+.adh .k{font:700 11px/14px var(--f-ui);color:var(--ink-3);margin-top:5px}
+.heat{display:grid;grid-template-columns:34px repeat(7,1fr);gap:3px 3px;flex:1;align-items:center}
+.heat .hd{font:800 9px/1 var(--f-ui);color:var(--ink-3);text-align:center;padding-bottom:1px}
+.heat .hw{font:700 9.5px/1 var(--f-ui);color:var(--ink-3);white-space:nowrap}
+.heat .c{display:block;height:13px;border-radius:4px}
+.heat .l0{background:var(--surface-3)}
+.heat .l1{background:color-mix(in oklab, var(--heat) 18%, var(--surface-2))}
+.heat .l2{background:color-mix(in oklab, var(--heat) 32%, var(--surface-2))}
+.heat .l3{background:color-mix(in oklab, var(--heat) 52%, var(--surface-2))}
+.heat .l4{background:color-mix(in oklab, var(--heat) 74%, var(--surface-2))}
+.heat .l5{background:var(--heat)}
+.heat .f{box-shadow:inset 0 0 0 1px var(--hairline-strong)}
+.heat .today{box-shadow:0 0 0 1.5px var(--surface-1), 0 0 0 3px var(--ink-1)}
+.hleg{display:flex;align-items:center;gap:3px;margin-top:8px;font:700 9.5px/1 var(--f-ui);color:var(--ink-3)}
+.hleg i{width:10px;height:8px;border-radius:2px}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.2 12 4l8 6.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19z"/></symbol>
+  <symbol id="i-train" viewBox="0 0 24 24"><rect x="5.2" y="6.5" width="3.3" height="11" rx="1.3"/><rect x="15.5" y="6.5" width="3.3" height="11" rx="1.3"/><path d="M2.5 9.5v5M21.5 9.5v5M8.5 12h7"/></symbol>
+  <symbol id="i-body" viewBox="0 0 24 24"><rect x="3.8" y="3.8" width="16.4" height="16.4" rx="4.5"/><path d="M8.2 10.4a5 5 0 0 1 7.6 0"/><path d="M12 10.8l1.6-2.1"/></symbol>
+  <symbol id="i-fuel" viewBox="0 0 24 24"><path d="M6.5 3.5v6.2a2 2 0 0 0 4 0V3.5M8.5 3.5v17"/><path d="M17.5 20.5v-17c-2.2 1.3-3.3 3.8-3.3 7v3.3h3.3"/></symbol>
+  <symbol id="i-squad" viewBox="0 0 24 24"><circle cx="9" cy="8.2" r="3.4"/><path d="M3 19.5c.6-3.4 3-5.4 6-5.4s5.4 2 6 5.4"/><path d="M15.5 5a3.3 3.3 0 0 1 0 6.3M17.4 14.4c2 .6 3.2 2.3 3.6 5.1"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.5-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.3 4.3L19 7.2"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9.5 6.5h10M9.5 12h10M9.5 17.5h10M4.8 6.5h.1M4.8 12h.1M4.8 17.5h.1"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21a6.5 6.5 0 0 0 6.5-6.5c0-4.3-3.2-6.4-4.4-10.5-1.7 1.9-3.1 3.8-3.1 6.4-1.1-.5-1.9-1.6-2.1-3-1.7 1.7-3.4 4.2-3.4 7.1A6.5 6.5 0 0 0 12 21z"/><path d="M12 21c-1.7 0-3-1.3-3-3 0-1.9 1.6-2.8 2.2-4.6 1.5 1 3.8 2.3 3.8 4.6 0 1.7-1.3 3-3 3z"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7.5 4h9v5.5a4.5 4.5 0 0 1-9 0z"/><path d="M7.5 6H4.5a3.2 3.2 0 0 0 3.3 4.3M16.5 6h3a3.2 3.2 0 0 1-3.3 4.3M12 14v3.5M8 20.5h8M9.5 17.5h5"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.8" y="5" width="16.4" height="15.2" rx="3.2"/><path d="M3.8 9.8h16.4M8.3 3v4M15.7 3v4M9 15l2 2 4-4"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.8h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></symbol>
+  <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="M6.5 9.5l5.5 5.5 5.5-5.5"/></symbol>
+  <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5.5 12h13"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.8 6.8l10.4 10.4M17.2 6.8 6.8 17.2"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><rect x="3.2" y="5.2" width="17.6" height="13.6" rx="3.8"/><path d="M10.3 9.3v5.4l4.5-2.7z" fill="currentColor"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M13.8 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8.2z"/><path d="M13.8 3.5v4.7h4.7"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M14 4.5h5.5V10M19.5 4.5 11 13M17.5 14v3.5a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2H10"/></symbol>
+  <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M6.5 13.5 12 19l5.5-5.5"/></symbol>
+  <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24"><path d="M4.6 12a7.4 7.4 0 1 0 2.2-5.2"/><path d="M4.3 4.3v3.6h3.6"/><path d="M12 8v4.2l2.8 1.8"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5.5 13.5H12L11 21l7.5-10.5H12z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><path d="M5.5 12h.1M12 12h.1M18.5 12h.1" stroke-width="3"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 7.5h11.5l-3.2-3.2M17 16.5H5.5l3.2 3.2"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 4.5h14v10.5l-5 5H5z"/><path d="M14 20v-5h5M8.5 9h7M8.5 12.5h4"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.6"/><path d="M12 12h.1" stroke-width="3"/></symbol>
+  <symbol id="i-stack" viewBox="0 0 24 24"><rect x="5.5" y="3.5" width="13" height="4.2" rx="1.4"/><rect x="5.5" y="9.9" width="13" height="4.2" rx="1.4"/><rect x="5.5" y="16.3" width="13" height="4.2" rx="1.4"/><path d="M12 1.5v2M12 7.7v2.2"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.3"/><path d="M12 13.5V9.8M9.5 2.8h5M18.4 6.9l1.4-1.4"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 17h-8.2L6.5 20.3V17H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 5z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.8v2M12 19.2v2M2.8 12h2M19.2 12h2M5.5 5.5l1.4 1.4M17.1 17.1l1.4 1.4M5.5 18.5l1.4-1.4M17.1 6.9l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.2A7.8 7.8 0 0 1 9.8 4.5a7.8 7.8 0 1 0 9.7 9.7z"/></symbol>
+  <symbol id="i-plus-c" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8.5v7M8.5 12h7"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="M4 18.5h16M6.5 18.5V11M12 18.5V6M17.5 18.5v-9"/></symbol>
+</defs>
+</svg>
+
+<header class="page-head">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 30 30"><path d="M6 21.5 12 9l4.2 8.4L19 12l5 9.5" fill="none" stroke="#D4FF3F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div>
+      <p class="dir"><i></i>Direction · Night Session</p>
+      <h1>Eimaste Cool Training <em>· Είμαστε Cool</em></h1>
+      <p>Dark-first, premium athletic. Near-black blue-tinted surfaces, one volt accent for action, huge condensed numerals, and member colors reserved for identity.</p>
+    </div>
+  </div>
+  <div class="head-r">
+    <div class="key" aria-label="Color key">
+      <span><i style="background:var(--m-stelios)"></i>Stelios</span>
+      <span><i style="background:var(--m-thanos)"></i>Thanos</span>
+      <span><i style="background:var(--m-dennis)"></i>Dennis (coach)</span>
+      <span><i class="acc"></i>Volt accent</span>
+    </div>
+    <div class="theme-switch" role="group" aria-label="Theme">
+      <button type="button" data-set-theme="light" aria-pressed="false"><svg class="ic"><use href="#i-sun"/></svg>Light</button>
+      <button type="button" data-set-theme="dark" aria-pressed="false"><svg class="ic"><use href="#i-moon"/></svg>Dark</button>
+    </div>
+  </div>
+</header>
+
+<main class="frames">
+
+<!-- ======================= A. HOME ======================= -->
+<section class="shot">
+  <header class="cap"><span class="cap-k">A</span><b>Home</b><span>Stelios · Thursday, week 3</span></header>
+  <div class="phone">
+    <div class="sb" aria-hidden="true"><span class="sb-t">9:41</span><span class="sb-r"><svg class="sbi" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg class="sbi" viewBox="0 0 17 12"><path d="M8.5 2.2c2.4 0 4.6.9 6.3 2.5l1.3-1.4A10.9 10.9 0 0 0 8.5.3 10.9 10.9 0 0 0 .9 3.3l1.3 1.4a9 9 0 0 1 6.3-2.5Zm0 3.8c1.4 0 2.7.5 3.7 1.4l1.3-1.4a7.4 7.4 0 0 0-10 0l1.3 1.4c1-.9 2.3-1.4 3.7-1.4Zm0 3.7c-.5 0-1 .2-1.3.5l1.3 1.5 1.3-1.5c-.3-.3-.8-.5-1.3-.5Z"/></svg><svg class="sbi bat" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="16" height="8" rx="2"/><path d="M25 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2Z" opacity=".45"/></svg></span></div><div class="island" aria-hidden="true"></div>
+    <div class="content">
+      <div class="hdr">
+        <div>
+          <p class="eyebrow">Thu 24 Sep · Week 3 of 12</p>
+          <h1 class="greet" lang="el">Καλησπέρα, Στέλιο</h1>
+        </div>
+        <div class="hdr-act">
+          <button class="btn-icon has-dot" aria-label="Notifications"><svg class="ic"><use href="#i-bell"/></svg></button>
+          <div class="av av-s" aria-label="Stelios">S</div>
+        </div>
+      </div>
+
+      <article class="card note">
+        <div class="av av-d sm" aria-hidden="true">D</div>
+        <div>
+          <p class="note-meta"><b>Coach Dennis</b> · 08:12</p>
+          <p class="note-text">Slow 3-sec negatives on the pulldowns. Beat last week’s rows and souvlaki is on me.</p>
+        </div>
+        <svg class="ic sm"><use href="#i-chev-r"/></svg>
+      </article>
+
+      <article class="hero night">
+        <div class="hero-top">
+          <span class="pill-live"><i></i>Today · Week 3</span>
+          <ol class="wdots" aria-label="This week: 2 of 5 done">
+            <li class="wd-l">2/5</li>
+            <li class="done" title="Upper · done">U</li><li class="done" title="Lower · done">L</li><li class="now" title="Pull · today">P</li><li title="Push">P</li><li title="Legs">L</li>
+          </ol>
+        </div>
+        <div class="hero-mid">
+          <div>
+            <h2 class="hero-title">Pull</h2>
+            <p class="hero-sub">Hypertrophy · Foundation block</p>
+          </div>
+          <ul class="hero-meta">
+            <li><svg class="ic"><use href="#i-list"/></svg>7 exercises</li>
+            <li><svg class="ic"><use href="#i-clock"/></svg>~65 min</li>
+          </ul>
+        </div>
+        <button class="btn btn-primary"><svg class="ic"><use href="#i-play"/></svg>Start workout</button>
+      </article>
+
+      <div class="tiles">
+        <div class="tile"><svg class="ic"><use href="#i-flame"/></svg><p class="tile-v num">3<small>wk</small></p><p class="tile-l">Week streak</p></div>
+        <div class="tile"><svg class="ic"><use href="#i-cal"/></svg><p class="tile-v num">92<small>%</small></p><p class="tile-l">On schedule</p></div>
+        <div class="tile"><svg class="ic"><use href="#i-trophy"/></svg><p class="tile-v num">4</p><p class="tile-l">PRs in Sept</p></div>
+      </div>
+
+      <div class="two">
+        <article class="card mini">
+          <div class="row"><p class="eyebrow">Weight</p><span class="delta good"><svg class="ic xs"><use href="#i-arrow-down"/></svg>1.5 kg</span></div>
+          <p class="big-v">80.9<small>kg</small></p>
+          <svg class="chart spark" viewBox="0 0 144 40" width="144" height="40" role="img" aria-label="Weight trend, 30 days, 82.6 to 80.9 kg"><defs><linearGradient id="sgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--m-stelios)" stop-opacity=".2"/><stop offset="1" stop-color="var(--m-stelios)" stop-opacity="0"/></linearGradient></defs><path d="M2,4.62C3.62,4.72 5.24,4.82 6.86,4.92C8.48,5.02 10.1,5.12 11.71,5.22C13.33,5.32 14.95,5.42 16.57,5.52C18.19,5.62 19.81,5.71 21.43,5.81C23.05,5.91 24.67,6.01 26.29,6.11C27.9,6.21 29.52,6.31 31.14,6.41C32.76,6.51 34.38,6.61 36,6.71C37.62,6.8 39.24,6.9 40.86,7C42.48,7.1 44.1,7.2 45.71,7.3C47.33,7.4 48.95,7.5 50.57,7.6C52.19,7.7 53.81,7.82 55.43,7.89C57.05,7.97 58.67,7.9 60.29,8.19C61.9,8.48 63.52,9.5 65.14,10.1C66.76,10.7 68.38,11.24 70,11.79C71.62,12.35 73.24,12.89 74.86,13.42C76.48,13.96 78.1,14.48 79.71,15C81.33,15.53 82.95,16.04 84.57,16.55C86.19,17.07 87.81,17.58 89.43,18.08C91.05,18.59 92.67,19.09 94.29,19.59C95.9,20.09 97.52,20.58 99.14,21.08C100.76,21.57 102.38,22.06 104,22.55C105.62,23.04 107.24,23.52 108.86,24.01C110.48,24.49 112.1,24.98 113.71,25.46C115.33,25.94 116.95,26.42 118.57,26.9C120.19,27.38 121.81,27.85 123.43,28.33C125.05,28.8 126.67,29.27 128.29,29.75C129.9,30.22 131.52,30.69 133.14,31.16C134.76,31.63 136.38,32.1 138,32.56L138,40L2,40Z" fill="url(#sgrad)"/><path class="ln" d="M2,4.62C3.62,4.72 5.24,4.82 6.86,4.92C8.48,5.02 10.1,5.12 11.71,5.22C13.33,5.32 14.95,5.42 16.57,5.52C18.19,5.62 19.81,5.71 21.43,5.81C23.05,5.91 24.67,6.01 26.29,6.11C27.9,6.21 29.52,6.31 31.14,6.41C32.76,6.51 34.38,6.61 36,6.71C37.62,6.8 39.24,6.9 40.86,7C42.48,7.1 44.1,7.2 45.71,7.3C47.33,7.4 48.95,7.5 50.57,7.6C52.19,7.7 53.81,7.82 55.43,7.89C57.05,7.97 58.67,7.9 60.29,8.19C61.9,8.48 63.52,9.5 65.14,10.1C66.76,10.7 68.38,11.24 70,11.79C71.62,12.35 73.24,12.89 74.86,13.42C76.48,13.96 78.1,14.48 79.71,15C81.33,15.53 82.95,16.04 84.57,16.55C86.19,17.07 87.81,17.58 89.43,18.08C91.05,18.59 92.67,19.09 94.29,19.59C95.9,20.09 97.52,20.58 99.14,21.08C100.76,21.57 102.38,22.06 104,22.55C105.62,23.04 107.24,23.52 108.86,24.01C110.48,24.49 112.1,24.98 113.71,25.46C115.33,25.94 116.95,26.42 118.57,26.9C120.19,27.38 121.81,27.85 123.43,28.33C125.05,28.8 126.67,29.27 128.29,29.75C129.9,30.22 131.52,30.69 133.14,31.16C134.76,31.63 136.38,32.1 138,32.56" style="stroke:var(--m-stelios)"/><circle class="end" cx="138" cy="32.56" r="4" style="fill:var(--m-stelios)"/></svg>
+        </article>
+        <article class="card mini">
+          <div class="row"><p class="eyebrow">Fuel today</p><svg class="ic sm" style="color:var(--ink-3)"><use href="#i-chev-r"/></svg></div>
+          <div class="fuel-mini">
+            <div class="ring" aria-label="3 of 5 meals">
+              <svg width="54" height="54" viewBox="0 0 54 54"><circle class="trk" cx="27" cy="27" r="23" fill="none" stroke-width="6"/><circle class="val" cx="27" cy="27" r="23" fill="none" stroke-width="6" stroke-dasharray="86.7 144.5"/></svg>
+              <b>3/5</b>
+            </div>
+            <div><p class="fm-v">1,510</p><p class="fm-s">of 2,400 kcal</p></div>
+          </div>
+          <p class="next"><svg class="ic"><use href="#i-clock"/></svg>Pre-workout · 17:30</p>
+        </article>
+      </div>
+
+      <article class="card pulse">
+        <div class="row"><p class="h-sec">Squad pulse</p><span class="sp"></span><span class="link">You lead Thanos 5–2<svg class="ic"><use href="#i-chev-r"/></svg></span></div>
+        <div class="pulse-item">
+          <div class="av av-t" aria-hidden="true">T</div>
+          <div>
+            <p class="pulse-t"><b>Thanos</b> finished <b>Push</b> · 2h</p>
+            <p class="pulse-s"><span class="pr"><svg class="ic"><use href="#i-trophy"/></svg>PR</span>Bench press <span class="pr-l">80 kg × 8</span></p>
+          </div>
+        </div>
+        <div class="reacts">
+          <span class="react me">🔥 2</span><span class="react">💪 1</span><span class="react">👏 1</span>
+          <button class="react add"><svg class="ic"><use href="#i-plus-c"/></svg>Kudos</button>
+        </div>
+      </article>
+    </div>
+    <nav class="tabbar" aria-label="Main"><a class="tab on" aria-current="page"><span class="tab-i"><svg class="ic"><use href="#i-home"/></svg></span><span class="tab-l">Home</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-train"/></svg></span><span class="tab-l">Train</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-body"/></svg></span><span class="tab-l">Body</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-fuel"/></svg></span><span class="tab-l">Fuel</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-squad"/></svg><b class="badge-dot"></b></span><span class="tab-l">Squad</span></a></nav><div class="homebar" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- ======================= B. TRAIN ======================= -->
+<section class="shot">
+  <header class="cap"><span class="cap-k">B</span><b>Train</b><span>Live workout logger · rest running</span></header>
+  <div class="phone">
+    <div class="sb" aria-hidden="true"><span class="sb-t">9:41</span><span class="sb-r"><svg class="sbi" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg class="sbi" viewBox="0 0 17 12"><path d="M8.5 2.2c2.4 0 4.6.9 6.3 2.5l1.3-1.4A10.9 10.9 0 0 0 8.5.3 10.9 10.9 0 0 0 .9 3.3l1.3 1.4a9 9 0 0 1 6.3-2.5Zm0 3.8c1.4 0 2.7.5 3.7 1.4l1.3-1.4a7.4 7.4 0 0 0-10 0l1.3 1.4c1-.9 2.3-1.4 3.7-1.4Zm0 3.7c-.5 0-1 .2-1.3.5l1.3 1.5 1.3-1.5c-.3-.3-.8-.5-1.3-.5Z"/></svg><svg class="sbi bat" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="16" height="8" rx="2"/><path d="M25 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2Z" opacity=".45"/></svg></span></div><div class="island" aria-hidden="true"></div>
+    <div class="content">
+      <div class="appbar">
+        <div>
+          <p class="eyebrow">BTS · Week 3 of 12</p>
+          <h2>Pull day</h2>
+        </div>
+        <div class="row" style="gap:8px">
+          <span class="live"><i></i>24:18</span>
+          <button class="btn btn-sm btn-ghost">Finish</button>
+        </div>
+      </div>
+
+      <div class="weeks-wrap">
+        <div class="blocks"><span class="b1">Foundation</span><span class="b2">Ramping</span></div>
+        <div class="weeks" role="tablist" aria-label="Program week">
+          <div class="wk done"><b>1</b><span class="bar"><i style="width:100%"></i></span></div>
+          <div class="wk done"><b>2</b><span class="bar"><i style="width:100%"></i></span></div>
+          <div class="wk cur" aria-selected="true"><b>3</b><span class="bar"><i style="width:40%"></i></span></div>
+          <div class="wk"><b>4</b><span class="bar"></span></div>
+          <div class="wk"><b>5</b><span class="bar"></span></div>
+          <div class="wk"><b>6</b><span class="bar"></span></div>
+          <div class="wk"><b>7</b><span class="bar"></span></div>
+          <div class="wk"><b>8</b><span class="bar"></span></div>
+        </div>
+      </div>
+
+      <div class="seg days" role="tablist" aria-label="Workout day">
+        <span>Upper<small><svg class="ic"><use href="#i-check"/></svg>Str</small></span>
+        <span>Lower<small><svg class="ic"><use href="#i-check"/></svg>Str</small></span>
+        <span class="on">Pull<small>Hyp · now</small></span>
+        <span>Push<small>Hyp</small></span>
+        <span>Legs<small>Hyp</small></span>
+      </div>
+
+      <article class="card ex">
+        <div class="ex-h">
+          <div style="flex:1;min-width:0">
+            <p class="ex-n">EXERCISE 1 OF 7</p>
+            <h3 class="ex-name">Neutral-Grip Lat Pulldown</h3>
+          </div>
+          <button class="btn-icon" aria-label="Demo video"><svg class="ic"><use href="#i-video"/></svg></button>
+        </div>
+        <div class="ex-tags">
+          <span class="chip"><svg class="ic"><use href="#i-stack"/></svg>Hammer Strength</span>
+          <span class="chip"><svg class="ic"><use href="#i-flame"/></svg>Last set: Failure</span>
+        </div>
+        <div class="spec">
+          <div><small>SETS</small><b>2</b></div>
+          <div><small>REPS</small><b>8–10</b></div>
+          <div><small>RPE</small><b>~8–9 <em>/</em> 10</b></div>
+          <div><small>REST</small><b>2–3<em>′</em></b></div>
+        </div>
+        <div class="last"><svg class="ic"><use href="#i-history"/></svg>Week 2 <b>55 × 10 · 55 × 9</b><span class="chip acc"><svg class="ic"><use href="#i-target"/></svg>Aim 57.5 kg</span></div>
+        <div class="sets">
+          <div class="sets-h"><span style="text-align:center">SET</span><span>KG</span><span>REPS</span><span></span></div>
+          <div class="set done">
+            <div class="set-n"><b>1</b><span class="pr"><svg class="ic"><use href="#i-trophy"/></svg>PR</span></div>
+            <div class="fld"><input value="57.5" inputmode="decimal" aria-label="Set 1 weight"></div>
+            <div class="fld"><input value="10" inputmode="numeric" aria-label="Set 1 reps"></div>
+            <button class="chk" aria-label="Set 1 done"><svg class="ic"><use href="#i-check"/></svg></button>
+          </div>
+          <div class="set">
+            <div class="set-n"><b>2</b><span class="tq">Fail</span></div>
+            <div class="fld"><input value="57.5" inputmode="decimal" aria-label="Set 2 weight"></div>
+            <div class="fld focus"><input placeholder="9" inputmode="numeric" aria-label="Set 2 reps"></div>
+            <button class="chk" aria-label="Mark set 2 done"><svg class="ic"><use href="#i-check"/></svg></button>
+          </div>
+        </div>
+        <details>
+          <summary class="xpand"><svg class="ic sm"><use href="#i-note"/></svg>Warm-up, swaps &amp; notes<span>2 swaps · 1 note</span><svg class="ic sm chev"><use href="#i-chev-d"/></svg></summary>
+          <div class="xp-body">
+            <p><b>Warm-up</b> · 1 × 10 @ 50%, 1 × 5 @ 75%</p>
+            <p><b>Swaps</b> · Neutral-Grip Pull-Up · Single-Arm Cable Pulldown</p>
+            <p><b>Coach</b> · Elbows to hips, 1 sec squeeze, 3 sec down.</p>
+          </div>
+        </details>
+      </article>
+
+      <article class="card ex2">
+        <div class="ring" aria-label="0 of 3 sets">
+          <svg width="40" height="40" viewBox="0 0 40 40"><circle class="trk" cx="20" cy="20" r="16" fill="none" stroke-width="4"/></svg>
+          <b style="font-size:15px">0/3</b>
+        </div>
+        <div style="flex:1">
+          <p class="t">Chest-Supported T-Bar Row</p>
+          <p class="s">3 × 8–10 · RPE ~8–9 / 10 · Myo-reps</p>
+        </div>
+        <svg class="ic sm" style="color:var(--ink-3)"><use href="#i-chev-d"/></svg>
+      </article>
+    </div>
+
+    <div class="rest night" role="timer" aria-label="Rest timer 1:47 remaining">
+      <div class="rest-bar"><i></i></div>
+      <div>
+        <p class="rest-l"><svg class="ic xs"><use href="#i-timer"/></svg>Rest</p>
+        <p class="rest-t">1:47</p>
+        <p class="rest-s">Next · set 2 to failure</p>
+      </div>
+      <div class="rest-btns">
+        <button class="rb">−15</button>
+        <button class="rb">+30</button>
+        <button class="rb x" aria-label="Skip rest"><svg class="ic"><use href="#i-x"/></svg></button>
+      </div>
+    </div>
+    <nav class="tabbar" aria-label="Main"><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-home"/></svg></span><span class="tab-l">Home</span></a><a class="tab on" aria-current="page"><span class="tab-i"><svg class="ic"><use href="#i-train"/></svg></span><span class="tab-l">Train</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-body"/></svg></span><span class="tab-l">Body</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-fuel"/></svg></span><span class="tab-l">Fuel</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-squad"/></svg><b class="badge-dot"></b></span><span class="tab-l">Squad</span></a></nav><div class="homebar" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- ======================= C. SQUAD ======================= -->
+<section class="shot">
+  <header class="cap"><span class="cap-k">C</span><b>Squad</b><span>Head-to-head · Stelios vs Thanos</span></header>
+  <div class="phone">
+    <div class="sb" aria-hidden="true"><span class="sb-t">9:41</span><span class="sb-r"><svg class="sbi" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg class="sbi" viewBox="0 0 17 12"><path d="M8.5 2.2c2.4 0 4.6.9 6.3 2.5l1.3-1.4A10.9 10.9 0 0 0 8.5.3 10.9 10.9 0 0 0 .9 3.3l1.3 1.4a9 9 0 0 1 6.3-2.5Zm0 3.8c1.4 0 2.7.5 3.7 1.4l1.3-1.4a7.4 7.4 0 0 0-10 0l1.3 1.4c1-.9 2.3-1.4 3.7-1.4Zm0 3.7c-.5 0-1 .2-1.3.5l1.3 1.5 1.3-1.5c-.3-.3-.8-.5-1.3-.5Z"/></svg><svg class="sbi bat" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="16" height="8" rx="2"/><path d="M25 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2Z" opacity=".45"/></svg></span></div><div class="island" aria-hidden="true"></div>
+    <div class="content">
+      <div class="appbar">
+        <div>
+          <p class="eyebrow">3 members · BTS week 3</p>
+          <h2>Squad</h2>
+        </div>
+        <div class="stack" aria-label="Stelios, Thanos, Dennis">
+          <div class="av av-s sm">S</div><div class="av av-t sm">T</div><div class="av av-d sm">D</div>
+        </div>
+      </div>
+      <div class="seg" role="tablist"><span>Board</span><span class="on">Head-to-head</span><span>Feed</span></div>
+
+      <article class="card vs">
+        <div class="vs-top">
+          <div class="who"><div class="av av-s xl">S</div><b>Stelios</b><span>Cut · 80.9 kg</span></div>
+          <div class="score">
+            <p class="score-v">5<em>–</em>2</p>
+            <p class="score-l">Stelios leads</p>
+            <div class="wins" aria-hidden="true">
+              <i style="--c:var(--m-stelios)"></i><i style="--c:var(--m-stelios)"></i><i style="--c:var(--m-stelios)"></i><i style="--c:var(--m-stelios)"></i><i style="--c:var(--m-stelios)"></i><i style="--c:var(--m-thanos)"></i><i style="--c:var(--m-thanos)"></i>
+            </div>
+          </div>
+          <div class="who"><div class="av av-t xl">T</div><b>Thanos</b><span>Lean bulk · 84.1 kg</span></div>
+        </div>
+        <div class="tape">
+          <div class="tr"><span class="v lead">13</span><span class="l">Workouts done</span><span class="v r">11</span>
+            <div class="tb"><div><i class="lead" style="--c:var(--m-stelios);width:100%"></i></div><div><i style="--c:var(--m-thanos);width:84.6%"></i></div></div></div>
+          <div class="tr"><span class="v lead">92%</span><span class="l">On schedule</span><span class="v r">79%</span>
+            <div class="tb"><div><i class="lead" style="--c:var(--m-stelios);width:100%"></i></div><div><i style="--c:var(--m-thanos);width:85.9%"></i></div></div></div>
+          <div class="tr"><span class="v lead">3</span><span class="l">Week streak</span><span class="v r">1</span>
+            <div class="tb"><div><i class="lead" style="--c:var(--m-stelios);width:100%"></i></div><div><i style="--c:var(--m-thanos);width:33.3%"></i></div></div></div>
+          <div class="tr"><span class="v">18.4t</span><span class="l">Volume this week</span><span class="v r lead">21.1t</span>
+            <div class="tb"><div><i style="--c:var(--m-stelios);width:87.2%"></i></div><div><i class="lead" style="--c:var(--m-thanos);width:100%"></i></div></div></div>
+          <div class="tr"><span class="v lead">9</span><span class="l">PRs set</span><span class="v r">7</span>
+            <div class="tb"><div><i class="lead" style="--c:var(--m-stelios);width:100%"></i></div><div><i style="--c:var(--m-thanos);width:77.8%"></i></div></div></div>
+          <div class="tr"><span class="v lead">+8.2%</span><span class="l">Strength gain</span><span class="v r">+6.9%</span>
+            <div class="tb"><div><i class="lead" style="--c:var(--m-stelios);width:100%"></i></div><div><i style="--c:var(--m-thanos);width:84.1%"></i></div></div></div>
+          <div class="tr"><span class="v">−1.5 kg</span><span class="l">Weight · to goal</span><span class="v r lead">+0.8 kg</span>
+            <div class="tb"><div><i style="--c:var(--m-stelios);width:85%"></i></div><div><i class="lead" style="--c:var(--m-thanos);width:100%"></i></div></div></div>
+        </div>
+      </article>
+
+      <div class="charts2">
+        <article class="card cc">
+          <p class="cc-t">The race</p>
+          <p class="cc-s">Workouts, cumulative</p>
+          <svg class="chart" viewBox="0 0 146 116" width="146" height="116" role="img" aria-label="Cumulative workouts over 3 weeks: Stelios 13, Thanos 11"><line class="grid base" x1="16" x2="130" y1="98" y2="98"/><text class="ax" x="11" y="101.5" text-anchor="end">0</text><line class="grid" x1="16" x2="130" y1="68" y2="68"/><text class="ax" x="11" y="71.5" text-anchor="end">5</text><line class="grid" x1="16" x2="130" y1="38" y2="38"/><text class="ax" x="11" y="41.5" text-anchor="end">10</text><line class="grid" x1="16" x2="130" y1="8" y2="8"/><text class="ax" x="11" y="11.5" text-anchor="end">15</text><line class="grid" x1="58.78" x2="58.78" y1="8" y2="98"/><line class="grid" x1="101.56" x2="101.56" y1="8" y2="98"/><text class="ax" x="37.39" y="112" text-anchor="middle">W1</text><text class="ax" x="80.17" y="112" text-anchor="middle">W2</text><text class="ax" x="113.78" y="112" text-anchor="middle">W3</text><path d="M16,98L22.11,92L28.22,86L34.33,86L40.44,80L46.56,80L52.67,74L58.78,74L64.89,68L71,68L77.11,62L83.22,56L89.33,50L95.44,44L101.56,44L107.67,44L113.78,38L119.89,38L126,32L126,98L16,98Z" style="fill:var(--m-thanos)" fill-opacity=".10"/><path class="ln" d="M16,98L22.11,92L28.22,86L34.33,86L40.44,80L46.56,80L52.67,74L58.78,74L64.89,68L71,68L77.11,62L83.22,56L89.33,50L95.44,44L101.56,44L107.67,44L113.78,38L119.89,38L126,32" style="stroke:var(--m-thanos)"><title>Thanos: 11 workouts</title></path><path d="M16,98L22.11,92L28.22,86L34.33,86L40.44,80L46.56,74L52.67,68L58.78,68L64.89,62L71,56L77.11,56L83.22,50L89.33,44L95.44,38L101.56,32L107.67,26L113.78,20L119.89,20L126,20L126,98L16,98Z" style="fill:var(--m-stelios)" fill-opacity=".10"/><path class="ln" d="M16,98L22.11,92L28.22,86L34.33,86L40.44,80L46.56,74L52.67,68L58.78,68L64.89,62L71,56L77.11,56L83.22,50L89.33,44L95.44,38L101.56,32L107.67,26L113.78,20L119.89,20L126,20" style="stroke:var(--m-stelios)"><title>Stelios: 13 workouts</title></path><circle class="end" cx="126" cy="32" r="4" style="fill:var(--m-thanos)"/><circle class="end" cx="126" cy="20" r="4" style="fill:var(--m-stelios)"/><text class="lab" x="134" y="21">13</text><text class="lab dim" x="134" y="41">11</text></svg>
+          <div class="legend"><span><i style="--c:var(--m-stelios)"></i>Stelios</span><span><i style="--c:var(--m-thanos)"></i>Thanos</span></div>
+        </article>
+        <article class="card cc">
+          <p class="cc-t">Bench press</p>
+          <p class="cc-s">e1RM by week, kg</p>
+          <svg class="chart" viewBox="0 0 146 116" width="146" height="116" role="img" aria-label="Bench press estimated 1RM by week. Stelios 88.0, 90.7, 93.3 kg. Thanos 96.0, 98.7, 101.3 kg"><line class="grid" x1="22" x2="144" y1="60.73" y2="60.73"/><text class="ax" x="17" y="64.22999999999999" text-anchor="end">50</text><line class="grid" x1="22" x2="144" y1="23.45" y2="23.45"/><text class="ax" x="17" y="26.95" text-anchor="end">100</text><path d="M26.33,98V36.4A4 4 0 0 1 30.33,32.4H37.33A4 4 0 0 1 41.33,36.4V98Z" style="fill:var(--m-stelios)"><title>Stelios · W1: 88.0 kg</title></path><path d="M43.33,98V30.44A4 4 0 0 1 47.33,26.44H54.33A4 4 0 0 1 58.33,30.44V98Z" style="fill:var(--m-thanos)"><title>Thanos · W1: 96.0 kg</title></path><text class="ax" x="42.33" y="112" text-anchor="middle">W1</text><path d="M67,98V34.39A4 4 0 0 1 71,30.39H78A4 4 0 0 1 82,34.39V98Z" style="fill:var(--m-stelios)"><title>Stelios · W2: 90.7 kg</title></path><path d="M84,98V28.42A4 4 0 0 1 88,24.42H95A4 4 0 0 1 99,28.42V98Z" style="fill:var(--m-thanos)"><title>Thanos · W2: 98.7 kg</title></path><text class="ax" x="83" y="112" text-anchor="middle">W2</text><path d="M107.67,98V32.45A4 4 0 0 1 111.67,28.45H118.67A4 4 0 0 1 122.67,32.45V98Z" style="fill:var(--m-stelios)"><title>Stelios · W3: 93.3 kg</title></path><path d="M124.67,98V26.49A4 4 0 0 1 128.67,22.49H135.67A4 4 0 0 1 139.67,26.49V98Z" style="fill:var(--m-thanos)"><title>Thanos · W3: 101.3 kg</title></path><text class="ax" x="123.67" y="112" text-anchor="middle">W3</text><text class="lab sm" x="115.17" y="23.45" text-anchor="middle">93</text><text class="lab sm" x="132.17" y="17.49" text-anchor="middle">101</text><line class="grid base" x1="22" x2="144" y1="98" y2="98"/></svg>
+          <div class="legend"><span><i style="--c:var(--m-stelios)"></i>Stelios</span><span><i style="--c:var(--m-thanos)"></i>Thanos</span></div>
+        </article>
+      </div>
+    </div>
+    <nav class="tabbar" aria-label="Main"><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-home"/></svg></span><span class="tab-l">Home</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-train"/></svg></span><span class="tab-l">Train</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-body"/></svg></span><span class="tab-l">Body</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-fuel"/></svg></span><span class="tab-l">Fuel</span></a><a class="tab on" aria-current="page"><span class="tab-i"><svg class="ic"><use href="#i-squad"/></svg></span><span class="tab-l">Squad</span></a></nav><div class="homebar" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- ======================= D. BODY ======================= -->
+<section class="shot">
+  <header class="cap"><span class="cap-k">D</span><b>Body</b><span>Weight trend · quick log</span></header>
+  <div class="phone">
+    <div class="sb" aria-hidden="true"><span class="sb-t">9:41</span><span class="sb-r"><svg class="sbi" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg class="sbi" viewBox="0 0 17 12"><path d="M8.5 2.2c2.4 0 4.6.9 6.3 2.5l1.3-1.4A10.9 10.9 0 0 0 8.5.3 10.9 10.9 0 0 0 .9 3.3l1.3 1.4a9 9 0 0 1 6.3-2.5Zm0 3.8c1.4 0 2.7.5 3.7 1.4l1.3-1.4a7.4 7.4 0 0 0-10 0l1.3 1.4c1-.9 2.3-1.4 3.7-1.4Zm0 3.7c-.5 0-1 .2-1.3.5l1.3 1.5 1.3-1.5c-.3-.3-.8-.5-1.3-.5Z"/></svg><svg class="sbi bat" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="16" height="8" rx="2"/><path d="M25 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2Z" opacity=".45"/></svg></span></div><div class="island" aria-hidden="true"></div>
+    <div class="content">
+      <div class="appbar">
+        <div>
+          <p class="eyebrow">Stelios · Cut phase</p>
+          <h2>Body</h2>
+        </div>
+        <div class="seg sm" style="width:150px" role="tablist" aria-label="Range"><span class="on">1M</span><span>3M</span><span>All</span></div>
+      </div>
+
+      <div>
+        <p class="eyebrow">7-day trend weight</p>
+        <div class="bw">
+          <p class="bw-v">80.9<small>kg</small></p>
+          <div class="bw-side">
+            <div><span class="delta good"><svg class="ic xs"><use href="#i-arrow-down"/></svg>1.5 kg</span><p class="k">since 7 Sep</p></div>
+            <div><p class="bw-rate num">−0.6<small>kg/wk</small></p><p class="k">weekly rate</p></div>
+          </div>
+        </div>
+      </div>
+
+      <article class="card goal">
+        <div class="row"><p class="h-sec">Goal 78.0 kg</p><span class="sp"></span><span class="link" style="color:var(--ink-3)">ETA ≈ 28 Oct</span></div>
+        <div class="gbar" role="progressbar" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100"><i></i><b></b><em>34%</em></div>
+        <div class="gends"><span>Start <b>82.4</b></span><span>2.9 kg to go</span><span>Goal <b>78.0</b></span></div>
+      </article>
+
+      <article class="card wc">
+        <div class="row"><p class="h-sec">Last 30 days</p><span class="sp"></span>
+          <div class="legend"><span><i class="dt" style="--c:var(--m-stelios)"></i>Daily</span><span><i class="ln" style="--c:var(--m-stelios)"></i>Trend</span><span><i class="ln" style="--c:var(--ink-2);height:1.5px"></i>Goal</span></div>
+        </div>
+        <svg class="chart" viewBox="0 0 326 172" width="326" height="172" role="img" aria-label="Weight, last 30 days: daily weigh-ins, 7-day trend from 82.6 to 80.9 kg, goal 78 kg"><defs><linearGradient id="wgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--m-stelios)" stop-opacity=".16"/><stop offset="1" stop-color="var(--m-stelios)" stop-opacity="0"/></linearGradient></defs><line class="grid" x1="26" x2="298" y1="112.48" y2="112.48"/><text class="ax" x="20" y="115.98" text-anchor="end">79</text><line class="grid" x1="26" x2="298" y1="65.59" y2="65.59"/><text class="ax" x="20" y="69.09" text-anchor="end">81</text><line class="grid" x1="26" x2="298" y1="18.69" y2="18.69"/><text class="ax" x="20" y="22.19" text-anchor="end">83</text><line class="grid strong" x1="140" x2="140" y1="12" y2="150"/><text class="ax tag" x="145" y="20">BTS start</text><line class="goal" x1="26" x2="298" y1="135.93" y2="135.93"/><text class="ax goal-t" x="20" y="139.43" text-anchor="end">78</text><text class="ax goal-l" x="298" y="129.93" text-anchor="end">Goal 78.0</text><path d="M26,27.6C29.17,27.74 32.33,27.89 35.5,28.03C38.67,28.17 41.83,28.32 45,28.46C48.17,28.6 51.33,28.74 54.5,28.89C57.67,29.03 60.83,29.17 64,29.32C67.17,29.46 70.33,29.6 73.5,29.75C76.67,29.89 79.83,30.03 83,30.17C86.17,30.32 89.33,30.46 92.5,30.6C95.67,30.75 98.83,30.89 102,31.03C105.17,31.18 108.33,31.32 111.5,31.46C114.67,31.6 117.83,31.75 121,31.89C124.17,32.03 127.33,32.21 130.5,32.32C133.67,32.43 136.83,32.33 140,32.75C143.17,33.16 146.33,34.64 149.5,35.5C152.67,36.37 155.83,37.15 159,37.95C162.17,38.75 165.33,39.53 168.5,40.3C171.67,41.07 174.83,41.83 178,42.58C181.17,43.34 184.33,44.08 187.5,44.82C190.67,45.56 193.83,46.3 197,47.02C200.17,47.75 203.33,48.48 206.5,49.2C209.67,49.92 212.83,50.63 216,51.35C219.17,52.06 222.33,52.77 225.5,53.48C228.67,54.18 231.83,54.88 235,55.58C238.17,56.28 241.33,56.98 244.5,57.68C247.67,58.37 250.83,59.06 254,59.75C257.17,60.44 260.33,61.13 263.5,61.81C266.67,62.5 269.83,63.18 273,63.87C276.17,64.55 279.33,65.23 282.5,65.9C285.67,66.58 288.83,67.26 292,67.93L292,150L26,150Z" fill="url(#wgrad)"/><circle class="pt" cx="26" cy="23.38" r="2.6"><title>Wed 26 Aug: 82.8 kg</title></circle><circle class="pt" cx="35.5" cy="32.76" r="2.6"><title>Thu 27 Aug: 82.4 kg</title></circle><circle class="pt" cx="45" cy="21.03" r="2.6"><title>Fri 28 Aug: 82.9 kg</title></circle><circle class="pt" cx="54.5" cy="30.41" r="2.6"><title>Sat 29 Aug: 82.5 kg</title></circle><circle class="pt" cx="64" cy="25.72" r="2.6"><title>Sun 30 Aug: 82.7 kg</title></circle><circle class="pt" cx="73.5" cy="37.45" r="2.6"><title>Mon 31 Aug: 82.2 kg</title></circle><circle class="pt" cx="83" cy="23.38" r="2.6"><title>Tue 1 Sep: 82.8 kg</title></circle><circle class="pt" cx="92.5" cy="30.41" r="2.6"><title>Wed 2 Sep: 82.5 kg</title></circle><circle class="pt" cx="102" cy="35.1" r="2.6"><title>Thu 3 Sep: 82.3 kg</title></circle><circle class="pt" cx="111.5" cy="23.38" r="2.6"><title>Fri 4 Sep: 82.8 kg</title></circle><circle class="pt" cx="121" cy="35.1" r="2.6"><title>Sat 5 Sep: 82.3 kg</title></circle><circle class="pt" cx="130.5" cy="30.41" r="2.6"><title>Sun 6 Sep: 82.5 kg</title></circle><circle class="pt" cx="140" cy="28.07" r="2.6"><title>Mon 7 Sep: 82.6 kg</title></circle><circle class="pt" cx="149.5" cy="42.14" r="2.6"><title>Tue 8 Sep: 82.0 kg</title></circle><circle class="pt" cx="159" cy="35.1" r="2.6"><title>Wed 9 Sep: 82.3 kg</title></circle><circle class="pt" cx="168.5" cy="32.76" r="2.6"><title>Thu 10 Sep: 82.4 kg</title></circle><circle class="pt" cx="178" cy="46.83" r="2.6"><title>Fri 11 Sep: 81.8 kg</title></circle><circle class="pt" cx="187.5" cy="44.48" r="2.6"><title>Sat 12 Sep: 81.9 kg</title></circle><circle class="pt" cx="197" cy="42.14" r="2.6"><title>Sun 13 Sep: 82.0 kg</title></circle><circle class="pt" cx="206.5" cy="56.21" r="2.6"><title>Mon 14 Sep: 81.4 kg</title></circle><circle class="pt" cx="216" cy="49.17" r="2.6"><title>Tue 15 Sep: 81.7 kg</title></circle><circle class="pt" cx="225.5" cy="51.52" r="2.6"><title>Wed 16 Sep: 81.6 kg</title></circle><circle class="pt" cx="235" cy="60.9" r="2.6"><title>Thu 17 Sep: 81.2 kg</title></circle><circle class="pt" cx="244.5" cy="51.52" r="2.6"><title>Fri 18 Sep: 81.6 kg</title></circle><circle class="pt" cx="254" cy="60.9" r="2.6"><title>Sat 19 Sep: 81.2 kg</title></circle><circle class="pt" cx="263.5" cy="58.55" r="2.6"><title>Sun 20 Sep: 81.3 kg</title></circle><circle class="pt" cx="273" cy="67.93" r="2.6"><title>Mon 21 Sep: 80.9 kg</title></circle><circle class="pt" cx="282.5" cy="65.59" r="2.6"><title>Tue 22 Sep: 81.0 kg</title></circle><circle class="pt" cx="292" cy="65.59" r="2.6"><title>Wed 23 Sep: 81.0 kg</title></circle><path class="ln" d="M26,27.6C29.17,27.74 32.33,27.89 35.5,28.03C38.67,28.17 41.83,28.32 45,28.46C48.17,28.6 51.33,28.74 54.5,28.89C57.67,29.03 60.83,29.17 64,29.32C67.17,29.46 70.33,29.6 73.5,29.75C76.67,29.89 79.83,30.03 83,30.17C86.17,30.32 89.33,30.46 92.5,30.6C95.67,30.75 98.83,30.89 102,31.03C105.17,31.18 108.33,31.32 111.5,31.46C114.67,31.6 117.83,31.75 121,31.89C124.17,32.03 127.33,32.21 130.5,32.32C133.67,32.43 136.83,32.33 140,32.75C143.17,33.16 146.33,34.64 149.5,35.5C152.67,36.37 155.83,37.15 159,37.95C162.17,38.75 165.33,39.53 168.5,40.3C171.67,41.07 174.83,41.83 178,42.58C181.17,43.34 184.33,44.08 187.5,44.82C190.67,45.56 193.83,46.3 197,47.02C200.17,47.75 203.33,48.48 206.5,49.2C209.67,49.92 212.83,50.63 216,51.35C219.17,52.06 222.33,52.77 225.5,53.48C228.67,54.18 231.83,54.88 235,55.58C238.17,56.28 241.33,56.98 244.5,57.68C247.67,58.37 250.83,59.06 254,59.75C257.17,60.44 260.33,61.13 263.5,61.81C266.67,62.5 269.83,63.18 273,63.87C276.17,64.55 279.33,65.23 282.5,65.9C285.67,66.58 288.83,67.26 292,67.93" style="stroke:var(--m-stelios)"/><circle class="end" cx="292" cy="67.93" r="4.5" style="fill:var(--m-stelios)"><title>Trend 80.9 kg</title></circle><text class="lab" x="301" y="71.93">80.9</text><text class="ax" x="26" y="167" text-anchor="start">26 Aug</text><text class="ax" x="92.5" y="167" text-anchor="middle">2 Sep</text><text class="ax" x="159" y="167" text-anchor="middle">9 Sep</text><text class="ax" x="225.5" y="167" text-anchor="middle">16 Sep</text><text class="ax" x="292" y="167" text-anchor="end">23 Sep</text></svg>
+      </article>
+
+      <div>
+        <div class="row" style="margin:4px 0 2px"><p class="h-sec">History</p><span class="sp"></span><span class="link">See all<svg class="ic"><use href="#i-chev-r"/></svg></span></div>
+        <ul class="hist"><li><span class="h-d"><b>Wed</b> 23 Sep</span><span class="h-v">81.0<small>kg</small></span><span class="h-x dn"><svg class="ic xs"><use href="#i-arrow-down"/></svg>0.0</span></li><li><span class="h-d"><b>Tue</b> 22 Sep</span><span class="h-v">81.0<small>kg</small></span><span class="h-x up"><svg class="ic xs"><use href="#i-arrow-up"/></svg>0.1</span></li><li><span class="h-d"><b>Mon</b> 21 Sep</span><span class="h-v">80.9<small>kg</small></span><span class="h-x dn"><svg class="ic xs"><use href="#i-arrow-down"/></svg>0.4</span></li><li><span class="h-d"><b>Sun</b> 20 Sep</span><span class="h-v">81.3<small>kg</small></span><span class="h-x up"><svg class="ic xs"><use href="#i-arrow-up"/></svg>0.1</span></li></ul>
+      </div>
+    </div>
+
+    <div class="dock" aria-label="Log today's weight">
+      <p class="k">Log today<span>Thu 24 Sep · 07:40</span></p>
+      <div class="step">
+        <button aria-label="Minus 0.1 kg"><svg class="ic"><use href="#i-minus"/></svg></button>
+        <output>80.7<small>kg</small></output>
+        <button aria-label="Plus 0.1 kg"><svg class="ic"><use href="#i-plus"/></svg></button>
+      </div>
+      <button class="save" aria-label="Save weight"><svg class="ic"><use href="#i-check"/></svg></button>
+    </div>
+    <nav class="tabbar" aria-label="Main"><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-home"/></svg></span><span class="tab-l">Home</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-train"/></svg></span><span class="tab-l">Train</span></a><a class="tab on" aria-current="page"><span class="tab-i"><svg class="ic"><use href="#i-body"/></svg></span><span class="tab-l">Body</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-fuel"/></svg></span><span class="tab-l">Fuel</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-squad"/></svg><b class="badge-dot"></b></span><span class="tab-l">Squad</span></a></nav><div class="homebar" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- ======================= E. FUEL ======================= -->
+<section class="shot">
+  <header class="cap"><span class="cap-k">E</span><b>Fuel</b><span>Meal plan · today</span></header>
+  <div class="phone">
+    <div class="sb" aria-hidden="true"><span class="sb-t">9:41</span><span class="sb-r"><svg class="sbi" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg class="sbi" viewBox="0 0 17 12"><path d="M8.5 2.2c2.4 0 4.6.9 6.3 2.5l1.3-1.4A10.9 10.9 0 0 0 8.5.3 10.9 10.9 0 0 0 .9 3.3l1.3 1.4a9 9 0 0 1 6.3-2.5Zm0 3.8c1.4 0 2.7.5 3.7 1.4l1.3-1.4a7.4 7.4 0 0 0-10 0l1.3 1.4c1-.9 2.3-1.4 3.7-1.4Zm0 3.7c-.5 0-1 .2-1.3.5l1.3 1.5 1.3-1.5c-.3-.3-.8-.5-1.3-.5Z"/></svg><svg class="sbi bat" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="16" height="8" rx="2"/><path d="M25 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2Z" opacity=".45"/></svg></span></div><div class="island" aria-hidden="true"></div>
+    <div class="content">
+      <div class="appbar">
+        <div>
+          <p class="eyebrow">Thu 24 Sep</p>
+          <h2>Fuel</h2>
+        </div>
+        <button class="btn-icon" aria-label="More"><svg class="ic"><use href="#i-more"/></svg></button>
+      </div>
+
+      <article class="card plan">
+        <div class="plan-h">
+          <div class="av av-d" aria-hidden="true">D</div>
+          <div>
+            <p class="plan-t">Cut phase — v2</p>
+            <p class="plan-s">Coach Dennis · updated 2d ago</p>
+          </div>
+          <span class="status"><svg class="ic"><use href="#i-check"/></svg>ACTIVE</span>
+        </div>
+        <div class="pdf">
+          <div class="pdf-i"><svg class="ic"><use href="#i-file"/></svg><em>PDF</em></div>
+          <div><p class="pdf-n">meal-plan-stelios.pdf</p><p class="pdf-s">6 pages · 1.2 MB</p></div>
+          <button class="btn-icon" aria-label="Open PDF"><svg class="ic"><use href="#i-open"/></svg></button>
+        </div>
+      </article>
+
+      <article class="card tg">
+        <div class="ring" aria-label="1,510 of 2,400 kcal">
+          <svg width="112" height="112" viewBox="0 0 112 112"><circle class="trk" cx="56" cy="56" r="49" fill="none" stroke-width="10"/><circle class="val" cx="56" cy="56" r="49" fill="none" stroke-width="10" stroke-dasharray="193.9 307.9"/></svg>
+          <b><span>890</span><small>kcal left</small><small style="color:var(--ink-2);font-weight:800">1,510 / 2,400</small></b>
+        </div>
+        <div class="macros">
+          <div><div class="mc-h"><span><b>P</b>Protein</span><em>124<small> / 180 g</small></em></div><div class="mbar"><i style="width:68.9%"></i></div></div>
+          <div><div class="mc-h"><span><b>C</b>Carbs</span><em>150<small> / 250 g</small></em></div><div class="mbar"><i style="width:60%"></i></div></div>
+          <div><div class="mc-h"><span><b>F</b>Fat</span><em>46<small> / 70 g</small></em></div><div class="mbar"><i style="width:65.7%"></i></div></div>
+        </div>
+      </article>
+
+      <article class="card meals">
+        <div class="row" style="height:28px"><p class="h-sec">Today’s meals</p><span class="sp"></span><span class="num" style="font-size:18px">3<span style="color:var(--ink-3)">/5</span></span></div>
+        <div class="meal ok"><span class="tick"><i><svg class="ic"><use href="#i-check"/></svg></i></span><div><p class="mn">Breakfast<span>08:00</span></p><p class="md">Oats, whey, berries</p></div><span class="kc">620<small>kcal</small></span></div>
+        <div class="meal ok"><span class="tick"><i><svg class="ic"><use href="#i-check"/></svg></i></span><div><p class="mn">Snack<span>11:00</span></p><p class="md">Greek yogurt, honey, walnuts</p></div><span class="kc">210<small>kcal</small></span></div>
+        <div class="meal ok"><span class="tick"><i><svg class="ic"><use href="#i-check"/></svg></i></span><div><p class="mn">Lunch<span>14:00</span></p><p class="md">Chicken, rice, horiatiki</p></div><span class="kc">680<small>kcal</small></span></div>
+        <div class="meal nx"><span class="tick"><i></i></span><div><p class="mn">Pre-workout<span>17:30</span><em class="nx-tag">NEXT</em></p><p class="md">Banana, rice cakes, honey</p></div><span class="kc">260<small>kcal</small></span></div>
+        <div class="meal"><span class="tick"><i></i></span><div><p class="mn">Dinner<span>20:30</span></p><p class="md">Salmon, potatoes, greens</p></div><span class="kc">630<small>kcal</small></span></div>
+      </article>
+
+      <article class="card adh">
+        <div>
+          <p class="adh-v">85<small>%</small></p>
+          <p class="k">adherence<br>last 4 weeks</p>
+          <div class="hleg"><span>0</span><i style="background:var(--surface-3)"></i><i class="" style="background:color-mix(in oklab, var(--heat) 32%, var(--surface-2))"></i><i style="background:color-mix(in oklab, var(--heat) 74%, var(--surface-2))"></i><i style="background:var(--heat)"></i><span>5</span></div>
+        </div>
+        <div class="heat" role="img" aria-label="Meal adherence, last 4 weeks"><span></span><span class="hd">M</span><span class="hd">T</span><span class="hd">W</span><span class="hd">T</span><span class="hd">F</span><span class="hd">S</span><span class="hd">S</span><span class="hw">31 Aug</span><i class="c l4" title="4/5 meals"></i><i class="c l5" title="5/5 meals"></i><i class="c l3" title="3/5 meals"></i><i class="c l5" title="5/5 meals"></i><i class="c l4" title="4/5 meals"></i><i class="c l2" title="2/5 meals"></i><i class="c l3" title="3/5 meals"></i><span class="hw">7 Sep</span><i class="c l5" title="5/5 meals"></i><i class="c l5" title="5/5 meals"></i><i class="c l4" title="4/5 meals"></i><i class="c l5" title="5/5 meals"></i><i class="c l5" title="5/5 meals"></i><i class="c l3" title="3/5 meals"></i><i class="c l4" title="4/5 meals"></i><span class="hw">14 Sep</span><i class="c l5" title="5/5 meals"></i><i class="c l4" title="4/5 meals"></i><i class="c l5" title="5/5 meals"></i><i class="c l5" title="5/5 meals"></i><i class="c l4" title="4/5 meals"></i><i class="c l4" title="4/5 meals"></i><i class="c l5" title="5/5 meals"></i><span class="hw">21 Sep</span><i class="c l5" title="5/5 meals"></i><i class="c l5" title="5/5 meals"></i><i class="c l4" title="4/5 meals"></i><i class="c l3 today" title="3/5 meals"></i><i class="c f"></i><i class="c f"></i><i class="c f"></i></div>
+      </article>
+    </div>
+    <nav class="tabbar" aria-label="Main"><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-home"/></svg></span><span class="tab-l">Home</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-train"/></svg></span><span class="tab-l">Train</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-body"/></svg></span><span class="tab-l">Body</span></a><a class="tab on" aria-current="page"><span class="tab-i"><svg class="ic"><use href="#i-fuel"/></svg></span><span class="tab-l">Fuel</span></a><a class="tab"><span class="tab-i"><svg class="ic"><use href="#i-squad"/></svg><b class="badge-dot"></b></span><span class="tab-l">Squad</span></a></nav><div class="homebar" aria-hidden="true"></div>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  var r=document.documentElement, btns=document.querySelectorAll('[data-set-theme]'), mq=window.matchMedia('(prefers-color-scheme: dark)');
+  function sync(){var cur=r.getAttribute('data-theme')||(mq.matches?'dark':'light');btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.setTheme===cur));});}
+  btns.forEach(function(b){b.addEventListener('click',function(){r.setAttribute('data-theme',b.dataset.setTheme);sync();});});
+  if(mq.addEventListener) mq.addEventListener('change',sync);
+  sync();
+})();
+</script>
+</body>
+</html>

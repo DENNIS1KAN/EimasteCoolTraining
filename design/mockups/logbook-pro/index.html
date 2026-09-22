@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Logbook Pro Mockups</title>
+<meta name="description" content="Eimaste Cool Training — design direction 'Logbook Pro': five mobile screens (Home, Train, Squad, Body, Fuel) in light and dark.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@1,7..72,400;1,7..72,500&family=Sofia+Sans+Condensed:wght@500;600;700;800&family=Sofia+Sans+Extra+Condensed:wght@700;800;900&family=Sofia+Sans:wght@400;500;600;700;800&display=swap&subset=greek" rel="stylesheet">
+<style>
+/* =========================================================
+   TOKENS — Logbook Pro
+   ========================================================= */
+:root{
+  color-scheme: light;
+  /* type */
+  --f-body: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-cond: "Sofia Sans Condensed", "Sofia Sans", system-ui, sans-serif;
+  --f-disp: "Sofia Sans Extra Condensed", "Sofia Sans Condensed", system-ui, sans-serif;
+  --f-quote: "Literata", Georgia, serif;
+
+  /* surfaces */
+  --page:#D9DCD5; --page-ink:#18202E; --page-ink-2:#5B6373; --page-rule:#C6CBC2;
+  --bezel:#11151B; --bezel-edge:#2B313A;
+  --paper:#EBEDE9;  --paper-2:#E1E4DE;
+  --card:#FFFFFF;   --card-2:#F3F4F1;  --card-3:#E9ECE6;
+  --card-border: rgba(24,32,46,.05);
+
+  /* ink */
+  --ink:#18202E; --ink-2:#465061; --ink-3:#5F6778; --ink-4:#8A919C;
+  --rule:#E5E8E2; --rule-2:#D2D7CF; --grid:#ECEEE9;
+
+  /* brand accent — "Signal Volt" (fills only; never text on paper) */
+  --accent:#D4F53C; --accent-press:#C4E82B; --accent-edge:#B3D421; --on-accent:#141A0C;
+  --accent-wash: rgba(212,245,60,.38);
+
+  /* hero (ink) block */
+  --hero:#18202E; --hero-2:#212A3A; --hero-ink:#F3F5EE; --hero-ink-2:#A7AFBC; --hero-rule:#323C4E;
+
+  /* members (fixed) */
+  --m-s:#2a78d6; --m-t:#eb6834; --m-d:#1baf7a; --on-member:#0F141C;
+
+  /* status (always + icon/label) */
+  --good:#2f7d1e; --warn:#7d6a00; --danger:#c0223f;
+  --good-bg:#E6F0E1; --warn-bg:#F1EDD7; --danger-bg:#F7E2E6;
+
+  /* meters + sequential (Stelios blue) */
+  --meter: var(--ink); --track:#E8EBE5;
+  --q0:#EEF0EC; --q1:#DCE7F6; --q2:#C0D5F1; --q3:#8DB4EA; --q4:#5594E0; --q5:#2a78d6;
+
+  /* elevation */
+  --shadow-1: 0 1px 1px rgba(24,32,46,.03), 0 2px 8px -3px rgba(24,32,46,.10);
+  --shadow-2: 0 2px 4px rgba(24,32,46,.06), 0 18px 36px -16px rgba(24,32,46,.34);
+  --shadow-timer: 0 -1px 0 rgba(24,32,46,.06), 0 18px 40px -12px rgba(24,32,46,.45);
+  --tabbar: rgba(255,255,255,.86);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --page:#050608; --page-ink:#EDEFE8; --page-ink-2:#8D95A2; --page-rule:#1C2129;
+    --bezel:#1B2027; --bezel-edge:#343B46;
+    --paper:#0C0F13;  --paper-2:#161A21;
+    --card:#151A21;   --card-2:#1C222B;  --card-3:#242B35;
+    --card-border: rgba(255,255,255,.045);
+    --ink:#EDEFE8; --ink-2:#B2B8C2; --ink-3:#878E9A; --ink-4:#646C79;
+    --rule:#232932; --rule-2:#2D343F; --grid:#1F252D;
+    --accent:#CDEE3A; --accent-press:#BDE02A; --accent-edge:#CDEE3A; --on-accent:#10140A;
+    --accent-wash: rgba(205,238,58,.16);
+    --hero:#1A202A; --hero-2:#222A36; --hero-ink:#EDEFE8; --hero-ink-2:#9AA2AF; --hero-rule:#2E3643;
+    --m-s:#3987e5; --m-t:#d95926; --m-d:#199e70; --on-member:#0B0F14;
+    --good:#78c850; --warn:#e6b54a; --danger:#ff6b9e;
+    --good-bg:rgba(120,200,80,.13); --warn-bg:rgba(230,181,74,.13); --danger-bg:rgba(255,107,158,.13);
+    --meter: var(--ink); --track:#262D37;
+    --q0:#1B2028; --q1:#1B2D45; --q2:#1F3D63; --q3:#255490; --q4:#2E6DBE; --q5:#3987e5;
+    --shadow-1: none;
+    --shadow-2: 0 18px 40px -18px rgba(0,0,0,.8);
+    --shadow-timer: 0 18px 50px -10px rgba(0,0,0,.85), 0 0 0 1px rgba(205,238,58,.25);
+    --tabbar: rgba(21,26,33,.84);
+  }
+}
+:root[data-theme="dark"]{
+    color-scheme: dark;
+    --page:#050608; --page-ink:#EDEFE8; --page-ink-2:#8D95A2; --page-rule:#1C2129;
+    --bezel:#1B2027; --bezel-edge:#343B46;
+    --paper:#0C0F13;  --paper-2:#161A21;
+    --card:#151A21;   --card-2:#1C222B;  --card-3:#242B35;
+    --card-border: rgba(255,255,255,.045);
+    --ink:#EDEFE8; --ink-2:#B2B8C2; --ink-3:#878E9A; --ink-4:#646C79;
+    --rule:#232932; --rule-2:#2D343F; --grid:#1F252D;
+    --accent:#CDEE3A; --accent-press:#BDE02A; --accent-edge:#CDEE3A; --on-accent:#10140A;
+    --accent-wash: rgba(205,238,58,.16);
+    --hero:#1A202A; --hero-2:#222A36; --hero-ink:#EDEFE8; --hero-ink-2:#9AA2AF; --hero-rule:#2E3643;
+    --m-s:#3987e5; --m-t:#d95926; --m-d:#199e70; --on-member:#0B0F14;
+    --good:#78c850; --warn:#e6b54a; --danger:#ff6b9e;
+    --good-bg:rgba(120,200,80,.13); --warn-bg:rgba(230,181,74,.13); --danger-bg:rgba(255,107,158,.13);
+    --meter: var(--ink); --track:#262D37;
+    --q0:#1B2028; --q1:#1B2D45; --q2:#1F3D63; --q3:#255490; --q4:#2E6DBE; --q5:#3987e5;
+    --shadow-1: none;
+    --shadow-2: 0 18px 40px -18px rgba(0,0,0,.8);
+    --shadow-timer: 0 18px 50px -10px rgba(0,0,0,.85), 0 0 0 1px rgba(205,238,58,.25);
+    --tabbar: rgba(21,26,33,.84);
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--page);color:var(--ink);font-family:var(--f-body);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;min-height:100vh;font-feature-settings:"kern" 1}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none;display:block}
+.i-16{width:16px;height:16px}.i-14{width:14px;height:14px;stroke-width:2}.i-18{width:18px;height:18px}.i-24{width:24px;height:24px}
+.tnum{font-variant-numeric:tabular-nums}
+.muted{color:var(--ink-3)}
+b{font-weight:700}
+
+/* =========================================================
+   PAGE (presentation shell)
+   ========================================================= */
+.page{max-width:2200px;margin:0 auto;padding:30px 53px 72px}
+.page-h{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;padding-bottom:22px;margin-bottom:34px;border-bottom:1px solid var(--page-rule);color:var(--page-ink)}
+.wordmark{display:flex;align-items:baseline;gap:12px;font:900 40px/0.9 var(--f-disp);letter-spacing:.005em;text-transform:uppercase}
+.wordmark em{font-style:normal;font-weight:700;color:var(--page-ink-2);font-size:40px}
+.wm-mark{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent);color:var(--on-accent);transform:translateY(4px)}
+.page-sub{margin-top:10px;font:500 15px/1.4 var(--f-body);color:var(--page-ink-2);max-width:880px}
+.page-sub b{color:var(--page-ink);font-weight:700}
+.switches{display:flex;gap:12px;align-items:center}
+.sw{display:flex;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--page-ink) 7%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--page-ink) 8%,transparent)}
+.sw button{display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font:700 14px/1 var(--f-cond);letter-spacing:.06em;text-transform:uppercase;color:var(--page-ink-2)}
+.sw button[aria-pressed="true"]{background:var(--page-ink);color:var(--page)}
+.sw-l{font:700 11px/1 var(--f-cond);letter-spacing:.12em;text-transform:uppercase;color:var(--page-ink-2);margin-right:2px}
+
+.frames{display:flex;flex-wrap:wrap;justify-content:center;gap:56px 36px}
+.frame{width:390px;flex:none}
+.cap{display:flex;align-items:baseline;gap:10px;margin:0 4px 20px;color:var(--page-ink)}
+.cap-n{font:800 14px/1 var(--f-cond);letter-spacing:.08em;color:var(--page-ink-2)}
+.cap-t{font:800 24px/1 var(--f-disp);letter-spacing:.01em;text-transform:uppercase}
+.cap-d{font:500 13px/1 var(--f-body);color:var(--page-ink-2);margin-left:auto}
+
+/* =========================================================
+   DEVICE
+   ========================================================= */
+.phone{position:relative;width:390px;height:844px;border-radius:54px;overflow:hidden;background:var(--paper);
+  box-shadow:0 0 0 1px var(--bezel-edge),0 0 0 7px var(--bezel),0 0 0 8px var(--bezel-edge),0 50px 90px -40px rgba(0,0,0,.55);isolation:isolate}
+.sb{position:absolute;inset:0 0 auto 0;height:50px;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:4px 30px 0 36px;background:linear-gradient(var(--paper) 72%,color-mix(in srgb,var(--paper) 0%,transparent));color:var(--ink)}
+.sb-time{font:700 16px/1 var(--f-body);letter-spacing:.01em}
+.sb-ic{display:flex;gap:6px;align-items:center}
+.sb-ic svg{display:block;fill:currentColor}
+.island{position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:20px;background:#000}
+.scr{position:absolute;inset:0;overflow:hidden;padding:54px 16px 110px}
+.home-ind{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);z-index:41;opacity:.9}
+
+/* tab bar */
+.tabbar{position:absolute;inset:auto 0 0 0;height:86px;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);padding:0 6px 30px;background:var(--tabbar);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-top:1px solid var(--rule)}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;padding-top:7px;color:var(--ink-3);font:700 11px/1 var(--f-cond);letter-spacing:.03em;min-height:48px}
+.tab .ti{display:grid;place-items:center;width:54px;height:30px;border-radius:15px}
+.tab.on{color:var(--ink)}
+.tab.on .ti{background:var(--ink);color:var(--paper)}
+
+/* =========================================================
+   TYPE
+   ========================================================= */
+.eyebrow{font:700 11px/1.1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.h-screen{font:800 36px/.92 var(--f-disp);letter-spacing:-.002em;color:var(--ink)}
+.h-card{font:800 26px/.95 var(--f-disp);letter-spacing:.005em}
+.num{font-family:var(--f-disp);font-weight:800;letter-spacing:-.005em}
+.num small,.unit{font:700 .42em/1 var(--f-cond);letter-spacing:.04em;color:var(--ink-3);margin-left:3px;text-transform:uppercase}
+
+/* =========================================================
+   LAYOUT HELPERS
+   ========================================================= */
+.stack>*+*{margin-top:12px}
+.row{display:flex;align-items:center}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sp{flex:1}
+
+/* top bar */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:6px 2px 4px}
+.top .eyebrow{margin-bottom:6px}
+.top-act{display:flex;align-items:center;gap:6px}
+.icon-btn{position:relative;display:grid;place-items:center;width:44px;height:44px;border-radius:14px;color:var(--ink)}
+.icon-btn.soft{background:var(--card);box-shadow:var(--shadow-1);border:1px solid var(--card-border)}
+.dot-badge{position:absolute;top:10px;right:11px;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--accent-edge)}
+
+/* card */
+.card{background:var(--card);border-radius:20px;box-shadow:var(--shadow-1);border:1px solid var(--card-border)}
+.pad{padding:16px}
+
+/* section header — editorial rule */
+.sec{display:flex;align-items:center;gap:10px;margin:20px 2px 10px}
+.sec-t{font:800 12px/1 var(--f-cond);letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+.sec-r{flex:1;height:1px;background:var(--rule-2)}
+.sec-a{display:flex;align-items:center;gap:2px;font:600 13px/1 var(--f-body);color:var(--ink-2)}
+
+/* avatar */
+.av{display:inline-grid;place-items:center;flex:none;border-radius:50%;font:800 15px/1 var(--f-cond);letter-spacing:.02em;color:var(--on-member);width:36px;height:36px;position:relative}
+.av-s{background:var(--m-s)}.av-t{background:var(--m-t)}.av-d{background:var(--m-d)}
+.av::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(150deg,rgba(255,255,255,.28),rgba(255,255,255,0) 55%);pointer-events:none}
+.av-24{width:24px;height:24px;font-size:11px}.av-28{width:28px;height:28px;font-size:12px}.av-32{width:32px;height:32px;font-size:14px}.av-40{width:40px;height:40px;font-size:17px}.av-56{width:56px;height:56px;font-size:25px}
+.av-ring{box-shadow:0 0 0 2px var(--card)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 16px;border-radius:14px;font:700 15px/1 var(--f-body);letter-spacing:.005em;white-space:nowrap}
+.btn-lg{height:54px;border-radius:16px;font-size:17px;padding:0 18px}
+.btn-sm{height:36px;padding:0 12px;border-radius:12px;font-size:13px}
+.btn-accent{background:var(--accent);color:var(--on-accent);box-shadow:inset 0 -2px 0 rgba(0,0,0,.08)}
+.btn-ink{background:var(--ink);color:var(--paper)}
+.btn-soft{background:var(--card-2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--rule)}
+.btn-ghost{color:var(--ink-2)}
+
+/* chips / tags */
+.tag{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:8px;font:700 11.5px/1 var(--f-cond);letter-spacing:.04em;text-transform:uppercase;background:var(--card-2);color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--rule)}
+.tag-ink{background:var(--ink);color:var(--paper);box-shadow:none}
+.pr{display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 7px 0 5px;border-radius:6px;background:var(--accent);color:var(--on-accent);font:900 11px/1 var(--f-cond);letter-spacing:.08em;box-shadow:inset 0 0 0 1px var(--accent-edge)}
+.pr .i{width:12px;height:12px;stroke-width:2.2}
+
+/* segmented */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px;padding:3px;border-radius:14px;background:var(--paper-2);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 5%,transparent)}
+.seg button{height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;gap:5px;font:700 14px/1 var(--f-cond);letter-spacing:.03em;color:var(--ink-3)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08),0 2px 6px -2px rgba(0,0,0,.12)}
+.seg button.done{color:var(--ink-2)}
+.seg button .i{width:13px;height:13px;stroke-width:2.4}
+.seg-sm{padding:2px;border-radius:10px}
+.seg-sm button{height:30px;padding:0 10px;border-radius:8px;font-size:12.5px}
+
+/* status */
+.st{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px 0 5px;border-radius:7px;font:700 12px/1 var(--f-cond);letter-spacing:.02em;color:var(--ink)}
+.st .i{width:14px;height:14px;stroke-width:2.4}
+.st-good{background:var(--good-bg)}.st-good .i{color:var(--good)}
+.st-warn{background:var(--warn-bg)}.st-warn .i{color:var(--warn)}
+.st-danger{background:var(--danger-bg)}.st-danger .i{color:var(--danger)}
+
+/* =========================================================
+   CHARTS
+   ========================================================= */
+.ch{display:block;overflow:visible}
+.ch text{font-family:var(--f-cond);font-weight:600;font-size:10.5px;fill:var(--ink-3);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.ch .grid{stroke:var(--grid);stroke-width:1;shape-rendering:crispEdges}
+.ch .base{stroke:var(--rule-2);stroke-width:1;shape-rendering:crispEdges}
+.ch .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ch .ln-s{stroke:var(--m-s)}.ch .ln-t{stroke:var(--m-t)}.ch .ln-d{stroke:var(--m-d)}
+.ch .area-s{fill:var(--m-s);opacity:.1}
+.ch .end{stroke:var(--card);stroke-width:2}
+.ch .end-s{fill:var(--m-s)}.ch .end-t{fill:var(--m-t)}
+.ch .bar-s{fill:var(--m-s)}.ch .bar-t{fill:var(--m-t)}
+.ch .dl{font-family:var(--f-cond);font-weight:800;font-size:12px;fill:var(--ink)}
+.ch .wpt{fill:var(--card);stroke:var(--m-s);stroke-width:1.5;opacity:.55}
+.ch .wpt-today{opacity:1;fill:var(--card);stroke-width:2}
+.ch .goal{stroke:var(--ink-2);stroke-width:1.25;shape-rendering:crispEdges}
+.ch .yt-goal{fill:var(--ink);font-weight:800}
+.ch .goal-tag rect{fill:var(--card-2);stroke:var(--rule-2)}
+.ch .goal-tag text{fill:var(--ink-2);font-weight:700;font-size:10px;letter-spacing:.04em}
+.ch .mark{stroke:var(--rule-2);stroke-width:1;shape-rendering:crispEdges}
+.ch .mk{font-size:10px;fill:var(--ink-3)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font:600 12px/1 var(--f-body);color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw-dot{width:8px;height:8px;border-radius:50%;flex:none}
+.sw-line{width:14px;height:2px;border-radius:2px;flex:none}
+.sw-ring{width:8px;height:8px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1.5px var(--m-s);opacity:.7}
+.bg-s{background:var(--m-s)}.bg-t{background:var(--m-t)}.bg-d{background:var(--m-d)}
+
+/* =========================================================
+   01 HOME
+   ========================================================= */
+.greet{font:800 34px/.95 var(--f-disp)}
+.note{display:flex;gap:12px;padding:14px 16px 14px 14px;position:relative}
+.note-meta{display:flex;align-items:center;gap:6px;font:600 12.5px/1 var(--f-body);color:var(--ink-3)}
+.note-meta b{color:var(--ink);font-weight:700}
+.note-q{margin-top:6px;font:italic 400 15px/1.36 var(--f-quote);color:var(--ink);letter-spacing:-.005em}
+
+.hero{position:relative;overflow:hidden;border-radius:24px;background:var(--hero);color:var(--hero-ink);padding:16px 16px 16px;box-shadow:var(--shadow-2)}
+.hero::before{content:"03";position:absolute;right:-10px;top:-32px;font:900 190px/1 var(--f-disp);letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px var(--hero-rule);pointer-events:none}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 100% 0%,var(--accent-wash),transparent 55%);opacity:.35;pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.hero .eyebrow{color:var(--hero-ink-2)}
+.hero-top{display:flex;justify-content:space-between;align-items:center}
+.hero-chip{height:24px;display:inline-flex;align-items:center;padding:0 9px;border-radius:8px;box-shadow:inset 0 0 0 1px var(--hero-rule);font:700 11px/1 var(--f-cond);letter-spacing:.08em;text-transform:uppercase;color:var(--hero-ink-2)}
+.hero-mid{display:flex;align-items:flex-end;justify-content:space-between;margin-top:4px}
+.hero-title{font:900 76px/.8 var(--f-disp);letter-spacing:-.01em;text-transform:uppercase;padding-top:6px}
+.hero-meta{display:flex;gap:0;padding-bottom:4px}
+.hero-meta div{display:flex;flex-direction:column;align-items:flex-end;padding:0 0 0 14px;margin-left:14px;border-left:1px solid var(--hero-rule)}
+.hero-meta div:first-child{border-left:0;margin-left:0}
+.hero-meta b{font:800 26px/1 var(--f-disp)}
+.hero-meta span{font:600 11px/1.2 var(--f-cond);letter-spacing:.06em;text-transform:uppercase;color:var(--hero-ink-2)}
+.wk5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:16px 0 14px}
+.wk5 div{display:flex;flex-direction:column;gap:7px}
+.wk5 i{display:block;height:5px;border-radius:3px;background:var(--hero-rule)}
+.wk5 .done i{background:var(--accent)}
+.wk5 .now i{background:linear-gradient(90deg,var(--accent) 0 50%,var(--hero-rule) 50%)}
+.wk5 span{display:flex;align-items:center;gap:3px;font:700 11px/1 var(--f-cond);letter-spacing:.06em;text-transform:uppercase;color:var(--hero-ink-2)}
+.wk5 .done span,.wk5 .now span{color:var(--hero-ink)}
+.wk5 .i{width:12px;height:12px;stroke-width:2.6;color:var(--accent)}
+.hero .btn-lg{width:100%;justify-content:space-between;padding:0 8px 0 20px}
+.btn-go{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--on-accent);color:var(--accent)}
+
+.ledger{display:grid;grid-template-columns:repeat(3,1fr);padding:14px 0}
+.lc{padding:0 16px;border-left:1px solid var(--rule)}
+.lc:first-child{border-left:0}
+.lc-v{font:800 34px/.9 var(--f-disp);letter-spacing:-.01em}
+.lc-v small{font:700 13px/1 var(--f-cond);color:var(--ink-3);margin-left:2px;letter-spacing:.02em}
+.lc-l{display:flex;align-items:center;gap:5px;margin-top:6px;font:700 11px/1.1 var(--f-cond);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.lc-l .i{width:13px;height:13px;stroke-width:2;color:var(--ink-2)}
+
+.tile{padding:14px 16px 14px;display:flex;flex-direction:column}
+.tile-h{display:flex;align-items:center;justify-content:space-between;color:var(--ink-3)}
+.tile-h .i{width:16px;height:16px}
+.tile-v{margin-top:8px;font:800 34px/.9 var(--f-disp);letter-spacing:-.01em}
+.tile-v small{font:700 13px/1 var(--f-cond);color:var(--ink-3);margin-left:3px;letter-spacing:.03em;text-transform:uppercase}
+.tile .st{margin-top:8px;align-self:flex-start}
+.tile .spark{margin-top:auto}
+.meals5{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:12px}
+.meals5 i{height:22px;border-radius:5px;background:var(--track)}
+.meals5 i.on{background:var(--meter)}
+.meals5 i.next{background:transparent;box-shadow:inset 0 0 0 1.5px var(--meter)}
+.tile-f{margin-top:10px;font:600 12.5px/1.3 var(--f-body);color:var(--ink-3)}
+.tile-f b{color:var(--ink);font-family:var(--f-cond);font-size:14px;font-weight:800}
+
+.pulse{padding:14px 16px}
+.pulse-h{display:flex;gap:12px;align-items:flex-start}
+.pulse-t{font:500 14.5px/1.3 var(--f-body);color:var(--ink-2)}
+.pulse-t b{color:var(--ink)}
+.pulse-s{margin-top:2px;font:600 12px/1.2 var(--f-body);color:var(--ink-3)}
+.pr-line{display:flex;align-items:center;gap:8px;margin:12px 0 0 48px;padding:9px 10px;border-radius:12px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule);font:600 13.5px/1 var(--f-body);color:var(--ink-2)}
+.pr-line b{margin-left:auto;font:800 17px/1 var(--f-cond);color:var(--ink);letter-spacing:.01em}
+.react{display:flex;gap:6px;align-items:center;margin:10px 0 0 48px}
+.rx{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px;border-radius:16px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule);font:700 13px/1 var(--f-cond);color:var(--ink)}
+.rx.mine{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.react .btn{margin-left:auto}
+
+/* =========================================================
+   02 TRAIN
+   ========================================================= */
+.h-tag{display:inline-block;vertical-align:middle;margin-left:4px;transform:translateY(-4px)}
+.clock{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 10px;border-radius:12px;background:var(--card);box-shadow:var(--shadow-1);border:1px solid var(--card-border);font:800 16px/1 var(--f-cond);letter-spacing:.02em}
+.rec{width:8px;height:8px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 3px var(--danger-bg)}
+.weeks{margin:14px -16px 0;padding:0 16px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+.weeks-lab{display:flex;gap:0;margin-bottom:6px;white-space:nowrap}
+.weeks-lab span{font:700 10.5px/1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.weeks-lab span:first-child{width:238px}
+.wks{display:flex;gap:6px;width:max-content}
+.wk{position:relative;width:40px;height:50px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:var(--card);border:1px solid var(--card-border);box-shadow:var(--shadow-1);font:800 18px/1 var(--f-cond);color:var(--ink)}
+.wk i{display:block;width:20px;height:3px;border-radius:2px;background:var(--track);overflow:hidden}
+.wk i::after{content:"";display:block;height:100%;width:var(--p,0%);background:var(--meter)}
+.wk.done{color:var(--ink-2)}
+.wk.cur{background:var(--ink);color:var(--paper);border-color:transparent}
+.wk.cur i{background:color-mix(in srgb,var(--paper) 25%,transparent)}
+.wk.cur i::after{background:var(--accent)}
+.wk.fut{background:transparent;box-shadow:inset 0 0 0 1px var(--rule-2);color:var(--ink-3);border-color:transparent}
+.wk-div{width:1px;align-self:stretch;background:var(--rule-2);margin:0 3px}
+.days{margin-top:12px}
+.prog{display:flex;align-items:center;gap:10px;margin:12px 2px 10px}
+.prog .eyebrow{color:var(--ink-2)}
+.prog-seg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;flex:1}
+.prog-seg i{height:4px;border-radius:2px;background:var(--track)}
+.prog-seg i.d{background:var(--meter)}
+.prog-seg i.c{background:linear-gradient(90deg,var(--meter) 50%,var(--track) 50%)}
+
+.ex{padding:16px 16px 4px}
+.ex-h{display:flex;gap:12px;align-items:flex-start}
+.ex-idx{font:900 30px/.85 var(--f-disp);color:var(--ink-4);letter-spacing:-.01em;padding-top:2px;width:26px}
+.ex-t{flex:1;min-width:0}
+.ex-t h3{font:800 23px/1 var(--f-cond);letter-spacing:-.005em;color:var(--ink)}
+.ex-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.ex-tags .i{width:12px;height:12px;stroke-width:2}
+.play{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule);color:var(--ink);flex:none}
+.rxs{display:grid;grid-template-columns:.8fr 1fr 1.35fr 1fr;margin-top:14px;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule)}
+.rxs div{padding:8px 0 9px 10px;border-left:1px solid var(--rule)}
+.rxs div:first-child{border-left:0;padding-left:0}
+.rxs span{display:block;font:700 10px/1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.rxs b{display:block;margin-top:5px;font:800 19px/1 var(--f-cond);letter-spacing:.005em;white-space:nowrap}
+.rxs b em{font-style:normal;color:var(--ink-3);font-weight:700;font-size:15px}
+.prev{display:flex;align-items:center;gap:6px;margin:10px 0 6px;font:600 12.5px/1 var(--f-body);color:var(--ink-3)}
+.prev b{margin-left:auto;font:700 14px/1 var(--f-cond);color:var(--ink-2);letter-spacing:.02em}
+.prev .i{width:14px;height:14px}
+.sets-h,.set{display:grid;grid-template-columns:34px 1fr 82px 64px 52px;gap:6px;align-items:center}
+.sets-h{padding:6px 0 6px;font:700 10px/1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.sets-h span:nth-child(3),.sets-h span:nth-child(4){text-align:center}
+.set{margin:0 -8px;padding:4px 8px;border-radius:14px;min-height:60px}
+.set+.set{margin-top:2px}
+.set-n{display:flex;flex-direction:column;align-items:flex-start;gap:4px;font:800 18px/1 var(--f-cond);color:var(--ink)}
+.set-n .fl{font:800 9.5px/1 var(--f-cond);letter-spacing:.08em;padding:3px 4px;border-radius:4px;background:var(--ink);color:var(--paper)}
+.set-prev{font:600 14px/1 var(--f-cond);color:var(--ink-4);letter-spacing:.02em}
+.inp{height:52px;border-radius:12px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule);display:flex;align-items:center;justify-content:center;font:800 24px/1 var(--f-cond);letter-spacing:.005em;color:var(--ink);position:relative}
+.inp .ph{color:var(--ink-4);font-weight:700}
+.inp.focus{background:var(--card);box-shadow:inset 0 0 0 2px var(--ink),0 0 0 4px color-mix(in srgb,var(--ink) 8%,transparent)}
+.caret{display:inline-block;width:2px;height:24px;margin-left:2px;background:var(--ink);border-radius:1px}
+.set.done .inp{background:transparent;box-shadow:none}
+.set.is-pr{background:linear-gradient(90deg,var(--accent-wash),transparent 75%)}
+.chk{display:grid;place-items:center;width:52px;height:52px;border-radius:14px;box-shadow:inset 0 0 0 2px var(--rule-2);color:var(--ink-4)}
+.chk .i{width:22px;height:22px;stroke-width:2.6}
+.chk.on{background:var(--ink);color:var(--paper);box-shadow:none}
+.set.active{background:var(--card-2)}
+.set.active .inp{background:var(--card)}
+.set.active .inp.focus{background:var(--card)}
+.hint{display:flex;align-items:center;gap:7px;margin:8px 0 2px;font:500 12.5px/1.25 var(--f-body);color:var(--ink-2)}
+.hint b{color:var(--ink);font-family:var(--f-cond);font-size:14px;font-weight:800}
+.hint .i{width:15px;height:15px;color:var(--ink)}
+.expand{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;margin-top:10px;border-top:1px solid var(--rule);text-align:left}
+.expand .t{font:700 14px/1.1 var(--f-body);color:var(--ink)}
+.expand .s{font:500 12px/1.1 var(--f-body);color:var(--ink-3);margin-top:3px}
+.expand .i{margin-left:auto;color:var(--ink-2)}
+.ex-next{display:flex;align-items:center;gap:12px;padding:14px 16px;opacity:.9}
+
+.timer{position:absolute;left:10px;right:10px;bottom:94px;z-index:45;border-radius:24px;background:var(--accent);color:var(--on-accent);padding:12px 12px 12px 18px;box-shadow:var(--shadow-timer);overflow:hidden}
+.timer-bar{position:absolute;left:0;right:0;top:0;height:4px;background:rgba(0,0,0,.1)}
+.timer-bar i{display:block;height:100%;width:29%;background:var(--on-accent)}
+.timer-row{display:flex;align-items:center;gap:8px}
+.timer-l{flex:1}
+.timer-k{display:flex;align-items:center;gap:6px;font:800 11px/1 var(--f-cond);letter-spacing:.12em;text-transform:uppercase;opacity:.8}
+.timer-k .i{width:14px;height:14px;stroke-width:2.2}
+.timer-v{font:900 54px/.86 var(--f-disp);letter-spacing:-.01em;margin-top:4px;font-variant-numeric:tabular-nums}
+.timer-v small{font:700 13px/1 var(--f-cond);letter-spacing:.06em;margin-left:6px;opacity:.7;text-transform:uppercase}
+.timer-ctl{display:flex;gap:6px}
+.tbtn{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:rgba(0,0,0,.09);font:800 16px/1 var(--f-cond);letter-spacing:.02em;color:var(--on-accent)}
+.tbtn.x{background:var(--on-accent);color:var(--accent)}
+.tbtn .i{width:20px;height:20px;stroke-width:2.4}
+
+/* =========================================================
+   03 SQUAD
+   ========================================================= */
+.avstack{display:flex}
+.avstack .av{box-shadow:0 0 0 2px var(--paper)}
+.avstack .av+.av{margin-left:-8px}
+.vs{padding:14px 16px 16px}
+.vs-top{display:flex;align-items:center;justify-content:space-between}
+.vs-top .btn-sm{margin-right:-6px}
+.vs-main{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin-top:8px}
+.vs-side{display:flex;align-items:center;gap:10px}
+.vs-side.r{flex-direction:row-reverse;text-align:right}
+.vs-name{font:800 22px/1 var(--f-cond)}
+.vs-sub{margin-top:3px;font:600 12px/1 var(--f-body);color:var(--ink-3)}
+.vs-score{text-align:center}
+.score{display:flex;align-items:baseline;justify-content:center;gap:4px;font:900 50px/.85 var(--f-disp);letter-spacing:-.01em}
+.score em{font-style:normal;color:var(--ink-4);font-weight:700;font-size:34px;transform:translateY(-6px)}
+.score-l{margin-top:4px;font:700 11px/1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.tally{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:14px}
+.tally i{height:6px}
+.tally i:first-child{border-radius:3px 0 0 3px}.tally i:last-child{border-radius:0 3px 3px 0}
+.tape{padding:6px 16px 10px}
+.tape-h{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:8px 0 8px;border-bottom:1px solid var(--ink)}
+.tape-h .l,.tape-h .r{display:flex;align-items:center;gap:6px;font:800 12px/1 var(--f-cond);letter-spacing:.08em;text-transform:uppercase}
+.tape-h .r{justify-content:flex-end}
+.tr{display:grid;grid-template-columns:52px 1fr 104px 1fr 52px;align-items:center;height:33px;border-bottom:1px solid var(--rule)}
+.tr:last-of-type{border-bottom:0}
+.tv{font:700 16px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.01em;white-space:nowrap}
+.tv.r{text-align:right}
+.tv.lead{color:var(--ink);font-weight:800}
+.tv.lead::before{content:"";display:inline-block;width:0;height:0;margin-right:4px;border:4px solid transparent;border-left:5px solid var(--ink);transform:translateY(-1px)}
+.tv.r.lead::before{display:none}
+.tv.r.lead::after{content:"";display:inline-block;width:0;height:0;margin-left:4px;border:4px solid transparent;border-right:5px solid var(--ink);transform:translateY(-1px)}
+.tl{text-align:center;font:600 12px/1 var(--f-body);color:var(--ink-2)}
+.tb{display:flex;height:6px}
+.tb.l{justify-content:flex-end;padding-right:2px}
+.tb.r{padding-left:2px}
+.tb i{display:block;height:6px}
+.tb.l i{border-radius:3px 0 0 3px;background:var(--m-s)}
+.tb.r i{border-radius:0 3px 3px 0;background:var(--m-t)}
+.tape-note{margin-top:6px;padding-top:8px;border-top:1px solid var(--rule);font:500 11.5px/1.35 var(--f-body);color:var(--ink-3)}
+.charts2{padding:14px 16px 14px}
+.charts2-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.charts2-g{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ch-t{font:700 12.5px/1.2 var(--f-body);color:var(--ink);margin-bottom:8px}
+.ch-t span{color:var(--ink-3);font-weight:500}
+
+/* =========================================================
+   04 BODY
+   ========================================================= */
+.bh{display:grid;grid-template-columns:1fr auto;align-items:end;gap:12px;padding:10px 2px 0}
+.bh-v{font:900 92px/.78 var(--f-disp);letter-spacing:-.02em;margin-top:10px}
+.bh-v small{font:800 22px/1 var(--f-cond);color:var(--ink-3);margin-left:4px;letter-spacing:.02em}
+.bh-sub{margin-top:10px;font:500 13px/1.2 var(--f-body);color:var(--ink-3)}
+.bh-sub b{color:var(--ink-2);font-family:var(--f-cond);font-weight:800;font-size:14px}
+.bh-r{display:flex;flex-direction:column;gap:0;padding-bottom:2px;min-width:118px}
+.mini{padding:9px 0;border-top:1px solid var(--rule-2)}
+.mini:first-child{border-top:1px solid var(--ink)}
+.mini b{display:flex;align-items:center;gap:4px;margin-top:5px;font:800 22px/1 var(--f-disp);letter-spacing:0}
+.mini b small{font:700 12px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.03em}
+.mini .i{width:15px;height:15px;stroke-width:2.4;color:var(--good)}
+.goal{padding:14px 16px 12px;margin-top:16px}
+.goal-h{display:flex;align-items:baseline;justify-content:space-between}
+.goal-h .v{font:600 12.5px/1 var(--f-body);color:var(--ink-3)}
+.goal-h .v b{color:var(--ink);font:800 15px/1 var(--f-cond)}
+.gtrack{position:relative;height:10px;margin:12px 0 8px;border-radius:5px;background:var(--track)}
+.gtrack i{position:absolute;left:0;top:0;bottom:0;width:34%;border-radius:5px;background:var(--m-s)}
+.gtrack .knob{position:absolute;top:50%;left:34%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--m-s);box-shadow:0 0 0 3px var(--card)}
+.gticks{display:flex;justify-content:space-between;font:600 12px/1 var(--f-body);color:var(--ink-3)}
+.gticks b{color:var(--ink);font:800 14px/1 var(--f-cond)}
+.wcard{padding:14px 16px 12px}
+.wcard-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.wcard .legend{margin-top:10px;font-size:11.5px}
+.logc{padding:12px 12px 12px 16px}
+.logc-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;padding-right:4px}
+.logc-h .muted{font:500 12.5px/1 var(--f-body)}
+.stepper{display:flex;align-items:center;gap:8px}
+.stp{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule);color:var(--ink)}
+.stp .i{width:22px;height:22px;stroke-width:2.4}
+.stp-v{flex:1;text-align:center;font:900 40px/.9 var(--f-disp);letter-spacing:-.01em}
+.stp-v small{font:800 14px/1 var(--f-cond);color:var(--ink-3);margin-left:3px}
+.stepper .btn{height:52px;border-radius:16px;padding:0 18px}
+.hist{padding:2px 16px}
+.hr{display:grid;grid-template-columns:1fr auto 64px;align-items:center;height:46px;border-bottom:1px solid var(--rule);font:600 14px/1 var(--f-body);color:var(--ink-2)}
+.hr:last-child{border-bottom:0}
+.hr .w{font:800 18px/1 var(--f-cond);color:var(--ink)}
+.hr .w small{font-size:12px;color:var(--ink-3);margin-left:2px}
+.hr .d{text-align:right;font:700 13px/1 var(--f-cond);color:var(--ink-3)}
+.hr .dt small{display:block;margin-top:3px;font:500 11.5px/1 var(--f-body);color:var(--ink-3)}
+
+/* =========================================================
+   05 FUEL
+   ========================================================= */
+.plan{padding:16px}
+.plan-by{display:flex;align-items:center;gap:8px;margin-top:8px;font:600 12.5px/1.2 var(--f-body);color:var(--ink-3)}
+.plan-by b{color:var(--ink)}
+.plan-t{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:6px}
+.tgt{display:grid;grid-template-columns:108px 1fr;gap:18px;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--rule)}
+.ring{display:block}
+.ring-track{fill:none;stroke:var(--track)}
+.ring-val{fill:none;stroke:var(--meter);stroke-linecap:round}
+.ringbox{position:relative;width:108px;height:108px}
+.ringbox .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ringbox .c b{font:900 30px/.85 var(--f-disp);letter-spacing:-.01em}
+.ringbox .c span{margin-top:4px;font:700 10px/1 var(--f-cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.mac{display:flex;flex-direction:column;gap:11px}
+.mac-r{display:grid;grid-template-columns:1fr auto;align-items:baseline;row-gap:6px}
+.mac-r .k{font:700 12px/1 var(--f-cond);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.mac-r .v{font:600 12px/1 var(--f-body);color:var(--ink-3)}
+.mac-r .v b{font:800 15px/1 var(--f-cond);color:var(--ink)}
+.mac-r .bar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--track);overflow:hidden}
+.mac-r .bar i{display:block;height:100%;border-radius:3px;background:var(--meter)}
+.kcal-t{margin-top:10px;display:flex;justify-content:space-between;font:600 12px/1 var(--f-body);color:var(--ink-3)}
+.kcal-t b{color:var(--ink);font:800 14px/1 var(--f-cond)}
+.meals{padding:4px 16px 4px}
+.meals-h{display:flex;align-items:center;justify-content:space-between;padding:10px 0 8px;border-bottom:1px solid var(--ink)}
+.meal{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:6px;min-height:48px;border-bottom:1px solid var(--rule)}
+.meal:last-child{border-bottom:0}
+.mchk{display:grid;place-items:center;width:44px;height:44px;margin-left:-8px}
+.mchk span{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;box-shadow:inset 0 0 0 2px var(--rule-2);color:transparent}
+.mchk span .i{width:16px;height:16px;stroke-width:2.8}
+.meal.on .mchk span{background:var(--ink);box-shadow:none;color:var(--paper)}
+.meal .n{font:700 14.5px/1.1 var(--f-body);color:var(--ink)}
+.meal .n small{display:block;margin-top:3px;font:500 12px/1.2 var(--f-body);color:var(--ink-3)}
+.meal.on .n{color:var(--ink-2)}
+.meal .tm{font:700 13px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.03em;text-align:right}
+.meal.next{margin:0 -8px;padding:0 8px;border-radius:12px;background:var(--card-2);border-bottom-color:transparent}
+.meal.next .tm{display:flex;align-items:center;gap:8px}
+.pdf{padding:14px;display:flex;flex-direction:column}
+.pdf-ic{position:relative;width:40px;height:48px;border-radius:6px 14px 6px 6px;background:var(--card-2);box-shadow:inset 0 0 0 1px var(--rule-2);display:flex;align-items:flex-end;justify-content:center;padding-bottom:7px}
+.pdf-ic::before{content:"";position:absolute;top:0;right:0;width:13px;height:13px;border-radius:0 12px 0 4px;background:var(--rule-2)}
+.pdf-ic span{font:900 10px/1 var(--f-cond);letter-spacing:.08em;padding:2px 4px;border-radius:3px;background:var(--ink);color:var(--paper)}
+.pdf-n{margin-top:10px;font:700 13.5px/1.2 var(--f-body);color:var(--ink);word-break:break-all}
+.pdf-m{margin-top:3px;font:500 11.5px/1.2 var(--f-body);color:var(--ink-3)}
+.pdf .btn{margin-top:auto;width:100%}
+.adh{padding:14px 14px 12px}
+.adh-v{display:flex;align-items:baseline;gap:6px;margin-top:6px}
+.adh-v b{font:900 32px/.85 var(--f-disp)}
+.adh-v span{font:600 11.5px/1 var(--f-body);color:var(--ink-3)}
+.hm{margin-top:10px;display:flex;flex-direction:column;gap:3px}
+.hm-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.hm-head span{text-align:center;font:700 9.5px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.04em;padding-bottom:1px}
+.hm i{display:block;aspect-ratio:1;border-radius:4px}
+.hm .q0{background:var(--q0)}.hm .q1{background:var(--q1)}.hm .q2{background:var(--q2)}.hm .q3{background:var(--q3)}.hm .q4{background:var(--q4)}.hm .q5{background:var(--q5)}
+.hm .qx{background:transparent;box-shadow:inset 0 0 0 1px var(--rule-2)}
+.hm .today{box-shadow:0 0 0 1.5px var(--card),0 0 0 3px var(--ink)}
+.hm-leg{display:flex;align-items:center;gap:3px;margin-top:9px;font:600 10.5px/1 var(--f-cond);color:var(--ink-3);letter-spacing:.03em}
+.hm-leg i{width:10px;height:10px;border-radius:3px}
+.hm-leg span{margin:0 3px}
+
+@media (max-width:520px){
+  .page{padding:20px 12px 48px}
+  .page-h{flex-direction:column;align-items:flex-start}
+  .wordmark,.wordmark em{font-size:30px}
+  .frame{width:100%;max-width:390px}
+}
+</style>
+</head>
+<body>
+<!-- ============ ICON SPRITE (24px grid, 1.75 stroke, round caps/joins) ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.2 12 4l8 6.2V19a1.5 1.5 0 0 1-1.5 1.5H15V15H9v5.5H5.5A1.5 1.5 0 0 1 4 19z"/></symbol>
+  <symbol id="i-train" viewBox="0 0 24 24"><path d="M8.5 12h7"/><rect x="4.5" y="6.5" width="4" height="11" rx="1.5"/><rect x="15.5" y="6.5" width="4" height="11" rx="1.5"/><path d="M2.5 10v4M21.5 10v4"/></symbol>
+  <symbol id="i-body" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M8 10.5a5.6 5.6 0 0 1 8 0"/><path d="m12 12.6 1.7-2.6"/></symbol>
+  <symbol id="i-fuel" viewBox="0 0 24 24"><path d="M7 3.5v17M4.5 3.5v5a2.5 2.5 0 0 0 5 0v-5"/><path d="M17.5 20.5v-17c-2.2 1.3-3.5 4-3.5 7.5v2.5h3.5"/></symbol>
+  <symbol id="i-squad" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.8 19.5c.7-3.3 3.2-5.3 6.2-5.3s5.5 2 6.2 5.3"/><path d="M15.5 5.3a3.3 3.3 0 0 1 0 6.4"/><path d="M17.6 14.6c2 .6 3.3 2.3 3.7 4.9"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 9.5 17 19 7.5"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8.5 6.2v11.6a.8.8 0 0 0 1.2.7l9.3-5.8a.8.8 0 0 0 0-1.4L9.7 5.5a.8.8 0 0 0-1.2.7z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21c-3.9 0-6.8-2.8-6.8-6.5 0-3.4 2.4-5.4 3.6-8 .6 1.8 1.5 2.9 2.6 3.5.3-2.8 1.9-5 3.9-6.5.3 3.6 4.3 6 4.3 11 0 3.7-3 6.5-7.6 6.5z"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7.5 4h9v5.5a4.5 4.5 0 0 1-9 0z"/><path d="M7.5 6h-3a3 3 0 0 0 3.2 4M16.5 6h3a3 3 0 0 1-3.2 4"/><path d="M12 14v3.5M8.5 20.5h7"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="m9 15 2 2 4-4"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6.5 13.5 12 19l5.5-5.5"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></symbol>
+  <symbol id="i-chevd" viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11M17.5 6.5l-11 11"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/><path d="M14 3.5V8h4.5"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></symbol>
+  <symbol id="i-hist" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4.5v4h4"/><path d="M12 8v4.3l2.8 1.7"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 7.5h12.5M16 4l3.5 3.5L16 11M17 16.5H4.5M8 13l-3.5 3.5L8 20"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M9.5 2.5h5M18.2 6.8l1.3-1.3"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+  <symbol id="i-stack" viewBox="0 0 24 24"><rect x="6" y="3.5" width="12" height="4.5" rx="1.2"/><rect x="6" y="9.75" width="12" height="4.5" rx="1.2"/><rect x="6" y="16" width="12" height="4.5" rx="1.2"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></symbol>
+  <symbol id="i-thumb" viewBox="0 0 24 24"><path d="M7.5 10.5V20h-3v-9.5z"/><path d="M7.5 10.5 11 3.8c1.4 0 2.5 1.1 2.2 2.6l-.7 3.6h6a2 2 0 0 1 2 2.3l-1.1 6a2 2 0 0 1-2 1.7H7.5"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/></symbol>
+  <symbol id="i-plus-c" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8.5v7M8.5 12h7"/></symbol>
+</svg>
+
+<!-- status-bar glyphs reused per frame -->
+<template id="sb-tpl"></template>
+
+<main class="page">
+  <header class="page-h">
+    <div>
+      <div class="wordmark"><span class="wm-mark"><svg class="i i-18" style="stroke-width:2.4"><use href="#i-train"/></svg></span>Είμαστε Cool <em>Training</em></div>
+      <p class="page-sub"><b>Direction — Logbook Pro.</b> The owner’s paper-and-ink logbook, grown into a sports-magazine training journal: condensed display numerals, ruled tables, hairline structure and generous whitespace. One signal colour — <b>Volt</b> — is reserved for “go” moments: Start, PRs and the rest timer. Member hues only ever mark identity.</p>
+    </div>
+    <div class="switches">
+      <div class="sw" role="group" aria-label="Language"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="el" aria-pressed="false">EL</button></div>
+      <div class="sw" role="group" aria-label="Theme"><span class="sw-l" style="align-self:center;padding:0 6px 0 8px">Theme</span><button data-set-theme="light" aria-pressed="false"><svg class="i i-16"><use href="#i-sun"/></svg>Light</button><button data-set-theme="dark" aria-pressed="false"><svg class="i i-16"><use href="#i-moon"/></svg>Dark</button></div>
+    </div>
+  </header>
+
+  <div class="frames">
+
+  <!-- =============================== 01 HOME =============================== -->
+  <figure class="frame">
+    <figcaption class="cap"><span class="cap-n">01</span><span class="cap-t">Home</span><span class="cap-d">Dashboard · Stelios</span></figcaption>
+    <div class="phone">
+      <div class="sb"><span class="sb-time">9:41</span><span class="sb-ic"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.2-1.3A10.3 10.3 0 0 0 8 .4 10.3 10.3 0 0 0 .8 3.3L2 4.6a8.6 8.6 0 0 1 6-2.4zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.8 6.8 0 0 0 8 4a6.8 6.8 0 0 0-4.6 1.8l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3zM8 9.4l1.9-1.9A2.7 2.7 0 0 0 8 6.8c-.7 0-1.4.3-1.9.7z"/></svg><svg width="27" height="13" viewBox="0 0 27 13" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="9" rx="2.3"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" opacity=".45"/></svg></span></div>
+      <div class="island"></div>
+      <div class="scr stack">
+        <header class="top">
+          <div>
+            <div class="eyebrow" data-el="Πέμ 24 Σεπ · Εβδομάδα 3 από 12">Thu 24 Sep · Week 3 of 12</div>
+            <h1 class="greet" data-el="Καλημέρα, Στέλιο">Καλημέρα, Stelios</h1>
+          </div>
+          <div class="top-act">
+            <button class="icon-btn soft" aria-label="Notifications"><svg class="i"><use href="#i-bell"/></svg><span class="dot-badge"></span></button>
+            <span class="av av-s av-40" aria-label="Stelios">S</span>
+          </div>
+        </header>
+
+        <article class="card note">
+          <span class="av av-d av-32" aria-label="Coach Dennis">D</span>
+          <div>
+            <div class="note-meta"><b>Coach Dennis</b><span>· note for today · 07:48</span></div>
+            <p class="note-q">“Pulldowns: last set to true failure. And 180&nbsp;g protein today — no excuses.”</p>
+          </div>
+        </article>
+
+        <section class="hero">
+          <div class="hero-top"><span class="eyebrow" data-el="Σήμερα · Εβδ. 3 · Προπόνηση 3/5">Today · Week 3 · Session 3/5</span><span class="hero-chip">Hypertrophy</span></div>
+          <div class="hero-mid">
+            <div class="hero-title">Pull</div>
+            <div class="hero-meta">
+              <div><b>7</b><span>exercises</span></div>
+              <div><b>~65</b><span>min</span></div>
+            </div>
+          </div>
+          <div class="wk5" aria-label="This week: 2 of 5 done">
+            <div class="done"><i></i><span><svg class="i"><use href="#i-check"/></svg>Upper</span></div>
+            <div class="done"><i></i><span><svg class="i"><use href="#i-check"/></svg>Lower</span></div>
+            <div class="now"><i></i><span>Pull</span></div>
+            <div><i></i><span>Push</span></div>
+            <div><i></i><span>Legs</span></div>
+          </div>
+          <button class="btn btn-accent btn-lg"><span data-el="Έναρξη προπόνησης">Start workout</span><span class="btn-go"><svg class="i"><use href="#i-play"/></svg></span></button>
+        </section>
+
+        <section class="card ledger" aria-label="Your numbers">
+          <div class="lc"><div class="lc-v">3<small>wk</small></div><div class="lc-l"><svg class="i"><use href="#i-flame"/></svg>Streak</div></div>
+          <div class="lc"><div class="lc-v">92<small>%</small></div><div class="lc-l"><svg class="i"><use href="#i-cal"/></svg>On schedule</div></div>
+          <div class="lc"><div class="lc-v">4</div><div class="lc-l"><svg class="i"><use href="#i-trophy"/></svg>PRs · Sep</div></div>
+        </section>
+
+        <div class="g2">
+          <article class="card tile">
+            <div class="tile-h"><span class="eyebrow" data-el="Βάρος">Weight</span><svg class="i"><use href="#i-chev"/></svg></div>
+            <div class="tile-v">80.9<small>kg</small></div>
+            <span class="st st-good"><svg class="i"><use href="#i-down"/></svg>1.5 kg since start</span>
+            <div style="margin-top:8px"><svg class="ch spark" viewBox="0 0 139 44" width="139" height="44" role="img" aria-label="Trend weight since 7 Sep: 82.4 to 80.9 kg">
+  <path class="area-s" d="M1,8.04 C2.39,8.27 5.93,8.83 8.71,9.35 C11.48,9.86 13.64,10.35 16.41,10.92 C19.19,11.48 21.34,11.92 24.12,12.48 C26.89,13.05 29.05,13.49 31.82,14.05 C34.6,14.62 36.76,15.06 39.53,15.62 C42.3,16.19 44.46,16.62 47.24,17.19 C50.01,17.75 52.17,18.19 54.94,18.76 C57.72,19.32 59.87,19.76 62.65,20.33 C65.42,20.89 67.58,21.33 70.35,21.9 C73.13,22.46 75.28,22.9 78.06,23.46 C80.83,24.03 82.99,24.47 85.76,25.03 C88.54,25.6 90.7,26.04 93.47,26.6 C96.24,27.17 98.4,27.61 101.18,28.17 C103.95,28.73 106.11,29.17 108.88,29.74 C111.66,30.3 113.81,30.74 116.59,31.31 C119.36,31.87 121.52,32.31 124.29,32.88 C127.07,33.44 130.61,34.16 132,34.44 L132,44 L1,44 Z"/>
+  <path class="ln ln-s" d="M1,8.04 C2.39,8.27 5.93,8.83 8.71,9.35 C11.48,9.86 13.64,10.35 16.41,10.92 C19.19,11.48 21.34,11.92 24.12,12.48 C26.89,13.05 29.05,13.49 31.82,14.05 C34.6,14.62 36.76,15.06 39.53,15.62 C42.3,16.19 44.46,16.62 47.24,17.19 C50.01,17.75 52.17,18.19 54.94,18.76 C57.72,19.32 59.87,19.76 62.65,20.33 C65.42,20.89 67.58,21.33 70.35,21.9 C73.13,22.46 75.28,22.9 78.06,23.46 C80.83,24.03 82.99,24.47 85.76,25.03 C88.54,25.6 90.7,26.04 93.47,26.6 C96.24,27.17 98.4,27.61 101.18,28.17 C103.95,28.73 106.11,29.17 108.88,29.74 C111.66,30.3 113.81,30.74 116.59,31.31 C119.36,31.87 121.52,32.31 124.29,32.88 C127.07,33.44 130.61,34.16 132,34.44"/>
+  <circle class="end end-s" cx="132" cy="34.44" r="4"/>
+</svg></div>
+          </article>
+          <article class="card tile">
+            <div class="tile-h"><span class="eyebrow" data-el="Διατροφή σήμερα">Fuel today</span><svg class="i"><use href="#i-chev"/></svg></div>
+            <div class="tile-v">3<small>/ 5 meals</small></div>
+            <div class="meals5" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="next"></i><i></i></div>
+            <div class="tile-f"><b>1,630</b> / 2,400 kcal<br>Next: pre-workout 17:30</div>
+          </article>
+        </div>
+
+        <div class="sec"><span class="sec-t" data-el="Παλμός ομάδας">Squad pulse</span><span class="sec-r"></span><span class="sec-a">You lead 5–2<svg class="i i-16"><use href="#i-chev"/></svg></span></div>
+        <article class="card pulse" style="margin-top:0">
+          <div class="pulse-h">
+            <span class="av av-t av-36">T</span>
+            <div>
+              <div class="pulse-t"><b>Thanos</b> finished <b>Push</b> · 2h ago</div>
+              <div class="pulse-s">Week 3 · 6 exercises · 21.1 t volume</div>
+            </div>
+          </div>
+          <div class="pr-line"><span class="pr"><svg class="i"><use href="#i-trophy"/></svg>PR</span>Bench press<b class="tnum">80 kg × 8</b></div>
+          <div class="react">
+            <span class="rx">🔥 3</span><span class="rx mine">💪 2</span>
+            <button class="btn btn-soft btn-sm"><svg class="i i-16"><use href="#i-thumb"/></svg>Kudos</button>
+          </div>
+        </article>
+      </div>
+      <nav class="tabbar" aria-label="Main"><button class="tab on" aria-current="page"><span class="ti"><svg class="i i-24"><use href="#i-home"/></svg></span><span data-el="Αρχική">Home</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-train"/></svg></span><span data-el="Προπόνηση">Train</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-body"/></svg></span><span data-el="Σώμα">Body</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-fuel"/></svg></span><span data-el="Διατροφή">Fuel</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-squad"/></svg></span><span data-el="Ομάδα">Squad</span></button></nav>
+      <div class="home-ind"></div>
+    </div>
+  </figure>
+
+  <!-- =============================== 02 TRAIN =============================== -->
+  <figure class="frame">
+    <figcaption class="cap"><span class="cap-n">02</span><span class="cap-t">Train</span><span class="cap-d">Workout logger · set 2 live</span></figcaption>
+    <div class="phone">
+      <div class="sb"><span class="sb-time">9:41</span><span class="sb-ic"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.2-1.3A10.3 10.3 0 0 0 8 .4 10.3 10.3 0 0 0 .8 3.3L2 4.6a8.6 8.6 0 0 1 6-2.4zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.8 6.8 0 0 0 8 4a6.8 6.8 0 0 0-4.6 1.8l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3zM8 9.4l1.9-1.9A2.7 2.7 0 0 0 8 6.8c-.7 0-1.4.3-1.9.7z"/></svg><svg width="27" height="13" viewBox="0 0 27 13" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="9" rx="2.3"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" opacity=".45"/></svg></span></div>
+      <div class="island"></div>
+      <div class="scr">
+        <header class="top">
+          <div>
+            <div class="eyebrow" data-el="BTS · Μπλοκ Θεμελίωσης">BTS · Foundation block</div>
+            <h1 class="h-screen"><span data-el="Εβδομάδα 3">Week 3</span></h1>
+          </div>
+          <div class="top-act">
+            <span class="clock tnum"><i class="rec" aria-hidden="true"></i>24:18</span>
+            <button class="btn btn-ink btn-sm" style="height:36px">Finish</button>
+          </div>
+        </header>
+
+        <div class="weeks" aria-label="Program weeks">
+          <div class="weeks-lab"><span>Foundation · 1–5</span><span>Ramping · 6–12</span></div>
+          <div class="wks">
+            <button class="wk done" style="--p:100%">1<i></i></button>
+            <button class="wk done" style="--p:100%">2<i></i></button>
+            <button class="wk cur" style="--p:40%">3<i></i></button>
+            <button class="wk fut">4<i></i></button>
+            <button class="wk fut">5<i></i></button>
+            <span class="wk-div"></span>
+            <button class="wk fut">6<i></i></button>
+            <button class="wk fut">7<i></i></button>
+            <button class="wk fut">8<i></i></button>
+            <button class="wk fut">9<i></i></button>
+            <button class="wk fut">10<i></i></button>
+            <button class="wk fut">11<i></i></button>
+            <button class="wk fut">12<i></i></button>
+          </div>
+        </div>
+
+        <div class="seg days" role="tablist">
+          <button class="done"><svg class="i"><use href="#i-check"/></svg>Upper</button>
+          <button class="done"><svg class="i"><use href="#i-check"/></svg>Lower</button>
+          <button class="on">Pull</button>
+          <button>Push</button>
+          <button>Legs</button>
+        </div>
+
+        <div class="prog"><span class="eyebrow">Exercise 2 of 7</span><span class="prog-seg"><i class="d"></i><i class="c"></i><i></i><i></i><i></i><i></i><i></i></span><span class="eyebrow tnum">4 / 18 sets</span></div>
+
+        <article class="card ex">
+          <div class="ex-h">
+            <div class="ex-idx">02</div>
+            <div class="ex-t">
+              <h3>Neutral-Grip Lat Pulldown</h3>
+              <div class="ex-tags"><span class="tag"><svg class="i"><use href="#i-stack"/></svg>Hammer Strength</span><span class="tag tag-ink">Last set · Failure</span></div>
+            </div>
+            <button class="play" aria-label="Demo video"><svg class="i"><use href="#i-play"/></svg></button>
+          </div>
+          <div class="rxs">
+            <div><span>Sets</span><b>2</b></div>
+            <div><span>Reps</span><b>8–10</b></div>
+            <div><span>RPE</span><b>~8–9 <em>/ 10</em></b></div>
+            <div><span>Rest</span><b>2–3′</b></div>
+          </div>
+          <div class="prev"><svg class="i"><use href="#i-hist"/></svg>Last time · Week 2<b class="tnum">55 × 10 · 55 × 9</b></div>
+          <div class="sets-h"><span>Set</span><span>Previous</span><span>kg</span><span>Reps</span><span></span></div>
+          <div class="set done is-pr">
+            <div class="set-n">1<span class="pr"><svg class="i"><use href="#i-trophy"/></svg>PR</span></div>
+            <div class="set-prev tnum">55 × 10</div>
+            <div class="inp tnum">57.5</div>
+            <div class="inp tnum">10</div>
+            <button class="chk on" aria-label="Set 1 done"><svg class="i"><use href="#i-check"/></svg></button>
+          </div>
+          <div class="set active">
+            <div class="set-n">2<span class="fl">FAIL</span></div>
+            <div class="set-prev tnum">55 × 9</div>
+            <div class="inp focus tnum">57.5<i class="caret"></i></div>
+            <div class="inp tnum"><span class="ph">9</span></div>
+            <button class="chk" aria-label="Mark set 2 done"><svg class="i"><use href="#i-check"/></svg></button>
+          </div>
+          <div class="hint"><svg class="i"><use href="#i-target"/></svg>Beat 55 × 9 — aim&nbsp;<b>57.5 × 9+</b>, then to failure</div>
+          <button class="expand"><div><div class="t">Warm-up, swaps &amp; notes</div><div class="s">2 swaps · 1 coach note · 2 warm-up sets</div></div><svg class="i"><use href="#i-chevd"/></svg></button>
+        </article>
+
+        <article class="card ex-next" style="margin-top:12px">
+          <div class="ex-idx">03</div>
+          <div class="ex-t"><h3 style="font-size:20px">Chest-Supported Row</h3><div class="muted" style="font:600 12.5px/1 var(--f-body);margin-top:5px">3 × 8–10 · RPE ~8–9 / 10 · Last set: Myo-reps</div></div>
+        </article>
+      </div>
+
+      <div class="timer" role="timer" aria-label="Rest timer 1:47 remaining">
+        <div class="timer-bar"><i></i></div>
+        <div class="timer-row">
+          <div class="timer-l">
+            <div class="timer-k"><svg class="i"><use href="#i-timer"/></svg><span data-el="Διάλειμμα · επόμενο σετ 2">Rest · next: set 2</span></div>
+            <div class="timer-v">1:47<small>/ 2:30</small></div>
+          </div>
+          <div class="timer-ctl">
+            <button class="tbtn" aria-label="Minus 15 seconds">−15</button>
+            <button class="tbtn" aria-label="Plus 30 seconds">+30</button>
+            <button class="tbtn x" aria-label="Close timer"><svg class="i"><use href="#i-x"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <nav class="tabbar" aria-label="Main"><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-home"/></svg></span><span data-el="Αρχική">Home</span></button><button class="tab on" aria-current="page"><span class="ti"><svg class="i i-24"><use href="#i-train"/></svg></span><span data-el="Προπόνηση">Train</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-body"/></svg></span><span data-el="Σώμα">Body</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-fuel"/></svg></span><span data-el="Διατροφή">Fuel</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-squad"/></svg></span><span data-el="Ομάδα">Squad</span></button></nav>
+      <div class="home-ind"></div>
+    </div>
+  </figure>
+
+  <!-- =============================== 03 SQUAD =============================== -->
+  <figure class="frame">
+    <figcaption class="cap"><span class="cap-n">03</span><span class="cap-t">Squad</span><span class="cap-d">Head-to-head · Stelios vs Thanos</span></figcaption>
+    <div class="phone">
+      <div class="sb"><span class="sb-time">9:41</span><span class="sb-ic"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.2-1.3A10.3 10.3 0 0 0 8 .4 10.3 10.3 0 0 0 .8 3.3L2 4.6a8.6 8.6 0 0 1 6-2.4zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.8 6.8 0 0 0 8 4a6.8 6.8 0 0 0-4.6 1.8l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3zM8 9.4l1.9-1.9A2.7 2.7 0 0 0 8 6.8c-.7 0-1.4.3-1.9.7z"/></svg><svg width="27" height="13" viewBox="0 0 27 13" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="9" rx="2.3"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" opacity=".45"/></svg></span></div>
+      <div class="island"></div>
+      <div class="scr stack">
+        <header class="top">
+          <div>
+            <div class="eyebrow">3 athletes · 1 coach</div>
+            <h1 class="h-screen" data-el="Ομάδα">Squad</h1>
+          </div>
+          <div class="avstack"><span class="av av-s av-32">S</span><span class="av av-t av-32">T</span><span class="av av-d av-32">D</span></div>
+        </header>
+        <div class="seg"><button>Board</button><button class="on" data-el="Μονομαχία">Head-to-head</button><button>Feed</button></div>
+
+        <section class="card vs">
+          <div class="vs-top"><span class="eyebrow">Block 1 · Weeks 1–3</span><button class="btn btn-ghost btn-sm"><svg class="i i-16"><use href="#i-swap"/></svg>Change</button></div>
+          <div class="vs-main">
+            <div class="vs-side"><span class="av av-s av-56">S</span><div><div class="vs-name">Stelios</div><div class="vs-sub">Cut · you</div></div></div>
+            <div class="vs-score"><div class="score"><span>5</span><em>–</em><span>2</span></div><div class="score-l">Stelios leads</div></div>
+            <div class="vs-side r"><span class="av av-t av-56">T</span><div><div class="vs-name">Thanos</div><div class="vs-sub">Lean bulk</div></div></div>
+          </div>
+          <div class="tally" aria-label="Categories won: Stelios 5, Thanos 2"><i class="bg-s"></i><i class="bg-s"></i><i class="bg-s"></i><i class="bg-s"></i><i class="bg-s"></i><i class="bg-t"></i><i class="bg-t"></i></div>
+        </section>
+
+        <section class="card tape" aria-label="Tale of the tape">
+          <div class="tape-h"><span class="l"><i class="sw-dot bg-s"></i>Stelios</span><span class="eyebrow" data-el="Σύγκριση">Tale of the tape</span><span class="r">Thanos<i class="sw-dot bg-t"></i></span></div>
+          <div class="tr"><span class="tv lead tnum">13</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">Workouts done</span><span class="tb r"><i style="width:84.6%"></i></span><span class="tv r tnum">11</span></div>
+          <div class="tr"><span class="tv lead tnum">92%</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">On schedule</span><span class="tb r"><i style="width:85.9%"></i></span><span class="tv r tnum">79%</span></div>
+          <div class="tr"><span class="tv lead tnum">3 wk</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">Week streak</span><span class="tb r"><i style="width:33.3%"></i></span><span class="tv r tnum">1 wk</span></div>
+          <div class="tr"><span class="tv tnum">18.4t</span><span class="tb l"><i style="width:87.2%"></i></span><span class="tl">Volume this week</span><span class="tb r"><i style="width:100%"></i></span><span class="tv r lead tnum">21.1t</span></div>
+          <div class="tr"><span class="tv lead tnum">9</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">PRs</span><span class="tb r"><i style="width:77.8%"></i></span><span class="tv r tnum">7</span></div>
+          <div class="tr"><span class="tv lead tnum">+8.2%</span><span class="tb l"><i style="width:100%"></i></span><span class="tl">Strength gain</span><span class="tb r"><i style="width:84.1%"></i></span><span class="tv r tnum">+6.9%</span></div>
+          <div class="tr"><span class="tv tnum">−1.5</span><span class="tb l"><i style="width:85%"></i></span><span class="tl">Weight → goal</span><span class="tb r"><i style="width:100%"></i></span><span class="tv r lead tnum">+0.8</span></div>
+          <p class="tape-note">Weight compares progress toward each athlete’s own goal (Stelios 34% of cut, Thanos 40% of bulk). Bars scale to the row leader.</p>
+        </section>
+
+        <section class="card charts2">
+          <div class="charts2-h"><span class="eyebrow">The race</span><span class="legend"><span><i class="sw-dot bg-s"></i>Stelios</span><span><i class="sw-dot bg-t"></i>Thanos</span></span></div>
+          <div class="charts2-g">
+            <div><div class="ch-t">Sessions <span>· cumulative</span></div><svg class="ch" viewBox="0 0 155 126" width="155" height="126" role="img" aria-label="Cumulative sessions: Stelios 13, Thanos 11"><line class="base" x1="16" x2="139" y1="108" y2="108"/><text class="yt" x="11" y="111.5" text-anchor="end">0</text><line class="grid" x1="16" x2="139" y1="74.67" y2="74.67"/><text class="yt" x="11" y="78.17" text-anchor="end">5</text><line class="grid" x1="16" x2="139" y1="41.33" y2="41.33"/><text class="yt" x="11" y="44.83" text-anchor="end">10</text><line class="grid" x1="16" x2="139" y1="8" y2="8"/><text class="yt" x="11" y="11.5" text-anchor="end">15</text><line class="grid" x1="63.06" x2="63.06" y1="8" y2="108"/><line class="grid" x1="110.11" x2="110.11" y1="8" y2="108"/><text class="xt" x="39.53" y="121" text-anchor="middle">W1</text><text class="xt" x="86.58" y="121" text-anchor="middle">W2</text><text class="xt" x="123.56" y="121" text-anchor="middle">W3</text><path class="ln ln-t" d="M16,108 H22.72 V101.33 H29.44 V94.67 H36.17 V94.67 H42.89 V94.67 H49.61 V88 H56.33 V81.33 H63.06 V81.33 H69.78 V74.67 H76.5 V74.67 H83.22 V68 H89.94 V68 H96.67 V61.33 H103.39 V61.33 H110.11 V61.33 H116.83 V54.67 H123.56 V48 H130.28 V41.33 H137 V34.67"/><path class="ln ln-s" d="M16,108 H22.72 V101.33 H29.44 V94.67 H36.17 V94.67 H42.89 V88 H49.61 V81.33 H56.33 V74.67 H63.06 V74.67 H69.78 V68 H76.5 V61.33 H83.22 V61.33 H89.94 V54.67 H96.67 V48 H103.39 V41.33 H110.11 V34.67 H116.83 V28 H123.56 V21.33 H130.28 V21.33 H137 V21.33"/><circle class="end end-t" cx="137" cy="34.67" r="4"><title>Thanos: 11 sessions</title></circle><circle class="end end-s" cx="137" cy="21.33" r="4"><title>Stelios: 13 sessions</title></circle><text class="dl" x="144" y="24.83">13</text><text class="dl dl-2" x="144" y="39.67">11</text></svg></div>
+            <div><div class="ch-t">Bench e1RM <span>· kg</span></div><svg class="ch" viewBox="0 0 155 126" width="155" height="126" role="img" aria-label="Bench press estimated 1RM by week: Stelios 84, 87, 89; Thanos 95, 98, 101 kg"><line class="base" x1="18" x2="153" y1="108" y2="108"/><text class="yt" x="13" y="111.5" text-anchor="end">0</text><line class="grid" x1="18" x2="153" y1="76.67" y2="76.67"/><text class="yt" x="13" y="80.17" text-anchor="end">40</text><line class="grid" x1="18" x2="153" y1="45.33" y2="45.33"/><text class="yt" x="13" y="48.83" text-anchor="end">80</text><line class="grid" x1="18" x2="153" y1="14" y2="14"/><text class="yt" x="13" y="17.5" text-anchor="end">120</text><path class="bar-s" d="M25.5,108 V46.2 Q25.5,42.2 29.5,42.2 H35.5 Q39.5,42.2 39.5,46.2 V108 Z"><title>Stelios W1: 84 kg</title></path><path class="bar-t" d="M41.5,108 V37.58 Q41.5,33.58 45.5,33.58 H51.5 Q55.5,33.58 55.5,37.58 V108 Z"><title>Thanos W1: 95 kg</title></path><text class="xt" x="40.5" y="121" text-anchor="middle">W1</text><path class="bar-s" d="M70.5,108 V43.85 Q70.5,39.85 74.5,39.85 H80.5 Q84.5,39.85 84.5,43.85 V108 Z"><title>Stelios W2: 87 kg</title></path><path class="bar-t" d="M86.5,108 V35.23 Q86.5,31.23 90.5,31.23 H96.5 Q100.5,31.23 100.5,35.23 V108 Z"><title>Thanos W2: 98 kg</title></path><text class="xt" x="85.5" y="121" text-anchor="middle">W2</text><path class="bar-s" d="M115.5,108 V42.28 Q115.5,38.28 119.5,38.28 H125.5 Q129.5,38.28 129.5,42.28 V108 Z"><title>Stelios W3: 89 kg</title></path><path class="bar-t" d="M131.5,108 V32.88 Q131.5,28.88 135.5,28.88 H141.5 Q145.5,28.88 145.5,32.88 V108 Z"><title>Thanos W3: 101 kg</title></path><text class="xt" x="130.5" y="121" text-anchor="middle">W3</text><text class="dl" x="122.5" y="34.28" text-anchor="middle">89</text><text class="dl" x="138.5" y="24.88" text-anchor="middle">101</text></svg></div>
+          </div>
+        </section>
+      </div>
+      <nav class="tabbar" aria-label="Main"><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-home"/></svg></span><span data-el="Αρχική">Home</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-train"/></svg></span><span data-el="Προπόνηση">Train</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-body"/></svg></span><span data-el="Σώμα">Body</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-fuel"/></svg></span><span data-el="Διατροφή">Fuel</span></button><button class="tab on" aria-current="page"><span class="ti"><svg class="i i-24"><use href="#i-squad"/></svg></span><span data-el="Ομάδα">Squad</span></button></nav>
+      <div class="home-ind"></div>
+    </div>
+  </figure>
+
+  <!-- =============================== 04 BODY =============================== -->
+  <figure class="frame">
+    <figcaption class="cap"><span class="cap-n">04</span><span class="cap-t">Body</span><span class="cap-d">Weight trend · goal</span></figcaption>
+    <div class="phone">
+      <div class="sb"><span class="sb-time">9:41</span><span class="sb-ic"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.2-1.3A10.3 10.3 0 0 0 8 .4 10.3 10.3 0 0 0 .8 3.3L2 4.6a8.6 8.6 0 0 1 6-2.4zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.8 6.8 0 0 0 8 4a6.8 6.8 0 0 0-4.6 1.8l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3zM8 9.4l1.9-1.9A2.7 2.7 0 0 0 8 6.8c-.7 0-1.4.3-1.9.7z"/></svg><svg width="27" height="13" viewBox="0 0 27 13" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="9" rx="2.3"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" opacity=".45"/></svg></span></div>
+      <div class="island"></div>
+      <div class="scr">
+        <header class="top">
+          <div>
+            <div class="eyebrow" data-el="Βάρος σώματος">Body weight</div>
+            <h1 class="h-screen" data-el="Σώμα">Body</h1>
+          </div>
+          <div class="top-act"><button class="icon-btn soft" aria-label="Settings"><svg class="i"><use href="#i-sliders"/></svg></button></div>
+        </header>
+
+        <section class="bh">
+          <div>
+            <div class="eyebrow">Trend weight · today</div>
+            <div class="bh-v">80.9<small>kg</small></div>
+            <div class="bh-sub">Scale this morning <b class="tnum">80.6 kg</b> · 07:12</div>
+          </div>
+          <div class="bh-r">
+            <div class="mini"><span class="eyebrow">Since start</span><b><svg class="i"><use href="#i-down"/></svg>1.5<small>kg</small></b></div>
+            <div class="mini"><span class="eyebrow">Weekly rate</span><b>−0.6<small>kg / wk</small></b></div>
+          </div>
+        </section>
+
+        <section class="card goal">
+          <div class="goal-h"><span class="eyebrow">Goal progress</span><span class="v"><b>34%</b> · 2.9 kg to go · ETA 12 Nov</span></div>
+          <div class="gtrack" aria-label="34% of the way from 82.4 to 78.0 kg"><i></i><span class="knob"></span></div>
+          <div class="gticks"><span><b class="tnum">82.4</b> start</span><span>goal <b class="tnum">78.0</b></span></div>
+        </section>
+
+        <section class="card wcard" style="margin-top:12px">
+          <div class="wcard-h"><span class="eyebrow">Last 30 days</span><div class="seg seg-sm"><button class="on">1M</button><button>3M</button><button>All</button></div></div>
+          <svg class="ch wchart" viewBox="0 0 326 188" width="326" height="188" role="img" aria-label="Daily weigh-ins and trend weight, last 30 days, with goal line at 78 kg"><line class="grid" x1="2" x2="296" y1="151.17" y2="151.17"/><line class="grid" x1="2" x2="296" y1="99.83" y2="99.83"/><text class="yt" x="326" y="103.33" text-anchor="end">80</text><line class="grid" x1="2" x2="296" y1="48.5" y2="48.5"/><text class="yt" x="326" y="52" text-anchor="end">82</text><line class="goal" x1="2" x2="296" y1="151.17" y2="151.17"/><text class="yt yt-goal" x="326" y="154.67" text-anchor="end">78</text><g class="goal-tag" transform="translate(6,129.17)"><rect width="72" height="16" rx="8"/><text x="36" y="11.5" text-anchor="middle">Goal 78.0 kg</text></g><line class="mark" x1="127.67" x2="127.67" y1="10" y2="164"/><text class="mk" x="132.67" y="18">Program start</text><path class="area-s" d="M2,29.25 C3.74,29.29 8.19,29.39 11.67,29.49 C15.15,29.59 17.85,29.67 21.33,29.82 C24.81,29.97 27.52,30.1 31,30.32 C34.48,30.53 37.19,30.73 40.67,31.02 C44.15,31.31 46.85,31.57 50.33,31.92 C53.81,32.27 56.52,32.59 60,32.98 C63.48,33.38 66.19,33.72 69.67,34.13 C73.15,34.54 75.85,34.87 79.33,35.27 C82.81,35.66 85.52,35.96 89,36.3 C92.48,36.65 95.19,36.9 98.67,37.17 C102.15,37.45 104.85,37.63 108.33,37.84 C111.81,38.04 114.52,38.16 118,38.3 C121.48,38.44 124.19,38.21 127.67,38.61 C131.15,39 133.85,39.75 137.33,40.5 C140.81,41.25 143.52,41.95 147,42.76 C150.48,43.58 153.19,44.21 156.67,45.03 C160.15,45.84 162.85,46.48 166.33,47.29 C169.81,48.11 172.52,48.74 176,49.56 C179.48,50.37 182.19,51.01 185.67,51.82 C189.15,52.64 191.85,53.27 195.33,54.09 C198.81,54.9 201.52,55.54 205,56.35 C208.48,57.17 211.19,57.8 214.67,58.62 C218.15,59.43 220.85,60.07 224.33,60.88 C227.81,61.7 230.52,62.33 234,63.15 C237.48,63.96 240.19,64.59 243.67,65.41 C247.15,66.23 249.85,66.86 253.33,67.67 C256.81,68.49 259.52,69.12 263,69.94 C266.48,70.75 269.19,71.39 272.67,72.2 C276.15,73.02 278.85,73.65 282.33,74.47 C285.81,75.28 290.26,76.33 292,76.73 L292,164 L2,164 Z"/><circle class="wpt" cx="2" cy="22.83" r="3.25"><title>25 Aug: 83.0 kg</title></circle><circle class="wpt" cx="11.67" cy="33.1" r="3.25"><title>26 Aug: 82.6 kg</title></circle><circle class="wpt" cx="21.33" cy="20.27" r="3.25"><title>27 Aug: 83.1 kg</title></circle><circle class="wpt" cx="31" cy="27.97" r="3.25"><title>28 Aug: 82.8 kg</title></circle><circle class="wpt" cx="40.67" cy="38.23" r="3.25"><title>29 Aug: 82.4 kg</title></circle><circle class="wpt" cx="60" cy="22.83" r="3.25"><title>31 Aug: 83.0 kg</title></circle><circle class="wpt" cx="69.67" cy="35.67" r="3.25"><title>1 Sept: 82.5 kg</title></circle><circle class="wpt" cx="79.33" cy="30.53" r="3.25"><title>2 Sept: 82.7 kg</title></circle><circle class="wpt" cx="89" cy="45.93" r="3.25"><title>3 Sept: 82.1 kg</title></circle><circle class="wpt" cx="98.67" cy="30.53" r="3.25"><title>4 Sept: 82.7 kg</title></circle><circle class="wpt" cx="108.33" cy="35.67" r="3.25"><title>5 Sept: 82.5 kg</title></circle><circle class="wpt" cx="127.67" cy="35.67" r="3.25"><title>7 Sept: 82.5 kg</title></circle><circle class="wpt" cx="137.33" cy="33.1" r="3.25"><title>8 Sept: 82.6 kg</title></circle><circle class="wpt" cx="147" cy="48.5" r="3.25"><title>9 Sept: 82.0 kg</title></circle><circle class="wpt" cx="156.67" cy="43.37" r="3.25"><title>10 Sept: 82.2 kg</title></circle><circle class="wpt" cx="166.33" cy="38.23" r="3.25"><title>11 Sept: 82.4 kg</title></circle><circle class="wpt" cx="176" cy="51.07" r="3.25"><title>12 Sept: 81.9 kg</title></circle><circle class="wpt" cx="195.33" cy="48.5" r="3.25"><title>14 Sept: 82.0 kg</title></circle><circle class="wpt" cx="205" cy="53.63" r="3.25"><title>15 Sept: 81.8 kg</title></circle><circle class="wpt" cx="214.67" cy="63.9" r="3.25"><title>16 Sept: 81.4 kg</title></circle><circle class="wpt" cx="224.33" cy="53.63" r="3.25"><title>17 Sept: 81.8 kg</title></circle><circle class="wpt" cx="234" cy="63.9" r="3.25"><title>18 Sept: 81.4 kg</title></circle><circle class="wpt" cx="243.67" cy="74.17" r="3.25"><title>19 Sept: 81.0 kg</title></circle><circle class="wpt" cx="263" cy="63.9" r="3.25"><title>21 Sept: 81.4 kg</title></circle><circle class="wpt" cx="272.67" cy="76.73" r="3.25"><title>22 Sept: 80.9 kg</title></circle><circle class="wpt" cx="282.33" cy="74.17" r="3.25"><title>23 Sept: 81.0 kg</title></circle><path class="ln ln-s" d="M2,29.25 C3.74,29.29 8.19,29.39 11.67,29.49 C15.15,29.59 17.85,29.67 21.33,29.82 C24.81,29.97 27.52,30.1 31,30.32 C34.48,30.53 37.19,30.73 40.67,31.02 C44.15,31.31 46.85,31.57 50.33,31.92 C53.81,32.27 56.52,32.59 60,32.98 C63.48,33.38 66.19,33.72 69.67,34.13 C73.15,34.54 75.85,34.87 79.33,35.27 C82.81,35.66 85.52,35.96 89,36.3 C92.48,36.65 95.19,36.9 98.67,37.17 C102.15,37.45 104.85,37.63 108.33,37.84 C111.81,38.04 114.52,38.16 118,38.3 C121.48,38.44 124.19,38.21 127.67,38.61 C131.15,39 133.85,39.75 137.33,40.5 C140.81,41.25 143.52,41.95 147,42.76 C150.48,43.58 153.19,44.21 156.67,45.03 C160.15,45.84 162.85,46.48 166.33,47.29 C169.81,48.11 172.52,48.74 176,49.56 C179.48,50.37 182.19,51.01 185.67,51.82 C189.15,52.64 191.85,53.27 195.33,54.09 C198.81,54.9 201.52,55.54 205,56.35 C208.48,57.17 211.19,57.8 214.67,58.62 C218.15,59.43 220.85,60.07 224.33,60.88 C227.81,61.7 230.52,62.33 234,63.15 C237.48,63.96 240.19,64.59 243.67,65.41 C247.15,66.23 249.85,66.86 253.33,67.67 C256.81,68.49 259.52,69.12 263,69.94 C266.48,70.75 269.19,71.39 272.67,72.2 C276.15,73.02 278.85,73.65 282.33,74.47 C285.81,75.28 290.26,76.33 292,76.73"/><circle class="wpt wpt-today" cx="292" cy="84.43" r="3.25"><title>Today: 80.6 kg</title></circle><circle class="end end-s" cx="292" cy="76.73" r="4.5"><title>Trend today: 80.9 kg</title></circle><text class="xt" x="2" y="182" text-anchor="start">25 Aug</text><text class="xt" x="69.67" y="182" text-anchor="middle">1 Sep</text><text class="xt" x="137.33" y="182" text-anchor="middle">8 Sep</text><text class="xt" x="205" y="182" text-anchor="middle">15 Sep</text><text class="xt" x="296" y="182" text-anchor="end">Today</text><line class="base" x1="2" x2="296" y1="164" y2="164"/></svg>
+          <div class="legend"><span><i class="sw-ring"></i>Daily weigh-in</span><span><i class="sw-line bg-s"></i>Trend</span><span><i class="sw-line" style="background:var(--ink-2);height:1.5px"></i>Goal</span></div>
+        </section>
+
+        <section class="card logc" style="margin-top:12px">
+          <div class="logc-h"><span class="eyebrow" data-el="Καταγραφή σήμερα">Log today’s weight</span><span class="muted">Thu 24 Sep · morning</span></div>
+          <div class="stepper">
+            <button class="stp" aria-label="Minus 0.1 kg" data-step="-0.1"><svg class="i"><use href="#i-minus"/></svg></button>
+            <div class="stp-v tnum"><span class="stp-num">80.6</span><small>kg</small></div>
+            <button class="stp" aria-label="Plus 0.1 kg" data-step="0.1"><svg class="i"><use href="#i-plus"/></svg></button>
+            <button class="btn btn-ink" data-el="Αποθήκευση">Save</button>
+          </div>
+        </section>
+
+        <div class="sec"><span class="sec-t" data-el="Ιστορικό">History</span><span class="sec-r"></span><span class="sec-a">Export<svg class="i i-16"><use href="#i-chev"/></svg></span></div>
+        <section class="card hist">
+          <div class="hr"><span class="dt">Wed 23 Sep</span><span class="w tnum">80.9<small>kg</small></span><span class="d tnum">−0.3</span></div>
+          <div class="hr"><span class="dt">Tue 22 Sep</span><span class="w tnum">81.2<small>kg</small></span><span class="d tnum">+0.2</span></div>
+          <div class="hr"><span class="dt">Mon 21 Sep</span><span class="w tnum">81.0<small>kg</small></span><span class="d tnum">−0.4</span></div>
+        </section>
+      </div>
+      <nav class="tabbar" aria-label="Main"><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-home"/></svg></span><span data-el="Αρχική">Home</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-train"/></svg></span><span data-el="Προπόνηση">Train</span></button><button class="tab on" aria-current="page"><span class="ti"><svg class="i i-24"><use href="#i-body"/></svg></span><span data-el="Σώμα">Body</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-fuel"/></svg></span><span data-el="Διατροφή">Fuel</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-squad"/></svg></span><span data-el="Ομάδα">Squad</span></button></nav>
+      <div class="home-ind"></div>
+    </div>
+  </figure>
+
+  <!-- =============================== 05 FUEL =============================== -->
+  <figure class="frame">
+    <figcaption class="cap"><span class="cap-n">05</span><span class="cap-t">Fuel</span><span class="cap-d">Meal plan · today</span></figcaption>
+    <div class="phone">
+      <div class="sb"><span class="sb-time">9:41</span><span class="sb-ic"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.2-1.3A10.3 10.3 0 0 0 8 .4 10.3 10.3 0 0 0 .8 3.3L2 4.6a8.6 8.6 0 0 1 6-2.4zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.8 6.8 0 0 0 8 4a6.8 6.8 0 0 0-4.6 1.8l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3zM8 9.4l1.9-1.9A2.7 2.7 0 0 0 8 6.8c-.7 0-1.4.3-1.9.7z"/></svg><svg width="27" height="13" viewBox="0 0 27 13" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="9" rx="2.3"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" opacity=".45"/></svg></span></div>
+      <div class="island"></div>
+      <div class="scr stack">
+        <header class="top">
+          <div>
+            <div class="eyebrow" data-el="Πρόγραμμα διατροφής">Meal plan</div>
+            <h1 class="h-screen" data-el="Διατροφή">Fuel</h1>
+          </div>
+          <div class="top-act"><button class="icon-btn soft" aria-label="Add food"><svg class="i"><use href="#i-plus"/></svg></button></div>
+        </header>
+
+        <section class="card plan">
+          <div class="row" style="justify-content:space-between"><span class="eyebrow">Active plan · since 14 Sep</span><span class="tag">v2</span></div>
+          <div class="plan-t"><h2 class="h-card">Cut phase — v2</h2></div>
+          <div class="plan-by"><span class="av av-d av-24">D</span>From <b>Coach Dennis</b> · updated 18 Sep</div>
+          <div class="tgt">
+            <div class="ringbox"><svg class="ring" viewBox="0 0 108 108" width="108" height="108" role="img" aria-label="1,630 of 2,400 kcal eaten">
+  <circle class="ring-track" cx="54" cy="54" r="44" stroke-width="10"/>
+  <circle class="ring-val" cx="54" cy="54" r="44" stroke-width="10" stroke-dasharray="187.76 276.46" transform="rotate(-90 54 54)"/>
+</svg><div class="c"><b class="tnum">770</b><span>kcal left</span></div></div>
+            <div class="mac">
+              <div class="mac-r"><span class="k">Protein</span><span class="v"><b class="tnum">132</b> / 180 g</span><span class="bar"><i style="width:73%"></i></span></div>
+              <div class="mac-r"><span class="k">Carbs</span><span class="v"><b class="tnum">170</b> / 250 g</span><span class="bar"><i style="width:68%"></i></span></div>
+              <div class="mac-r"><span class="k">Fat</span><span class="v"><b class="tnum">41</b> / 70 g</span><span class="bar"><i style="width:58.6%"></i></span></div>
+            </div>
+          </div>
+          <div class="kcal-t"><span><b class="tnum">1,630</b> eaten</span><span>Target <b class="tnum">2,400</b> kcal</span></div>
+        </section>
+
+        <section class="card meals">
+          <div class="meals-h"><span class="sec-t" data-el="Σημερινά γεύματα">Today’s meals</span><span class="eyebrow tnum">3 of 5</span></div>
+          <div class="meal on"><button class="mchk" aria-label="Breakfast eaten"><span><svg class="i"><use href="#i-check"/></svg></span></button><div class="n">Breakfast<small>Oats, whey, berries · 520 kcal</small></div><span class="tm tnum">08:00</span></div>
+          <div class="meal on"><button class="mchk" aria-label="Snack eaten"><span><svg class="i"><use href="#i-check"/></svg></span></button><div class="n">Snack<small>Greek yogurt, walnuts · 290 kcal</small></div><span class="tm tnum">11:00</span></div>
+          <div class="meal on"><button class="mchk" aria-label="Lunch eaten"><span><svg class="i"><use href="#i-check"/></svg></span></button><div class="n">Lunch<small>Chicken, rice, horiatiki · 820 kcal</small></div><span class="tm tnum">14:00</span></div>
+          <div class="meal next"><button class="mchk" aria-label="Mark pre-workout eaten"><span><svg class="i"><use href="#i-check"/></svg></span></button><div class="n">Pre-workout<small>Banana, rice cakes, honey · 310 kcal</small></div><span class="tm tnum"><span class="tag tag-ink" style="height:22px">Next</span>17:30</span></div>
+          <div class="meal"><button class="mchk" aria-label="Mark dinner eaten"><span><svg class="i"><use href="#i-check"/></svg></span></button><div class="n">Dinner<small>Salmon, potatoes, greens · 460 kcal</small></div><span class="tm tnum">21:00</span></div>
+        </section>
+
+        <div class="g2">
+          <article class="card pdf">
+            <div class="pdf-ic"><span>PDF</span></div>
+            <div class="pdf-n">meal-plan-stelios.pdf</div>
+            <div class="pdf-m">4 pages · 312 KB</div>
+            <button class="btn btn-soft btn-sm" style="margin-top:10px;height:40px"><svg class="i i-16"><use href="#i-dl"/></svg>Open</button>
+          </article>
+          <article class="card adh">
+            <div class="eyebrow">Adherence · 4 wk</div>
+            <div class="adh-v"><b>87%</b><span>meals ticked</span></div>
+            <div class="hm" role="img" aria-label="Meal plan adherence, last 4 weeks"><div class="hm-row hm-head"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q3" title="3/5 meals"></i><i class="q4" title="4/5 meals"></i></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q2" title="2/5 meals"></i><i class="q4" title="4/5 meals"></i></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q3" title="3/5 meals"></i></div><div class="hm-row"><i class="q5" title="5/5 meals"></i><i class="q5" title="5/5 meals"></i><i class="q4" title="4/5 meals"></i><i class="q3 today" title="3/5 meals"></i><i class="qx" title="Upcoming"></i><i class="qx" title="Upcoming"></i><i class="qx" title="Upcoming"></i></div></div>
+            <div class="hm-leg"><span style="margin-left:0">0</span><i style="background:var(--q1)"></i><i style="background:var(--q2)"></i><i style="background:var(--q3)"></i><i style="background:var(--q4)"></i><i style="background:var(--q5)"></i><span>5 meals</span></div>
+          </article>
+        </div>
+      </div>
+      <nav class="tabbar" aria-label="Main"><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-home"/></svg></span><span data-el="Αρχική">Home</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-train"/></svg></span><span data-el="Προπόνηση">Train</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-body"/></svg></span><span data-el="Σώμα">Body</span></button><button class="tab on" aria-current="page"><span class="ti"><svg class="i i-24"><use href="#i-fuel"/></svg></span><span data-el="Διατροφή">Fuel</span></button><button class="tab"><span class="ti"><svg class="i i-24"><use href="#i-squad"/></svg></span><span data-el="Ομάδα">Squad</span></button></nav>
+      <div class="home-ind"></div>
+    </div>
+  </figure>
+
+  </div>
+</main>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var mq=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)');
+  function sync(){
+    var t=root.getAttribute('data-theme')||(mq&&mq.matches?'dark':'light');
+    document.querySelectorAll('[data-set-theme]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.setTheme===t));});
+  }
+  document.querySelectorAll('[data-set-theme]').forEach(function(b){b.addEventListener('click',function(){root.setAttribute('data-theme',b.dataset.setTheme);sync();});});
+  if(mq&&mq.addEventListener)mq.addEventListener('change',sync);
+  sync();
+  // EN / EL
+  document.querySelectorAll('[data-lang]').forEach(function(b){b.addEventListener('click',function(){
+    var el=b.dataset.lang==='el';
+    document.querySelectorAll('[data-el]').forEach(function(n){ if(n.dataset.en==null)n.dataset.en=n.textContent; n.textContent=el?n.dataset.el:n.dataset.en; });
+    root.lang=el?'el':'en';
+    document.querySelectorAll('[data-lang]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b));});
+  });});
+  // weight stepper
+  document.querySelectorAll('[data-step]').forEach(function(b){b.addEventListener('click',function(){
+    var n=b.parentNode.querySelector('.stp-num'); n.textContent=(parseFloat(n.textContent)+parseFloat(b.dataset.step)).toFixed(1);
+  });});
+  // meal ticks
+  document.querySelectorAll('.mchk').forEach(function(b){b.addEventListener('click',function(){b.parentNode.classList.toggle('on');});});
+})();
+</script>
+</body>
+</html>
