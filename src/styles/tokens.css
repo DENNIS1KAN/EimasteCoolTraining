@@ -1,0 +1,147 @@
+/*
+ * Design tokens: the ONLY place raw colors live. Everything else uses these names.
+ * Values below are provisional; the chosen design direction sets the final values.
+ */
+:root {
+  color-scheme: light;
+  /* surfaces */
+  --bg: #f4f5f2;
+  --surface: #ffffff;
+  --surface-2: #f0f1ee; /* inset / secondary panels, inputs */
+  --surface-3: #e7e9e4; /* pressed / tracks */
+  --line: #dde0db; /* hairlines */
+  --line-strong: #c9cdc6;
+  /* ink */
+  --ink: #111418;
+  --ink-2: #3d434c;
+  --muted: #6b7280;
+  --faint: #9aa1ab;
+  /* brand accent */
+  --accent: #1d4ed8;
+  --accent-ink: #1d4ed8; /* accent used as text/icons on surface */
+  --on-accent: #ffffff;
+  --accent-soft: #dce5fb;
+  /* status (always paired with an icon or label) */
+  --good: #0f8a3c;
+  --good-soft: #d8eee2;
+  --warn: #b7791f;
+  --warn-soft: #fbefd5;
+  --danger: #c8102e;
+  --danger-soft: #f8dce0;
+  /* member identity colors (validated colorblind-safe order: blue, orange, aqua) */
+  --m-blue: #2a78d6;
+  --m-orange: #eb6834;
+  --m-aqua: #1baf7a;
+  --m-yellow: #eda100;
+  --m-magenta: #e87ba4;
+  --m-green: #008300;
+  --m-violet: #4a3aa7;
+  --m-red: #e34948;
+  /* charts */
+  --chart-surface: var(--surface);
+  --grid: #e6e8e3;
+  --axis: #c3c7bf;
+  /* type */
+  --font-display: 'Sofia Sans Extra Condensed', 'Sofia Sans Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif;
+  --font-body: 'Sofia Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* shape */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+  --shadow-1: 0 1px 2px rgba(17, 20, 24, 0.06), 0 1px 1px rgba(17, 20, 24, 0.04);
+  --shadow-2: 0 10px 30px rgba(17, 20, 24, 0.12), 0 2px 6px rgba(17, 20, 24, 0.06);
+  /* spacing (4px grid) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  /* motion */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-1: 120ms;
+  --dur-2: 220ms;
+  /* layout */
+  --tabbar-h: 64px;
+  --content-max: 720px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #0b0d10;
+    --surface: #14171c;
+    --surface-2: #1b1f26;
+    --surface-3: #242932;
+    --line: #262b33;
+    --line-strong: #353b45;
+    --ink: #f2f4f7;
+    --ink-2: #c9ced6;
+    --muted: #98a2b3;
+    --faint: #667085;
+    --accent: #7c9bff;
+    --accent-ink: #9db4ff;
+    --on-accent: #0b0d10;
+    --accent-soft: #1f2a4a;
+    --good: #3ccf7e;
+    --good-soft: #143424;
+    --warn: #f5b841;
+    --warn-soft: #3a2e14;
+    --danger: #ff5c70;
+    --danger-soft: #3a1d23;
+    --m-blue: #3987e5;
+    --m-orange: #d95926;
+    --m-aqua: #199e70;
+    --m-yellow: #c98500;
+    --m-magenta: #d55181;
+    --m-green: #008300;
+    --m-violet: #9085e9;
+    --m-red: #e66767;
+    --grid: #22262d;
+    --axis: #383d46;
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b0d10;
+  --surface: #14171c;
+  --surface-2: #1b1f26;
+  --surface-3: #242932;
+  --line: #262b33;
+  --line-strong: #353b45;
+  --ink: #f2f4f7;
+  --ink-2: #c9ced6;
+  --muted: #98a2b3;
+  --faint: #667085;
+  --accent: #7c9bff;
+  --accent-ink: #9db4ff;
+  --on-accent: #0b0d10;
+  --accent-soft: #1f2a4a;
+  --good: #3ccf7e;
+  --good-soft: #143424;
+  --warn: #f5b841;
+  --warn-soft: #3a2e14;
+  --danger: #ff5c70;
+  --danger-soft: #3a1d23;
+  --m-blue: #3987e5;
+  --m-orange: #d95926;
+  --m-aqua: #199e70;
+  --m-yellow: #c98500;
+  --m-magenta: #d55181;
+  --m-green: #008300;
+  --m-violet: #9085e9;
+  --m-red: #e66767;
+  --grid: #22262d;
+  --axis: #383d46;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
