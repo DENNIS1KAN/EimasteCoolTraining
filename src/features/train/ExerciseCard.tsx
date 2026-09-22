@@ -11,7 +11,7 @@ import { ProgressRing } from '../../ui/charts'
 import { ExerciseExtras, type ExtrasActions } from './ExerciseExtras'
 import { SetList } from './SetList'
 import { SetRow, type SetActions } from './SetRow'
-import { fmtRange, fmtRestShort, fmtRpe, fmtTypedWeight, swapCount } from './logic/format'
+import { fmtRange, fmtRestShort, fmtRpe, fmtTypedWeight, setSeparator, swapCount } from './logic/format'
 import { exerciseFrom, type Machines } from './logic/log'
 import { placeholderFor, type PrevPerformance } from './logic/previous'
 import { parseRepRange, suggestNext, type Suggestion } from './logic/progression'
@@ -72,11 +72,11 @@ function OpenExercise(p: Props & { x: ExerciseLog }) {
       <div className="tr-ex__head">
         <div className="tr-ex__title">
           <p className="tr-ex__n">{t('exerciseN', { n: index + 1, total })}</p>
-          <h3 className="tr-ex__name" id={`ex-${index}-name`}>
+          <h2 className="tr-ex__name" id={`ex-${index}-name`}>
             <Link to={`/lift/${p.slug}/${encodeURIComponent(name)}`} title={t('history', { name })} lang="en">
               {name}
             </Link>
-          </h3>
+          </h2>
         </div>
         {video ? (
           <a className="ui-iconbtn ui-iconbtn--soft" href={video} target="_blank" rel="noreferrer" aria-label={`${t('video')}: ${name}`}>
@@ -252,7 +252,7 @@ export function SetsText({ sets }: { sets: { w: string; r: string }[] }) {
     <>
       {sets.map((s, i) => (
         <span key={i} className="nowrap">
-          {i > 0 ? ', ' : null}
+          {i > 0 ? setSeparator() : null}
           {s.w ? (
             <>
               {fmtTypedWeight(s.w)}
@@ -328,7 +328,13 @@ function CollapsedExercise(p: Props & { x: ExerciseLog }) {
   )
   return (
     <Card as="article" className={cx('tr-ex2', complete && 'is-complete')} id={`ex-${index}`} padding="none">
-      <button type="button" className="tr-ex2__btn" aria-expanded="false" onClick={() => p.actions.toggle(index)}>
+      <button
+        type="button"
+        className="tr-ex2__btn"
+        aria-expanded="false"
+        aria-label={`${t('exerciseN', { n: index + 1, total })}: ${name}, ${t('setsProgress', { done, total: rows })}`}
+        onClick={() => p.actions.toggle(index)}
+      >
         <ProgressRing value={rows ? done / rows : 0} size={40} stroke={4} color="var(--accent-strong)" trackColor="var(--surface-3)" ariaLabel={t('setsProgress', { done, total: rows })}>
           {complete ? <Icon name="check" size={18} strokeWidth={2.6} /> : <span className="num tr-ex2__frac">{`${done}/${rows}`}</span>}
         </ProgressRing>

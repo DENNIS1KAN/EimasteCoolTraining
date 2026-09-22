@@ -31,7 +31,9 @@ export function useSummaryText() {
       return subj.id === viewerId ? t(you) : t(other, { name: subj.name })
     })
     if (!parts.length) return ''
-    const s = parts.join('; ')
+    // "…; you're more consistent" in English, "…, ενώ εσύ…" in Greek (where ";" is a question mark).
+    const sep = clauses.length > 1 && clauses[0].who !== clauses[1].who ? t('sepContrast') : t('sepSame')
+    const s = parts.join(sep)
     return `${s.charAt(0).toLocaleUpperCase()}${s.slice(1)}.`
   }
 }

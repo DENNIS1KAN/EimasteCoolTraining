@@ -135,7 +135,7 @@ export function MemberEditor({ member, viewer }: MemberEditorProps) {
 
         <div className="member-col">
           <CoachNoteCard member={member} />
-          <LoginCard member={member} />
+          <LoginCard member={member} isMe={isMe} />
         </div>
       </div>
 

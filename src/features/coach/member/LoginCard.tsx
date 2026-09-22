@@ -9,7 +9,7 @@ import { appLocation, inviteLink } from '../lib/invite'
 import { M } from '../messages'
 
 /** Invite status and link, and "Reset login" for a forgotten password (new link, old login detached). */
-export function LoginCard({ member }: { member: Member }) {
+export function LoginCard({ member, isMe }: { member: Member; isMe: boolean }) {
   const t = useT(M)
   const demo = useStore((s) => s.backend === 'demo')
   const invites = useInvites()
@@ -71,7 +71,7 @@ export function LoginCard({ member }: { member: Member }) {
         )
       ) : null}
 
-      {member.joined && !justReset ? (
+      {member.joined && !justReset && !isMe ? (
         <div className="login-reset">
           <p className="login-reset__help">{t('resetHelp')}</p>
           <Button variant="ghost" size="sm" icon="refresh" onClick={() => setConfirming(true)}>

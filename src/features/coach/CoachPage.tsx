@@ -14,7 +14,7 @@ import './coach.css'
 // Built by the fuel feature; loaded only when the tab opens.
 const CoachNutritionTab = lazy(() => import('../fuel/CoachNutritionTab'))
 
-/** Coach console: the squad's accountability board, meal plans and programs. */
+/** Coach console: the squad's accountability board, meal plans and programs (?tab=squad|nutrition|programs). */
 export default function CoachPage() {
   const t = useT(M)
   const [params, setParams] = useSearchParams()
@@ -25,20 +25,22 @@ export default function CoachPage() {
   const tabId = (v: CoachTab) => `${uid}-tab-${v}`
 
   const labels: Record<CoachTab, string> = { squad: t('tabSquad'), nutrition: t('tabNutrition'), programs: t('tabPrograms') }
+  const date = fmtDate(todayISO(), 'long')
 
   return (
     <div className="coach-page">
-      <PageHeader eyebrow={memberCount === 1 ? t('eyebrowOne', { date: fmtDate(todayISO(), 'long') }) : t('eyebrow', { members: memberCount, date: fmtDate(todayISO(), 'long') })} title={t('title')} account />
-      <Tabs<CoachTab>
-        options={TABS.map((v) => ({ value: v, label: labels[v] }))}
-        value={tab}
-        onChange={(v) => setParams(v === 'squad' ? {} : { tab: v }, { replace: true })}
-        ariaLabel={t('tabsLabel')}
-        block
-        controls={panelId}
-        tabId={tabId}
-        className="coach-tabs"
-      />
+      <PageHeader eyebrow={memberCount === 1 ? t('eyebrowOne', { date }) : t('eyebrow', { members: memberCount, date })} title={t('title')} account />
+      <div className="coach-tabs-bar">
+        <Tabs<CoachTab>
+          options={TABS.map((v) => ({ value: v, label: labels[v] }))}
+          value={tab}
+          onChange={(v) => setParams(v === 'squad' ? {} : { tab: v }, { replace: true })}
+          ariaLabel={t('tabsLabel')}
+          block
+          controls={panelId}
+          tabId={tabId}
+        />
+      </div>
       <div role="tabpanel" id={panelId(tab)} aria-labelledby={tabId(tab)} className="coach-panel">
         {tab === 'squad' && <SquadTab />}
         {tab === 'nutrition' && (

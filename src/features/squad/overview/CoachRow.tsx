@@ -14,7 +14,7 @@ export function CoachRow({ member, isMe, athletes }: { member: Member; isMe: boo
       <Avatar member={member} size={40} you={isMe} decorative />
       <div className="sq-coach__id">
         <p className="sq-coach__name">
-          <Link to={memberHref(member)} className="sq-stretch" aria-label={t('openProfile', { name: member.name })}>
+          <Link to={memberHref(member)} className="sq-stretch" title={t('openProfile', { name: member.name })}>
             {member.name}
           </Link>
           <Tag icon="whistle">{t('coachRole')}</Tag>

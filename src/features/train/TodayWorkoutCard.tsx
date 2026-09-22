@@ -188,7 +188,8 @@ function Hero({ me, program }: { me: Member; program: Program | null }) {
       const d = dayOf(state.ref)!
       const f = focusWord(state.ref)
       return shell({
-        eyebrow: f ? t('todayFocus', { focus: f }) : t('today'),
+        // Behind schedule: the warning line below says "catch up", so the eyebrow only names the focus.
+        eyebrow: state.scheduledToday ? (f ? t('todayFocus', { focus: f }) : t('today')) : (f ?? t('catchUp')),
         live: true,
         children: (
           <>

@@ -33,7 +33,7 @@ export function FeedItemView({ item, members, me, unit, compact, timeLabel }: Fe
   const badgeText = useBadgeText()
   const m = members[item.memberId]
   if (!m) return null
-  const name = (x: Member | undefined) => (x ? (x.id === me?.id ? t('you') : x.name) : '?')
+  const name = (x: Member | undefined) => (x ? (x.id === me?.id ? t('youCap') : x.name) : '?')
   // Greek conjugates by person ("τελείωσε" / "τελείωσες"), so "you" items use their own strings.
   const isMe = m.id === me?.id
   const time = timeLabel ?? (item.kind === 'weighin' || item.kind === 'badge' ? null : fmtTime(item.at))
@@ -191,7 +191,7 @@ export function FeedItemView({ item, members, me, unit, compact, timeLabel }: Fe
       body = (
         <>
           <p className="sq-feed__line">
-            {t('newPlanFor', { name: name(m) })}
+            {t('newPlanFor', { name: isMe ? t('forYou') : m.name })}
             {stamp}
           </p>
           <p className="sq-feed__plan">

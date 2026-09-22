@@ -5,7 +5,6 @@ import { useT } from '../../../i18n'
 import { fmtDayLabel, fmtDuration, fmtVolume } from '../../../lib/format'
 import { logDate, sessionSummary, type PR } from '../../../lib/stats'
 import { ButtonLink, Card, CardHeader, EmptyState, Icon, PRBadge } from '../../../ui'
-import { NudgeButton } from '../NudgeButton'
 import { memberWorkoutHref } from '../format'
 import { SQ } from '../messages'
 
@@ -60,9 +59,7 @@ export function RecentWorkouts({ member, logs, programs, prs, unit, isMe }: Rece
               <ButtonLink to="/train" size="sm" icon="play">
                 {t('startWorkout')}
               </ButtonLink>
-            ) : (
-              <NudgeButton member={member} size="sm" />
-            )
+            ) : undefined
           }
         />
       )}

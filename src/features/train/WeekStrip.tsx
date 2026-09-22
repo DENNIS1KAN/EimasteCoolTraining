@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Program } from '../../data/types'
 import { useT } from '../../i18n'
 import { fmtPct } from '../../lib/format'
@@ -24,18 +24,34 @@ export function WeekStrip({ program, week, currentWeek, completion, onSelect }: 
   const t = useT(M)
   const scroller = useRef<HTMLDivElement>(null)
   const groups = blockGroups(program)
+  const [overflows, setOverflows] = useState(true)
+
+  useEffect(() => {
+    const el = scroller.current
+    if (!el) return
+    // Fade the right edge only while there is more to scroll to.
+    const check = () => setOverflows(el.scrollLeft + el.clientWidth < el.scrollWidth - 4)
+    check()
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(check) : null
+    ro?.observe(el)
+    el.addEventListener('scroll', check, { passive: true })
+    return () => {
+      ro?.disconnect()
+      el.removeEventListener('scroll', check)
+    }
+  }, [])
 
   useEffect(() => {
     const el = scroller.current
     const chip = el?.querySelector<HTMLElement>(`[data-week="${week}"]`)
     if (!el || !chip) return
     const left = chip.offsetLeft - el.clientWidth / 2 + chip.offsetWidth / 2
-    el.scrollTo({ left: Math.max(0, left), behavior: 'smooth' })
+    el.scrollTo?.({ left: Math.max(0, left), behavior: 'smooth' })
   }, [week])
 
   return (
     <div className="tr-weeks">
-      <div className="tr-weeks__scroll" ref={scroller}>
+      <div className={cx('tr-weeks__scroll', overflows && 'is-overflow')} ref={scroller}>
         <div className="tr-weeks__blocks" aria-hidden="true">
           {groups.map((g) => (
             <span key={g.from} className="tr-weeks__block" style={{ width: (g.to - g.from + 1) * (CHIP + GAP) - GAP }}>

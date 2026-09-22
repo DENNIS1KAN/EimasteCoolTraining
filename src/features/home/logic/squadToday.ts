@@ -69,7 +69,8 @@ export function todayStatus(d: SquadData, m: Member, g: AthleteGlance, today: IS
   if (m.programStart > today) return { kind: 'startsOn', date: m.programStart }
   if (g.stats.schedule?.finished) return { kind: 'finished' }
   const ref = g.stats.schedule?.today
-  if (ref && !logs.some((l) => l.done && l.week === ref.week && l.day === ref.day)) return { kind: 'due', dayName: nameOf(program, ref.week, ref.day) }
+  if (ref && !logs.some((l) => l.done && l.week === ref.week && l.day === ref.day))
+    return { kind: 'due', dayName: nameOf(program, ref.week, ref.day) }
   return { kind: 'rest' }
 }
 

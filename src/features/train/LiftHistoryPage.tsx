@@ -10,6 +10,7 @@ import { e1rm, exerciseHistory, personalRecords, type ExercisePoint } from '../.
 import { kgToUnit } from '../../lib/units'
 import { Avatar, BigNumber, ButtonLink, Card, CardHeader, Chip, Delta, EmptyState, Icon, PRBadge, PageHeader, memberColorVar } from '../../ui'
 import { LineChart, type LineSeries } from '../../ui/charts'
+import { setSeparator } from './logic/format'
 import { LIFT } from './messages'
 import './train.css'
 import './lift.css'
@@ -236,7 +237,7 @@ function SessionList(p: { member: Member; history: ExercisePoint[]; unit: Unit; 
                         </>
                       ) : null}
                       {s.reps}
-                      {i < p.sets.length - 1 ? ',' : null}
+                      {i < p.sets.length - 1 ? setSeparator().trimEnd() : null}
                     </span>
                   ))}
                   {p.machine ? (

@@ -40,3 +40,6 @@ export const swapCount = (e: { s1?: string; s2?: string }): number => (e.s1 ? 1 
 /** Clock time in the current locale: "07:40". */
 export const fmtTime = (ms: number): string =>
   new Intl.DateTimeFormat(localeOf(getLang()), { hour: '2-digit', minute: '2-digit' }).format(ms)
+
+/** Separator between sets in "55 × 10, 55 × 9". Greek writes decimals with a comma, so it uses a middle dot. */
+export const setSeparator = (): string => (getLang() === 'el' ? ' · ' : ', ')

@@ -30,11 +30,11 @@ export function ReadOnlyExercise({ x, e, total, intro, unit, slug }: Props) {
       <div className="tr-ex__head">
         <div className="tr-ex__title">
           <p className="tr-ex__n">{t('exerciseN', { n: x.index + 1, total })}</p>
-          <h3 className="tr-ex__name" id={`ro-${x.index}`}>
+          <h2 className="tr-ex__name" id={`ro-${x.index}`}>
             <Link to={`/lift/${slug}/${encodeURIComponent(x.name)}`} title={l('viewLift', { name: x.name })} lang="en">
               {x.name}
             </Link>
-          </h3>
+          </h2>
         </div>
       </div>
       {x.machine || x.v || tech ? (

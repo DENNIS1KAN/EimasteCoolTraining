@@ -49,7 +49,7 @@ export function CompetitorCard({ member, stats, data, today, now, isMe, access, 
         <Avatar member={member} size={54} you={isMe} decorative />
         <div className="sq-comp__id">
           <h3 className="sq-comp__name">
-            <Link to={memberHref(member)} className="sq-stretch" aria-label={t('openProfile', { name: member.name })}>
+            <Link to={memberHref(member)} className="sq-stretch" title={t('openProfile', { name: member.name })}>
               {member.name}
             </Link>
             {isMe && <Tag tone="accent">{t('youLabel')}</Tag>}

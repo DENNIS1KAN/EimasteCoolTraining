@@ -265,6 +265,7 @@ export const TODAY = defineMessages(
   {
     today: 'Today',
     todayFocus: 'Today · {focus}',
+    catchUp: 'Catch up',
     focusStr: 'Strength',
     focusHyp: 'Hypertrophy',
     exercisesN: '{n} exercises',
@@ -313,6 +314,7 @@ export const TODAY = defineMessages(
   {
     today: 'Σήμερα',
     todayFocus: 'Σήμερα · {focus}',
+    catchUp: 'Αναπλήρωση',
     focusStr: 'Δύναμη',
     focusHyp: 'Υπερτροφία',
     exercisesN: '{n} ασκήσεις',
@@ -408,7 +410,7 @@ export const LIFT = defineMessages(
     compare: 'Σύγκρινε με',
     nobodyElse: 'Κανείς άλλος δεν έχει κάνει αυτή την άσκηση ακόμη.',
     sessionList: 'Όλες οι προπονήσεις',
-    weekDay: 'Εβδομάδα {week} · {day}',
+    weekDay: 'Εβδ. {week} · {day}',
     empty: 'Δεν υπάρχουν σετ ακόμη',
     emptyMine: 'Γράψε το {exercise} σε μια προπόνηση και η πρόοδός σου θα φανεί εδώ.',
     emptyOther: '{name}: κανένα σετ στο {exercise} ακόμη.',

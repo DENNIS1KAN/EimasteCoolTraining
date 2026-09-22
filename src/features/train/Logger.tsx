@@ -127,7 +127,7 @@ export function Logger({ me, program, week, day }: Props) {
     const ex = (i: number) => ctx.current.pday.ex[i]
 
     const scrollTo = (i: number) =>
-      requestAnimationFrame(() => document.getElementById(`ex-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+      requestAnimationFrame(() => document.getElementById(`ex-${i}`)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' }))
     const advance = (from: number, to: number) => {
       setOpen((prev) => {
         const n = new Set(prev)
@@ -198,7 +198,7 @@ export function Logger({ me, program, week, day }: Props) {
 
   const jump = (i: number) => {
     setOpen((prev) => new Set(prev).add(i))
-    setTimeout(() => document.getElementById(`ex-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30)
+    setTimeout(() => document.getElementById(`ex-${i}`)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' }), 30)
   }
 
   const finish = (p: FinishInput) => {
@@ -211,7 +211,7 @@ export function Logger({ me, program, week, day }: Props) {
     if (!isDesktop) setOpen(new Set())
     celebrate({ intensity: prs.length ? 'big' : 'small' })
     toast(prs.length > 1 ? t('prToast', { n: prs.length }) : prs.length ? t('prToastOne') : t('finishedToast'), { tone: 'good' })
-    document.getElementById('tr-top')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    document.getElementById('tr-top')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
   }
 
   const undo = () => {
@@ -235,6 +235,7 @@ export function Logger({ me, program, week, day }: Props) {
   return (
     <div className="tr-page" id="tr-top">
       <PageHeader
+        className="tr-head"
         eyebrow={t('eyebrow', { program: programShortName(program), week, total: program.weeks.length })}
         title={t('dayTitle', { day: dayShortName(pday) })}
         actions={

@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { Link, Outlet, useLocation } from 'react-router'
 import { useMe, useStore, useSync } from '../data/store'
 import type { Member } from '../data/types'
@@ -11,6 +11,9 @@ import { AccountSheet } from './AccountSheet'
 import { PageFallback } from './BootScreens'
 import { Brand } from './Brand'
 import './AppShell.css'
+
+// The rest timer keeps running (and stays visible) on every screen once a set is ticked.
+const RestTimerHost = lazy(() => import('../features/train/RestTimer').then((m) => ({ default: m.RestTimerHost })))
 
 const M = defineMessages(
   {
@@ -151,6 +154,9 @@ export function AppShell() {
 
       <AccountSheet />
       <Toaster />
+      <Suspense fallback={null}>
+        <RestTimerHost global />
+      </Suspense>
     </div>
   )
 }

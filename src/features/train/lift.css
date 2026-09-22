@@ -160,9 +160,8 @@
   color: var(--ink);
 }
 .lf-row__e1 small {
-  font: 800 8.5px/12px var(--font-body);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font: 800 10px/12px var(--font-body);
+  letter-spacing: 0.02em;
   color: var(--muted);
 }
 .lf-row__chev {

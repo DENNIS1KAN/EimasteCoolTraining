@@ -6,10 +6,16 @@
   gap: var(--s-3);
   min-width: 0;
 }
-.coach-tabs {
+/* tabs stay reachable on long tabs: a full-bleed bar in the page color */
+.coach-tabs-bar {
   position: sticky;
-  top: calc(var(--safe-top) + 6px);
-  z-index: 2;
+  top: 0;
+  z-index: var(--z-bar);
+  margin: -6px calc(-1 * var(--gutter)) 0;
+  padding: 6px var(--gutter) 8px;
+  background: color-mix(in oklab, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
 }
 .coach-panel {
   min-width: 0;
