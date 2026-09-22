@@ -261,11 +261,13 @@ const ICONS: Record<IconName, ReactNode> = {
     </>
   ),
   chart: <path d="M4 20h16M7 16.5V12M12 16.5V6.5M17 16.5v-6" />,
-  // weight with a handle
+  // digital bathroom scale (body is the analog dial)
   scale: (
     <>
-      <path d="M9.2 7.5a2.8 2.8 0 1 1 5.6 0" />
-      <path d="M7 7.5h10a1.5 1.5 0 0 1 1.47 1.2l1.9 9.6A1.5 1.5 0 0 1 18.9 20H5.1a1.5 1.5 0 0 1-1.47-1.7l1.9-9.6A1.5 1.5 0 0 1 7 7.5z" />
+      <rect x="3.6" y="3.6" width="16.8" height="16.8" rx="4.8" />
+      <rect x="8.2" y="7.2" width="7.6" height="4" rx="1.4" />
+      <Dot cx={8.4} cy={16.4} r={1.1} />
+      <Dot cx={15.6} cy={16.4} r={1.1} />
     </>
   ),
   droplet: <path d="M12 3.5s6.2 6.3 6.2 10.9a6.2 6.2 0 0 1-12.4 0C5.8 9.8 12 3.5 12 3.5z" />,
@@ -331,9 +333,8 @@ const ICONS: Record<IconName, ReactNode> = {
   ),
   whistle: (
     <>
-      <path d="M9 9h11a1 1 0 0 1 1 1v1.5a1 1 0 0 1-1 1h-6.23A5 5 0 1 1 9 9z" />
-      <circle cx="9" cy="14" r="1.5" />
-      <path d="M11.5 9V6.5" />
+      <path d="M9.5 8H20a1 1 0 0 1 1 1v1.8a1 1 0 0 1-1 1h-5.27A5.5 5.5 0 1 1 9.5 8z" />
+      <circle cx="9.5" cy="13.5" r="1.6" />
     </>
   ),
   sparkles: (

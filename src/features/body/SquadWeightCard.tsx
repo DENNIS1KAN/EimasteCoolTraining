@@ -13,7 +13,7 @@ import { pctSigned } from './format'
  * Everyone's % change since their start on one chart: a fair race between people of different sizes.
  * Only percentages are shown, so members sharing "change" or "exact" are both included; "private" ones are not.
  */
-export function SquadWeightCard({ range, today }: { range: Range; today: string }) {
+export function SquadWeightCard({ range, today, height = 176 }: { range: Range; today: string; height?: number }) {
   const t = useT(M)
   const me = useMe()
   const members = useStore((s) => s.members)
@@ -40,7 +40,6 @@ export function SquadWeightCard({ range, today }: { range: Range; today: string 
         label: m.name,
         color: memberColorVar(m.color),
         points: pts.map((p) => ({ x: fromISODate(p.date).getTime(), y: Math.round(p.pct * 1000) / 10 })),
-        emphasis: m.id === me?.id,
       })
       ends.push(`${m.name} ${pctSigned(pts[pts.length - 1].pct)}`)
     }
@@ -54,9 +53,9 @@ export function SquadWeightCard({ range, today }: { range: Range; today: string 
       {data.series.length ? (
         <LineChart
           series={data.series}
-          height={176}
+          height={height}
           yPadding={0.1}
-          refLines={[{ y: 0, label: t('start') }]}
+          refLines={[{ y: 0, label: '' }]}
           formatY={(n) => `${fmtSigned(n, 1)}%`}
           formatTooltipY={(n) => `${fmtSigned(n, 1)}%`}
           formatX={(x) => fmtDate(isoFromMs(x), 'dayMonth')}

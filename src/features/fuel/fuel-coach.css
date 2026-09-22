@@ -1,0 +1,194 @@
+/* Coach console → Nutrition tab. Tokens only. */
+.fu-cn-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.fu-cn-list.is-wide {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+.fu-cn.ui-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.fu-cn__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.fu-cn__head .ui-tag {
+  align-self: flex-start;
+  margin-top: 2px;
+  flex: none;
+}
+.fu-cn__who {
+  flex: 1;
+  min-width: 0;
+}
+.fu-cn__name {
+  font: 800 17px/21px var(--font-body);
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.fu-cn__plan {
+  font: 600 12.5px/16px var(--font-body);
+  color: var(--muted);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.fu-cn__title {
+  font-weight: 800;
+  color: var(--ink-2);
+}
+.fu-cn__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.fu-cn__stat {
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+}
+.fu-cn__v {
+  font-size: 30px;
+  line-height: 0.95;
+  color: var(--ink);
+}
+.fu-cn__v small {
+  font-size: 16px;
+  color: var(--ink-2);
+  margin-left: 1px;
+}
+.fu-cn__v--text {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 29px;
+  font: 800 15px/19px var(--font-body);
+  letter-spacing: -0.01em;
+}
+.fu-cn__v--text.is-stale svg {
+  color: var(--warn);
+  flex: none;
+}
+.fu-cn__l {
+  margin-top: 4px;
+  font: 700 11px/14px var(--font-body);
+  color: var(--muted);
+}
+.fu-cn__strip {
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  gap: 2px;
+  margin-top: 8px;
+}
+.fu-cn__strip i {
+  display: block;
+  height: 8px;
+  border-radius: 2px;
+}
+.fu-cn__strip i.is-empty {
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.fu-cn__lastsum {
+  margin-top: 8px;
+  font: 700 11.5px/14px var(--font-body);
+  color: var(--ink-2);
+}
+.fu-cn__hint {
+  font: 600 13px/18px var(--font-body);
+  color: var(--ink-2);
+}
+.fu-cn__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font: 600 12.5px/17px var(--font-body);
+  color: var(--ink-2);
+}
+.fu-cn__note svg {
+  flex: none;
+  margin-top: 1.5px;
+  color: var(--muted);
+}
+.fu-cn__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.fu-cn__hist {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: calc(100% + 8px);
+  min-height: 46px;
+  margin: -4px -4px -8px;
+  padding: 0 4px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: none;
+  text-align: left;
+  color: var(--ink-2);
+  font: 700 12.5px/16px var(--font-body);
+  cursor: pointer;
+}
+.fu-cn__hist svg {
+  flex: none;
+  color: var(--muted);
+}
+.fu-cn__histl {
+  flex: 1;
+}
+.fu-cn__histn {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  font-size: 13px;
+  line-height: 1;
+}
+.fu-cn__list {
+  list-style: none;
+  margin: -6px 0 -6px;
+  padding: 0;
+}
+.fu-cn__list li + li {
+  border-top: 1px solid var(--line);
+}
+.fu-cn__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 2px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.fu-cn__item svg {
+  color: var(--muted);
+  flex: none;
+}
+.fu-cn__itemt {
+  flex: 1;
+  min-width: 0;
+  font: 800 13.5px/17px var(--font-body);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.fu-cn__itemd {
+  font: 600 12px/16px var(--font-body);
+  color: var(--muted);
+}

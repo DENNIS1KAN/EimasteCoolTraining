@@ -5,6 +5,7 @@ import { fmtDate } from '../../lib/format'
 import { Button, Card, Icon, IconButton, Tag, memberColorVar } from '../../ui'
 import { GoalSheet } from './GoalSheet'
 import type { WeightModel } from './hooks'
+import { maintainGauge } from './logic'
 import { M } from './messages'
 import { wAbs, wNum, wText } from './format'
 
@@ -41,9 +42,19 @@ export function GoalCard({ member, model, editable }: { member: Member; model: W
   const editBtn = editable ? <IconButton icon="edit" label={t('editGoal')} variant="ghost" size={36} onClick={() => setOpen(true)} /> : null
   const color = memberColorVar(member.color)
   let right: ReactNode = null
-  if (g?.reached) right = <Tag tone="good" icon="check">{t('goalReached')}</Tag>
+  if (g?.reached)
+    right = (
+      <Tag tone="good" icon="check">
+        {t('goalReached')}
+      </Tag>
+    )
   else if (g?.eta) right = <span className="body-goal__eta">{t('eta', { date: fmtDate(g.eta, 'dayMonth') })}</span>
-  else if (g?.onTrack === false) right = <Tag tone="warn" icon="alert">{t('offTrack')}</Tag>
+  else if (g?.onTrack === false)
+    right = (
+      <Tag tone="warn" icon="alert">
+        {t('offTrack')}
+      </Tag>
+    )
   else if (g && g.onTrack == null && g.phase !== 'maintain') right = <span className="body-goal__eta">{t('etaLater')}</span>
 
   return (
@@ -58,26 +69,32 @@ export function GoalCard({ member, model, editable }: { member: Member; model: W
       </div>
       {g ? (
         <>
-          <div
-            className="body-goal__bar"
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={g.pct}
-            aria-label={t('goalProgress', { pct: g.pct })}
-            style={{ ['--p' as string]: `${g.bar * 100}%`, ['--c' as string]: color } as CSSProperties}
-          >
-            <i className="body-goal__fill" />
-            <b className="body-goal__knob" />
-            <em className="body-goal__pct num">{g.pct}%</em>
-          </div>
+          {g.phase === 'maintain' ? (
+            <MaintainGauge currentKg={g.currentKg} goalKg={g.goalKg} color={color} label={t('goalProgress', { pct: g.pct })} />
+          ) : (
+            <div
+              className="body-goal__bar"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={g.pct}
+              aria-label={t('goalProgress', { pct: g.pct })}
+              style={{ ['--p' as string]: `${g.bar * 100}%`, ['--c' as string]: color } as CSSProperties}
+            >
+              <i className="body-goal__fill" />
+              <b className="body-goal__knob" />
+              <em className="body-goal__pct num">{g.pct}%</em>
+            </div>
+          )}
           <div className="body-goal__ends">
             {g.phase === 'maintain' ? (
               <>
                 <span>
                   {t('now')} <b className="num">{wNum(g.currentKg, unit)}</b>
                 </span>
-                <span>{g.reached ? t('within', { value: wAbs(g.goalKg - g.currentKg, unit) }) : t('offBy', { value: wAbs(g.goalKg - g.currentKg, unit) })}</span>
+                <span>
+                  {g.reached ? t('within', { value: wAbs(g.goalKg - g.currentKg, unit) }) : t('offBy', { value: wAbs(g.goalKg - g.currentKg, unit) })}
+                </span>
               </>
             ) : (
               <>
@@ -93,8 +110,33 @@ export function GoalCard({ member, model, editable }: { member: Member; model: W
           </div>
           {g.reached && g.phase !== 'maintain' && <p className="body-goal__note">{t('goalReachedBody', { value: wText(goalKg, unit) })}</p>}
         </>
-      ) : null}
+      ) : (
+        <p className="body-goal__sub">{t('goalNoData')}</p>
+      )}
       {sheet}
     </Card>
+  )
+}
+
+/** Hold-steady gauge: goal in the middle, the on-target band around it, the knob at the current trend. */
+function MaintainGauge({ currentKg, goalKg, color, label }: { currentKg: number; goalKg: number; color: string; label: string }) {
+  const { pos, bandFrom, bandTo } = maintainGauge(currentKg, goalKg)
+  const pct = (x: number) => `${x * 100}%`
+  return (
+    <div
+      className="body-goal__bar body-goal__bar--gauge"
+      role="meter"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(pos * 100)}
+      style={
+        { ['--p' as string]: pct(pos), ['--c' as string]: color, ['--b0' as string]: pct(bandFrom), ['--b1' as string]: pct(bandTo) } as CSSProperties
+      }
+    >
+      <i className="body-goal__band" />
+      <i className="body-goal__tick" />
+      <b className="body-goal__knob" />
+    </div>
   )
 }

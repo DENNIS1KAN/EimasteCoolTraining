@@ -5,7 +5,7 @@ import { addDays, fromISODate, isoFromMs, todayISO } from '../../lib/dates'
 import { fmtDate, fmtDayLabel, fmtNum, fmtSigned } from '../../lib/format'
 import { weightSeries } from '../../lib/stats'
 import { kgToUnit } from '../../lib/units'
-import { EmptyState, memberColorVar } from '../../ui'
+import { EmptyState, Icon, memberColorVar } from '../../ui'
 import { LineChart, type LineSeries, type RefLine } from '../../ui/charts'
 import { useMemberWeights } from './hooks'
 import { changeSeries, goalFits, toDisplay, weightModeFor } from './logic'
@@ -23,7 +23,8 @@ export function WeightTrendChart({ memberId, days = 90, height = 200 }: { member
   const t = useT(M)
   const lang = useLang()
   const me = useMe()
-  const member = useStore((s) => s.members[memberId] ?? null)
+  const members = useStore((s) => s.members)
+  const member = members[memberId] ?? null
   const entries = useMemberWeights(memberId)
   const unit = me?.settings.unit ?? member?.settings.unit ?? 'kg'
   const mode = member ? weightModeFor(me, member) : 'hidden'
@@ -39,7 +40,15 @@ export function WeightTrendChart({ memberId, days = 90, height = 200 }: { member
       const raw = pts.map((p) => ({ x: ms(p.date), y: toDisplay(p.kg, unit) }))
       const trend = pts.map((p) => ({ x: ms(p.date), y: Math.round(kgToUnit(p.trendKg, unit) * 100) / 100 }))
       const goal = member.goalWeightKg != null ? toDisplay(member.goalWeightKg, unit) : null
-      const refLines: RefLine[] = goal != null && goalFits(trend.map((p) => p.y), goal, unit) ? [{ y: goal, label: t('goalLine', { value: fmtNum(goal, 1, 1) }) }] : []
+      const refLines: RefLine[] =
+        goal != null &&
+        goalFits(
+          trend.map((p) => p.y),
+          goal,
+          unit,
+        )
+          ? [{ y: goal, label: t('goalLine', { value: fmtNum(goal, 1, 1) }) }]
+          : []
       const series: LineSeries[] = [
         { id: 'daily', label: t('daily'), color, points: raw, line: false },
         { id: 'trend', label: t('trend'), color, points: trend, area: true },
@@ -66,7 +75,7 @@ export function WeightTrendChart({ memberId, days = 90, height = 200 }: { member
     return {
       mode,
       series,
-      refLines: [{ y: 0, label: t('start') }] as RefLine[],
+      refLines: [{ y: 0, label: '' }] as RefLine[],
       aria: t('trendAriaChange', { name: member.name, n: days, value: wSigned(last.trendKg, unit) }),
     }
   }, [member, mode, entries, unit, days, today, lang])
@@ -83,7 +92,8 @@ export function WeightTrendChart({ memberId, days = 90, height = 200 }: { member
     <div className="body-trend">
       {change && (
         <p className="body-trend__caption">
-          {t('changeAxis')} · {t('changeOnly')}
+          <Icon name="eye" size={12} />
+          {t('changeOnlyOf', { name: member.name })}
         </p>
       )}
       <LineChart

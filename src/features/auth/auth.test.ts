@@ -35,7 +35,7 @@ describe('authErrorKey', () => {
   })
 
   it('maps password-change errors', () => {
-    expect(authErrorKey(err('weak_password'), 'password', true)).toBe('errWeakPassword')
+    expect(authErrorKey(err('weak_password'), 'password', true)).toBe('errPasswordRejected')
     expect(authErrorKey(err('auth'), 'password', true)).toBe('errSessionExpired')
     expect(authErrorKey(err('network'), 'password', true)).toBe('errOffline')
     expect(authErrorKey(err('forbidden'), 'password', true)).toBe('errGeneric')
@@ -75,11 +75,13 @@ describe('last profile', () => {
 })
 
 describe('detectPlatform', () => {
-  const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'
+  const IPHONE =
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'
   const IPAD = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15'
   const ANDROID = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Mobile Safari/537.36'
   const WIN = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36'
-  const CHROME_IOS = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/129.0 Mobile/15E148 Safari/604.1'
+  const CHROME_IOS =
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/129.0 Mobile/15E148 Safari/604.1'
 
   it('recognises iPhone, iPad (desktop UA + touch), Android and desktop', () => {
     expect(detectPlatform(IPHONE)).toBe('ios')

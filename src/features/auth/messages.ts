@@ -39,6 +39,7 @@ export const AUTH = defineMessages(
       'Almost there. Your coach must turn off "Confirm email" in Supabase → Authentication → Sign In / Providers → Email. Then open this link again.',
     errInviteStarted: 'This invite was already started with another password. Use that one, or ask your coach for a new link.',
     errSessionExpired: 'Your session expired. Sign out and sign in again, then retry.',
+    errPasswordRejected: 'That password can’t be used. Pick at least 6 characters, nothing obvious, and not your current one.',
 
     joinHi: 'Hi {name} 👋',
     joinInvitedBy: 'Coach {coach} invited you to Eimaste Cool Training.',
@@ -116,6 +117,7 @@ export const AUTH = defineMessages(
       'Σχεδόν έτοιμο. Ο προπονητής πρέπει να κλείσει το "Confirm email" στο Supabase → Authentication → Sign In / Providers → Email. Μετά άνοιξε ξανά τον σύνδεσμο.',
     errInviteStarted: 'Αυτή η πρόσκληση ξεκίνησε ήδη με άλλον κωδικό. Χρησιμοποίησε εκείνον ή ζήτα νέο σύνδεσμο από τον προπονητή.',
     errSessionExpired: 'Η σύνδεσή σου έληξε. Αποσυνδέσου, συνδέσου ξανά και ξαναδοκίμασε.',
+    errPasswordRejected: 'Αυτός ο κωδικός δεν γίνεται. Βάλε τουλάχιστον 6 χαρακτήρες, όχι κάτι προφανές, και όχι τον τωρινό σου.',
 
     joinHi: 'Γεια σου {name} 👋',
     joinInvitedBy: 'Ο προπονητής {coach} σε προσκάλεσε στο Eimaste Cool Training.',

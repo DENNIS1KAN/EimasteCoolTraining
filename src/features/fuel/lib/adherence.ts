@@ -86,3 +86,22 @@ export function lastCheckinDate(checkins: NutritionCheckin[], memberId: string):
   for (const c of checkins) if (c.memberId === memberId && (best == null || c.date > best)) best = c.date
   return best
 }
+
+/** Without a plan: consecutive rated days scoring >= 0.8 (ending today, or yesterday while today is open). */
+export function ratingStreak(checkins: NutritionCheckin[], today: ISODate): number {
+  const byDate = new Map(checkins.map((c) => [c.date, c]))
+  const good = (d: ISODate) => checkinScore(byDate.get(d), null) >= 0.8
+  let d = good(today) ? today : addDays(today, -1)
+  let n = 0
+  while (good(d) && n < 3650) {
+    n++
+    d = addDays(d, -1)
+  }
+  return n
+}
+
+/** Without a plan: the average score of the logged days in the window (null when nothing is logged). */
+export function loggedAverage(days: FuelDay[]): number | null {
+  const logged = days.filter((d) => d.logged && d.value != null)
+  return logged.length ? logged.reduce((a, d) => a + (d.value ?? 0), 0) / logged.length : null
+}

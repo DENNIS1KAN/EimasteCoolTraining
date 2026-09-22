@@ -1,0 +1,211 @@
+/* Coach console: shared pieces (page, tabs, color picker, invite box). Built from tokens only. */
+
+.coach-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.coach-tabs {
+  position: sticky;
+  top: calc(var(--safe-top) + 6px);
+  z-index: 2;
+}
+.coach-panel {
+  min-width: 0;
+}
+.coach-panel:focus-visible {
+  outline: none;
+}
+.coach-error {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--danger);
+}
+
+/* ------------------------------------------------------------------ color picker */
+
+.color-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.color-picker > .ui-field__label {
+  margin: 0;
+}
+.color-picker__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.color-swatch {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+.color-swatch__dot {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, color-mix(in oklab, var(--swatch) 84%, var(--on-member)), var(--swatch) 55%);
+  color: var(--on-member);
+  transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+.color-swatch {
+  position: relative;
+}
+/* worn by someone else: their initial in a small badge */
+.color-swatch__who {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 0 0 1.5px var(--line-strong);
+  color: var(--ink-2);
+  font-size: 9.5px;
+  font-weight: 800;
+  line-height: 1;
+}
+.color-swatch.is-selected .color-swatch__dot {
+  opacity: 1;
+  transform: scale(1.06);
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--swatch);
+}
+.color-swatch:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 0;
+}
+
+/* ------------------------------------------------------------------ invite link box */
+
+.invite-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.invite-box__label {
+  color: var(--muted);
+}
+.invite-box__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 14px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.invite-box__link {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 600 13px/1 var(--font-body);
+  text-overflow: ellipsis;
+}
+.invite-box__link:focus {
+  outline: none;
+}
+.invite-box__row:focus-within {
+  box-shadow:
+    inset 0 0 0 2px var(--accent-strong),
+    0 0 0 4px var(--accent-soft);
+}
+
+/* ------------------------------------------------------------------ weekly pattern strip */
+
+.pattern-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.pattern-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 50px;
+  padding: 6px 2px;
+  border-radius: var(--r-sm);
+  text-align: center;
+}
+.pattern-chip.is-train {
+  background: var(--surface-2);
+  box-shadow: inset 0 -3px 0 var(--accent-strong);
+}
+.pattern-chip.is-rest {
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.pattern-chip__wd {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.pattern-chip__day {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.pattern-chip.is-rest .pattern-chip__day {
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------ spec strip */
+
+/* micro label over a condensed number, hairline separators (the mockup's spec strip) */
+.spec-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 9px 0;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+.spec-strip > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 12px;
+  min-width: 0;
+}
+.spec-strip > div + div {
+  border-left: 1px solid var(--line-strong);
+}
+.spec-strip dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.spec-strip dd {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--ink);
+}

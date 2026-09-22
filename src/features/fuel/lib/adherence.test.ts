@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Meal, MealPlan, NutritionCheckin } from '../../../data/types'
-import { dayClosed, fuelDays, heatRange, lastCheckinDate, recentAdherence } from './adherence'
+import { dayClosed, fuelDays, heatRange, lastCheckinDate, loggedAverage, ratingStreak, recentAdherence } from './adherence'
 
 const meal = (id: string): Meal => ({ id, name: id, time: '', items: '', kcal: null, protein: null })
 const plan = (id: string, startDate: string, meals: string[], active = true): MealPlan => ({
@@ -110,5 +110,20 @@ describe('lastCheckinDate', () => {
   it('finds the latest date for the member', () => {
     expect(lastCheckinDate([ci('2026-09-02', []), ci('2026-09-05', []), { ...ci('2026-09-09', []), memberId: 'x' }], 'm')).toBe('2026-09-05')
     expect(lastCheckinDate([], 'm')).toBeNull()
+  })
+})
+
+describe('without a plan', () => {
+  it('counts a rating streak', () => {
+    const cs = [ci('2026-09-08', [], 'on'), ci('2026-09-09', [], 'on'), ci('2026-09-10', [], 'mostly'), ci('2026-09-11', [], 'on')]
+    expect(ratingStreak(cs, '2026-09-12')).toBe(1)
+    expect(ratingStreak(cs, '2026-09-11')).toBe(1)
+    expect(ratingStreak(cs.slice(0, 2), '2026-09-10')).toBe(2)
+    expect(ratingStreak([], '2026-09-10')).toBe(0)
+  })
+  it('averages the logged days', () => {
+    const days = fuelDays([ci('2026-09-02', [], 'on'), ci('2026-09-03', [], 'mostly')], {}, null, '2026-09-01', '2026-09-04', '2026-09-04')
+    expect(loggedAverage(days)).toBe(0.75)
+    expect(loggedAverage([])).toBeNull()
   })
 })

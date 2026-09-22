@@ -1,0 +1,243 @@
+/* Coach · Programs tab. Built from tokens only. */
+
+.coach-programs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.program-grid {
+  display: grid;
+  gap: var(--s-3);
+}
+.program-grid > li {
+  display: flex;
+  min-width: 0;
+}
+.program-bottom {
+  display: grid;
+  gap: var(--s-3);
+  align-items: start;
+}
+@media (min-width: 760px) {
+  .program-grid,
+  .program-bottom {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ------------------------------------------------------------------ program card */
+
+.program-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.program-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  margin: -4px -6px -4px 0;
+}
+.program-card__name {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+}
+.program-card__name a {
+  color: var(--ink);
+  text-decoration: none;
+}
+.program-card__name a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+.program-card__desc {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--ink-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.program-card__members {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+}
+.program-card__names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.program-card__names .micro {
+  color: var(--muted);
+}
+.program-card__names.is-empty {
+  font-weight: 600;
+  color: var(--muted);
+}
+.program-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+/* ------------------------------------------------------------------ import card */
+
+.import-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1.5px dashed var(--line-strong);
+  box-shadow: none;
+  background: transparent;
+}
+.import-card__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+.import-card__title {
+  margin-top: 4px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+.import-card__body {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--ink-2);
+}
+.import-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* ------------------------------------------------------------------ import sheet */
+
+.import-file {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 10px 10px 12px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+.import-paste {
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.import-list {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.import-list li + li {
+  margin-top: 2px;
+}
+.import-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--r-lg);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.import-days {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.import-days .micro {
+  color: var(--muted);
+}
+.import-days__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.import-blocks {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.import-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ------------------------------------------------------------------ data card */
+
+.data-card__item {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.data-card__item:first-of-type {
+  margin-top: 10px;
+}
+.data-card__item:last-child {
+  padding-bottom: 0;
+}
+.data-card__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+.data-card__title {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.data-card__hint {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--muted);
+}
+.data-card__controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+.data-card__controls > :first-child {
+  flex: 1;
+  min-width: 0;
+}

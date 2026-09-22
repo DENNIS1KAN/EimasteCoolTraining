@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { at, MINI, mkCheckin, mkLog, mkMember, mkPlan, mkWeight, meals, squad } from '../../../lib/testing/fixtures'
-import { athleteGlance, glanceTotals, lastActiveAt, squadGlance, trainees } from './glance'
+import { athleteGlance, glanceTotals, lastActiveAt, needsPush, needsSetup, squadGlance, trainees } from './glance'
 
 // MINI: 2 weeks x 3 days on Mon / Wed / Fri. Start Monday 2026-01-05.
 const START = '2026-01-05'
@@ -40,9 +40,20 @@ describe('athleteGlance', () => {
     const noStart = mkMember({ id: 'a' })
     const noProgram = mkMember({ id: 'b', programId: null })
     const d = squad({ members: [noStart, noProgram] })
-    expect(athleteGlance(d, noStart, '2026-01-08').flags).toEqual(['notStarted', 'noWeighIn'])
-    expect(athleteGlance(d, noProgram, '2026-01-08').flags).toEqual(['noProgram', 'noWeighIn'])
-    expect(athleteGlance(d, noStart, '2026-01-08').weekTarget).toBe(3)
+    // no weigh-in warnings before they have even started
+    expect(athleteGlance(d, noStart, '2026-01-08').flags).toEqual(['notStarted'])
+    expect(athleteGlance(d, noProgram, '2026-01-08').flags).toEqual(['noProgram'])
+    expect(athleteGlance(d, noStart, '2026-01-08').weekTarget).toBe(0)
+  })
+
+  it('expects weigh-ins once the program runs, or once they weigh in anyway', () => {
+    const future = mkMember({ id: 'a', programStart: '2026-01-12' })
+    const weighs = mkMember({ id: 'b', programId: null })
+    const d = squad({ members: [future, weighs], weights: [mkWeight('b', '2025-12-20', 70)] })
+    expect(athleteGlance(d, future, '2026-01-08').flags).toEqual([])
+    expect(athleteGlance(d, future, '2026-01-08').weekTarget).toBe(0)
+    expect(athleteGlance(d, future, '2026-01-12').flags).toEqual(['noWeighIn'])
+    expect(athleteGlance(d, weighs, '2026-01-08').flags).toEqual(['noProgram', 'noWeighIn'])
   })
 
   it('warns about low nutrition adherence', () => {
@@ -78,6 +89,8 @@ describe('squadGlance', () => {
     expect(rows.map((r) => r.member.id)).toEqual(['amy', 'zed'])
     const totals = glanceTotals(rows)
     expect(totals).toMatchObject({ athletes: 2, onTrack: 1, weekDone: 2, weekTarget: 6, adherence: null })
+    expect(rows.map(needsPush)).toEqual([true, false])
+    expect(rows.map(needsSetup)).toEqual([false, false])
   })
 })
 

@@ -152,6 +152,7 @@ export const FM = defineMessages(
     duplicate: 'Start from the previous plan',
     duplicateDesc: 'Copy targets, meals, notes and files from “{title}”',
     duplicated: 'Copied from “{title}”',
+    copy: 'Copy',
     fixErrors: 'Check the highlighted fields',
     errRequired: 'Required',
     errNumber: 'Enter a number',
@@ -346,6 +347,7 @@ export const FM = defineMessages(
     duplicate: 'Ξεκίνα από το προηγούμενο πλάνο',
     duplicateDesc: 'Αντιγραφή στόχων, γευμάτων, σημειώσεων και αρχείων από το «{title}»',
     duplicated: 'Αντιγράφηκε από το «{title}»',
+    copy: 'Αντιγραφή',
     fixErrors: 'Έλεγξε τα σημειωμένα πεδία',
     errRequired: 'Υποχρεωτικό',
     errNumber: 'Γράψε έναν αριθμό',
@@ -382,10 +384,10 @@ export const FM = defineMessages(
     planOf: 'Πλάνο: {title}',
 
     // home card
-    fuelToday: 'Διατροφή σήμερα',
+    fuelToday: 'Διατροφή',
     ofKcal: 'από {n} kcal',
     mealsOf: '{x} από {y} γεύματα',
-    noPlanYet: 'Κανένα πλάνο ακόμη',
+    noPlanYet: 'Χωρίς πλάνο ακόμη',
     noPlanHome: 'Βαθμολόγησε τη μέρα σου',
     allDone: 'Όλα τα γεύματα έγιναν',
     ratedAs: 'Βαθμός: {rating}',

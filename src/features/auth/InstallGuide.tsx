@@ -29,7 +29,10 @@ const GUIDES: Guide[] = [
     platform: 'desktop',
     title: 'installDesktop',
     icon: 'monitor',
-    steps: [{ text: 'installDesktop1', icon: 'download' }, { text: 'installDesktop2', icon: 'more' }],
+    steps: [
+      { text: 'installDesktop1', icon: 'download' },
+      { text: 'installDesktop2', icon: 'more' },
+    ],
   },
 ]
 

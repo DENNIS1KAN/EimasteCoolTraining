@@ -1,0 +1,443 @@
+/* Coach · program page. Built from tokens only. */
+
+.program-layout {
+  display: grid;
+  gap: var(--s-3);
+  align-items: start;
+}
+/* ------------------------------------------------------------------ overview */
+
+.program-overview,
+.program-overview__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  min-width: 0;
+}
+
+.program-overview__desc {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--ink-2);
+}
+.program-overview__hint {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.program-overview__members {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.program-overview__names {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.program-overview__names.is-empty {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+@media (min-width: 1024px) {
+  .program-layout {
+    gap: var(--s-5);
+  }
+  /* overview: two columns (about + size | pattern, blocks, members) above full-width weeks */
+  .program-overview {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s-4) var(--s-6);
+    align-items: start;
+  }
+  .program-overview__col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    min-width: 0;
+  }
+}
+
+/* blocks as a proportional bar: Foundation 1–5 | Ramping 6–12 */
+.block-bar {
+  display: flex;
+  gap: 4px;
+}
+.block-bar__seg {
+  flex-basis: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  box-shadow: inset 0 3px 0 var(--accent-strong);
+}
+.block-bar__seg + .block-bar__seg {
+  box-shadow: inset 0 3px 0 color-mix(in oklab, var(--accent-strong) 55%, transparent);
+}
+.block-bar__name {
+  overflow-wrap: anywhere;
+  font-size: 10.5px;
+  line-height: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.block-bar__weeks {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------ weeks accordion */
+
+.weeks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.weeks__block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.weeks__block + .weeks__block {
+  margin-top: var(--s-2);
+}
+.weeks__block-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.weeks__block-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.weeks__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.week-item {
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  border: 1px solid var(--card-border);
+  overflow: clip;
+}
+.week-item__h {
+  margin: 0;
+}
+.week-item__head {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto 24px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 14px 10px 10px;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.week-item__head:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: -2px;
+  border-radius: var(--r-xl);
+}
+.week-item__num {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  font-size: 24px;
+  color: var(--ink);
+}
+.week-item.is-open .week-item__num {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: var(--shadow-accent);
+}
+.week-item__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.week-item__title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.week-item__meta {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.week-item__chev {
+  color: var(--ink-2);
+  transition: transform var(--dur-2) var(--ease);
+}
+.week-item.is-open .week-item__chev {
+  transform: rotate(180deg);
+}
+.week-item__body {
+  padding: 4px 12px 12px;
+  border-top: 1px solid var(--line);
+}
+@media (min-width: 760px) {
+  .week-item__body {
+    padding: 8px 16px 16px;
+  }
+}
+
+.week-days {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 10px;
+}
+.week-days__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 2px 0 4px;
+}
+.week-days__name {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.week-days__focus {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.week-days__count {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------ exercise table */
+
+.ex-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.ex-table th {
+  padding: 8px 10px;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line-strong);
+  white-space: nowrap;
+}
+.ex-table td {
+  padding: 12px 10px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+.ex-table tr:last-child td {
+  border-bottom: 0;
+}
+.ex-table__idx {
+  width: 28px;
+}
+.ex-row__idx {
+  font-size: 20px;
+  line-height: 1.1;
+  color: var(--muted);
+}
+.ex-row__name {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14.5px;
+  font-weight: 800;
+  line-height: 19px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.ex-row__video {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  margin: -4px 0 -4px auto;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  position: relative;
+}
+.ex-row__video::after {
+  /* 44px hit area */
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+.ex-row__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 6px;
+}
+.ex-row__tags:empty {
+  display: none;
+}
+.ex-row__warm {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.ex-row__subs {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--ink-2);
+}
+.ex-row__subs svg {
+  margin-top: 1px;
+  color: var(--muted);
+}
+.ex-row__note {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 17px;
+  color: var(--muted);
+}
+.ex-row__val {
+  font-size: 19px;
+  line-height: 1.1;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.ex-row__slash {
+  margin: 0 3px;
+  color: var(--muted);
+  font-weight: 700;
+}
+.ex-row__rest {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+.ex-row__tech-text {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* wide: technique has its own column, so the inline tag is hidden */
+@media (min-width: 760px) {
+  .ex-row__tech-tag {
+    display: none;
+  }
+  .ex-row__main {
+    min-width: 220px;
+  }
+}
+
+/* phones: each row is a compact card; labelled cells in a 3-up grid under the name */
+@media (max-width: 759px) {
+  .ex-table,
+  .ex-table tbody {
+    display: block;
+  }
+  .ex-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .ex-table tr.ex-row {
+    display: grid;
+    grid-template-columns: 26px repeat(3, minmax(0, 1fr));
+    column-gap: 8px;
+    row-gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .ex-table tr.ex-row:last-child {
+    border-bottom: 0;
+  }
+  .ex-table td {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+  .ex-row__idx {
+    grid-row: 1 / span 2;
+    font-size: 18px;
+  }
+  .ex-row__main {
+    grid-column: 2 / -1;
+  }
+  .ex-row__cell {
+    grid-column: auto;
+    display: flex !important;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 10px !important;
+    border-radius: var(--r-sm);
+    background: var(--surface-2);
+    min-width: 0;
+  }
+  .ex-row__cell::before {
+    content: attr(data-label);
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ex-row__cell:nth-of-type(3) {
+    grid-column: 2;
+  }
+  .ex-row__val {
+    font-size: 18px;
+  }
+  .ex-row__tech {
+    display: none !important;
+  }
+}

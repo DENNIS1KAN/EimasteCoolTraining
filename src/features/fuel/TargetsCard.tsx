@@ -26,7 +26,7 @@ function MacroRow({ m }: { m: MacroProgress }) {
         <span className="fu-macro__val num">
           {m.eaten != null ? (
             <>
-              {m.mode === 'estimate' && <i className="approx">≈</i>}
+              {m.mode === 'estimate' && m.eaten > 0 && <i className="approx">≈</i>}
               {fmtNum(m.eaten, 0)}
               <small> / {fmtNum(target, 0)} g</small>
             </>
@@ -52,7 +52,7 @@ export function TargetsCard({ summary }: { summary: DaySummary }) {
   const { kcalTarget, kcalEaten, kcalLeft } = summary
   const hasRing = kcalTarget != null || summary.mealsTotal > 0
   if (!hasRing && !macros.length) return null
-  const estimated = macros.some((m) => m.mode === 'estimate')
+  const estimated = macros.some((m) => m.mode === 'estimate' && (m.eaten ?? 0) > 0)
 
   let ring = null
   if (kcalTarget != null && kcalEaten != null && kcalLeft != null) {

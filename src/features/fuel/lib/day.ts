@@ -107,3 +107,17 @@ export const nextRating = (cur: CheckinRating | null, picked: CheckinRating): Ch
 
 /** True when nothing meaningful is left in the row (so it can be deleted instead of stored empty). */
 export const isBlankCheckin = (c: NutritionCheckin): boolean => !c.meals.length && c.rating == null && !c.waterL && !c.note.trim()
+
+/**
+ * The plan that applies on a date: the one the day's check-in was logged against, else the newest plan
+ * already started by then, else the current plan (so a day before any plan still shows something to follow).
+ */
+export function planOnDate(plans: MealPlan[], current: MealPlan | null, date: string, checkin?: NutritionCheckin | null): MealPlan | null {
+  if (checkin?.planId) {
+    const own = plans.find((p) => p.id === checkin.planId)
+    if (own) return own
+  }
+  if (current && current.startDate <= date) return current
+  const started = plans.filter((p) => p.startDate <= date).sort((a, b) => (a.startDate < b.startDate ? 1 : a.startDate > b.startDate ? -1 : 0))
+  return started[0] ?? current
+}

@@ -5,7 +5,7 @@ import type { Member } from '../data/types'
 import { defineMessages, useT } from '../i18n'
 import { COMMON } from '../i18n/common'
 import { unseenCheers } from '../lib/stats'
-import { Avatar, Banner, Icon, Toaster, openAccountSheet, useMediaQuery, type IconName } from '../ui'
+import { Avatar, Banner, Icon, Toaster, openAccountSheet, type IconName } from '../ui'
 import { memberColorVar } from '../ui/member'
 import { AccountSheet } from './AccountSheet'
 import { PageFallback } from './BootScreens'
@@ -70,6 +70,8 @@ function navKeyFor(pathname: string): NavKey | null {
   return null
 }
 
+const prefersReducedMotion = (): boolean => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
 const DEMO_BANNER_KEY = 'ect-demo-banner-hidden'
 function readSession(key: string): boolean {
   try {
@@ -96,7 +98,6 @@ export function AppShell() {
   const { pathname } = useLocation()
   const active = navKeyFor(pathname)
   const unseen = useStore((s) => (s.meId ? unseenCheers(s.cheers, s.meId).length : 0))
-  const reduced = useMediaQuery('(prefers-reduced-motion: reduce)')
   const pageRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
   const firstPath = useRef(true)
@@ -108,7 +109,7 @@ export function AppShell() {
       return
     }
     window.scrollTo(0, 0)
-    if (reduced) return
+    if (prefersReducedMotion()) return
     // Animates `top` (relative offset), not transform, so position:fixed docks inside pages stay put.
     pageRef.current?.animate?.(
       [
@@ -117,7 +118,7 @@ export function AppShell() {
       ],
       { duration: 160, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
     )
-  }, [pathname, reduced])
+  }, [pathname])
 
   const skipToContent = () => mainRef.current?.focus()
 
@@ -125,7 +126,6 @@ export function AppShell() {
 
   return (
     <div className="app-shell" style={style}>
-      <div className="app-shell__glow" aria-hidden="true" />
       <button type="button" className="app-skip" onClick={skipToContent}>
         {t('skip')}
       </button>
@@ -164,8 +164,7 @@ function NavLink({ item, active, dot, variant }: { item: NavItem; active: boolea
     // Tapping the tab you're already on (its root, no sub-page) scrolls back to the top, like native tab bars.
     if (pathname === item.to && !search && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
       e.preventDefault()
-      const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
     }
   }
   const badge = dot ? <span className="app-dot" aria-hidden="true" /> : null

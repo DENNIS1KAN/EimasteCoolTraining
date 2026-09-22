@@ -29,7 +29,10 @@ export function HistoryList({
   const shown = all ? rows : rows.slice(0, PAGE)
   return (
     <section className="body-history" aria-labelledby="body-history-title">
-      <SectionTitle title={<span id="body-history-title">{t('history')}</span>} action={<span className="body-history__count num">{rows.length}</span>} />
+      <SectionTitle
+        title={<span id="body-history-title">{t('history')}</span>}
+        action={<span className="body-history__count num">{rows.length}</span>}
+      />
       <ul className="body-history__list">
         {shown.map(({ entry, deltaKg }) => {
           const dir = deltaKg == null ? 'flat' : dirOf(deltaKg)

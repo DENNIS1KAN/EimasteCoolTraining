@@ -2,6 +2,7 @@ import { useId, useState, type ComponentPropsWithRef, type ReactNode } from 'rea
 import { useT } from '../../i18n'
 import { Icon } from '../../ui'
 import { AUTH } from './messages'
+import './fields.css'
 
 interface Props extends Omit<ComponentPropsWithRef<'input'>, 'type' | 'onChange' | 'value'> {
   label: ReactNode

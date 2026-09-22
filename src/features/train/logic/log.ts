@@ -6,6 +6,8 @@ import type { ExerciseLog, MemberSettings, ProgramDay, ProgramExercise, SetLog, 
 import { exerciseName, workingSets } from '../../../data/programs'
 import { logId } from '../../../lib/ids'
 import { parseNum } from '../../../lib/units'
+import { fromISODate, isoFromMs, type ISODate } from '../../../lib/dates'
+import { setReps } from '../../../lib/stats'
 
 export type Machines = Record<string, string>
 
@@ -34,7 +36,11 @@ export function emptyLog(memberId: string, programId: string, week: number, day:
  * the prescribed number of empty sets). Stored entries are padded up to the prescribed sets.
  */
 export function exerciseLog(log: WorkoutLog | null | undefined, i: number, e: ProgramExercise, machines: Machines): ExerciseLog {
-  const cur = log?.ex[String(i)]
+  return exerciseFrom(log?.ex[String(i)], e, machines)
+}
+
+/** Same as exerciseLog, from the stored entry itself (lets memoized cards depend on one exercise only). */
+export function exerciseFrom(cur: ExerciseLog | undefined, e: ProgramExercise, machines: Machines): ExerciseLog {
   const v = cur?.v ?? 0
   const n = workingSets(e)
   const sets = cur?.sets ?? []
@@ -149,6 +155,26 @@ export function machineSuggestions(settings: MemberSettings, logs: WorkoutLog[])
   for (const m of Object.values(settings.machines)) add(m, 2)
   for (const l of logs) for (const x of Object.values(l.ex)) add(x.m)
   return [...count.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([m]) => m)
+}
+
+/**
+ * When a workout finished on `date`: now if that's today, else the last set ticked that day, else its start that
+ * day, else local noon (for a session marked done after the fact).
+ */
+export function doneAtFor(date: ISODate, log: WorkoutLog, now: number): number {
+  if (date === isoFromMs(now)) return now
+  const times = Object.values(log.ex).flatMap((x) => x.sets.map((s) => s.at ?? 0)).filter((at) => at && isoFromMs(at) === date)
+  if (times.length) return Math.max(...times)
+  if (log.startedAt && isoFromMs(log.startedAt) === date) return log.startedAt
+  return fromISODate(date).getTime()
+}
+
+/** Sets with reps that aren't ticked (they count once the workout is marked done). */
+export function openSetsWithReps(log: WorkoutLog | null | undefined): number {
+  if (!log) return 0
+  let n = 0
+  for (const x of Object.values(log.ex)) for (const s of x.sets) if (!s.ok && setReps(s) != null) n++
+  return n
 }
 
 export function finishLog(log: WorkoutLog, p: { doneAt: number; feel: number | null; note: string }): WorkoutLog {

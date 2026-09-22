@@ -20,7 +20,8 @@ import './body.css'
 export function WeightMiniCard({ memberId }: { memberId: string }) {
   const t = useT(M)
   const me = useMe()
-  const member = useStore((s) => s.members[memberId] ?? null)
+  const members = useStore((s) => s.members)
+  const member = members[memberId] ?? null
   const model = useWeightModel(member)
   const self = !!me && me.id === memberId
   const unit = me?.settings.unit ?? member?.settings.unit ?? 'kg'

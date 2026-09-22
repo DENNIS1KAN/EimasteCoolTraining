@@ -65,8 +65,10 @@ describe('lift duel', () => {
     mkLog({ member: T, week: 1, day: 0, doneAt: at('2026-03-24'), ex: { 0: { sets: [['90', '8']] } } }),
     mkLog({ member: T, week: 1, day: 1, doneAt: at('2026-03-26'), ex: { 0: { sets: [['140', '8']] } } }),
   ]
-  it('finds exercises both performed', () => {
+  it('finds exercises both performed, heaviest first', () => {
     expect(commonExercises(a, b, programs)).toEqual(['Bench Press'])
+    const c = [...a, mkLog({ member: S, week: 1, day: 1, doneAt: at('2026-03-25'), ex: { 0: { sets: [['140', '5']] } } })]
+    expect(commonExercises(c, b, programs)).toEqual(['Squat', 'Bench Press'])
   })
   it('plots best e1RM per day, optionally relative to body weight', () => {
     const pts = liftDuelPoints(a, programs, 'Bench Press')

@@ -98,10 +98,10 @@ export function stopRest(): void {
 }
 
 /** Remaining ms (0 once time is up). */
-export const restRemaining = (s: RestState, now: number): number => Math.max(0, s.endsAt - now)
+export const restRemaining = (s: Pick<RestState, 'endsAt'>, now: number): number => Math.max(0, s.endsAt - now)
 
 /** Share of the rest still to go, 1 -> 0 (the progress line drains). */
-export const restFraction = (s: RestState, now: number): number => (s.total > 0 ? Math.min(1, restRemaining(s, now) / s.total) : 0)
+export const restFraction = (s: Pick<RestState, 'endsAt' | 'total'>, now: number): number => (s.total > 0 ? Math.min(1, restRemaining(s, now) / s.total) : 0)
 
 /* ------------------------------------------------------------------ alarm */
 

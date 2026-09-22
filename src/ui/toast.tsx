@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { useT } from '../i18n'
 import { cx } from './cx'
 import { Icon } from './Icon'
@@ -82,10 +82,38 @@ export function useToasts(): ToastItem[] {
   return useSyncExternalStore(subscribe, snapshot, snapshot)
 }
 
+/* Only one <Toaster/> renders at a time (the first mounted), so pages may mount one defensively. */
+let owner: symbol | null = null
+const ownerListeners = new Set<() => void>()
+const subscribeOwner = (f: () => void) => {
+  ownerListeners.add(f)
+  return () => {
+    ownerListeners.delete(f)
+  }
+}
+const setOwner = (o: symbol | null) => {
+  owner = o
+  ownerListeners.forEach((f) => f())
+}
+
 /** Mount once (AppShell). Toasts float above the tab bar, dark "night" pills in both themes. */
 export function Toaster() {
+  const [me] = useState(() => Symbol('toaster'))
+  const current = useSyncExternalStore(subscribeOwner, () => owner, () => owner)
+  useEffect(() => {
+    const claim = () => {
+      if (!owner) setOwner(me)
+    }
+    claim()
+    const unsub = subscribeOwner(claim)
+    return () => {
+      unsub()
+      if (owner === me) setOwner(null)
+    }
+  }, [me])
   const list = useToasts()
   const t = useT(UIM)
+  if (current !== me) return null
   return (
     <div className="ui-toaster" role="region" aria-label={t('notifications')}>
       <div className="ui-toaster__live" aria-live="polite" aria-relevant="additions text">

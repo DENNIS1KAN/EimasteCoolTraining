@@ -12,6 +12,7 @@ import { setLastProfile } from './lastProfile'
 import { AUTH } from './messages'
 import { checkPassword } from './password'
 import { PasswordField } from './PasswordField'
+import { FormError, PasswordRules } from './PasswordRules'
 import { useLoginProfiles } from './useLoginProfiles'
 import './install'
 
@@ -23,12 +24,17 @@ const capitalize = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s)
  * welcome step stays on screen (the signed-in routes would otherwise replace this page at once).
  */
 export default function JoinPage() {
-  const t = useT(AUTH)
-  const navigate = useNavigate()
   const { slug: rawSlug = '' } = useParams()
   const [params] = useSearchParams()
   const code = (params.get('code') || '').trim()
   const slug = rawSlug.trim().toLowerCase()
+  // A different invite link starts over (fresh form state).
+  return <JoinFlow key={`${slug}|${code}`} slug={slug} code={code} />
+}
+
+function JoinFlow({ slug, code }: { slug: string; code: string }) {
+  const t = useT(AUTH)
+  const navigate = useNavigate()
   const demo = useStore((s) => s.backend) === 'demo'
   const { status, profiles } = useLoginProfiles()
 
@@ -155,22 +161,29 @@ export default function JoinPage() {
         <p className="join-card__lede">{coach ? t('joinInvitedBy', { coach: coach.name }) : t('joinInvited')}</p>
 
         {profile?.joined && !demo ? (
-          <Banner
-            tone="info"
-            icon="user"
-            action={
-              <Button size="sm" variant="secondary" onClick={signInInstead}>
+          <div className="auth-note">
+            <Icon name="user" size={18} />
+            <div className="auth-note__col">
+              <p className="auth-note__body">{t('alreadyJoinedNote')}</p>
+              <Button size="sm" variant="secondary" iconRight="arrow-right" onClick={signInInstead}>
                 {t('signInInstead')}
               </Button>
-            }
-          >
-            {t('alreadyJoinedNote')}
-          </Banner>
+            </div>
+          </div>
         ) : null}
 
         <form className="auth-form join-form" onSubmit={submit} noValidate>
           <p className="join-form__explain">{t('joinExplain')}</p>
-          <input className="visually-hidden" type="text" name="username" autoComplete="username" value={slug} readOnly tabIndex={-1} aria-hidden="true" />
+          <input
+            className="visually-hidden"
+            type="text"
+            name="username"
+            autoComplete="username"
+            value={slug}
+            readOnly
+            tabIndex={-1}
+            aria-hidden="true"
+          />
           <PasswordField
             label={t('choosePassword')}
             name="new-password"
@@ -201,26 +214,8 @@ export default function JoinPage() {
             describedBy="join-rules"
             error={confirm.length > 0 && password.length > 0 && !check.matches && confirm.length >= password.length}
           />
-          <ul id="join-rules" className="join-rules">
-            <li className={check.longEnough ? 'is-ok' : undefined}>
-              <span className="join-rules__tick" aria-hidden="true">
-                <Icon name="check" size={12} strokeWidth={2.6} />
-              </span>
-              {t('ruleLength')}
-            </li>
-            <li className={check.matches ? 'is-ok' : undefined}>
-              <span className="join-rules__tick" aria-hidden="true">
-                <Icon name="check" size={12} strokeWidth={2.6} />
-              </span>
-              {t('ruleMatch')}
-            </li>
-          </ul>
-          {error ? (
-            <p className="auth-error" role="alert">
-              <Icon name="alert" size={16} />
-              {t(error)}
-            </p>
-          ) : null}
+          <PasswordRules id="join-rules" check={check} />
+          {error ? <FormError>{t(error)}</FormError> : null}
           <Button type="submit" variant="primary" size="lg" block loading={busy} disabled={!check.ok} iconRight="arrow-right">
             {busy ? t('joining') : t('joinCta')}
           </Button>

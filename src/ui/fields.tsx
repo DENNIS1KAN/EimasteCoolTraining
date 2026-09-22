@@ -669,16 +669,17 @@ export function FileDrop({ accept, multiple, onFiles, label, hint, icon = 'uploa
           {label}
         </p>
         {hint ? <p className="ui-filedrop__hint">{hint}</p> : null}
+        <button
+          type="button"
+          className="ui-btn ui-btn--secondary ui-btn--sm ui-filedrop__btn"
+          disabled={disabled}
+          aria-describedby={labelId}
+          onClick={() => inputRef.current?.click()}
+        >
+          <Icon name="upload" size={16} />
+          <span className="ui-btn__label">{buttonLabel ?? (multiple ? t('chooseFiles') : t('chooseFile'))}</span>
+        </button>
       </div>
-      <button
-        type="button"
-        className="ui-btn ui-btn--secondary ui-btn--sm ui-filedrop__btn"
-        disabled={disabled}
-        aria-describedby={labelId}
-        onClick={() => inputRef.current?.click()}
-      >
-        <span className="ui-btn__label">{buttonLabel ?? (multiple ? t('chooseFiles') : t('chooseFile'))}</span>
-      </button>
       <input
         ref={inputRef}
         type="file"

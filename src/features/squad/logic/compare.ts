@@ -5,7 +5,6 @@ import {
   bestE1rmByExercise,
   exerciseHistory,
   logDate,
-  performedExercises,
   sessionSummary,
   weightSeries,
   weightStats,
@@ -80,17 +79,12 @@ export function weeklyVolume(logs: WorkoutLog[], programs: ProgramMap, weekStart
 
 /* ------------------------------------------------------------------ lift duel */
 
-/** Exercises both members performed, the ones they trained most (together) first. */
+/** Exercises both members performed with weight, the heaviest (combined best e1RM) first: the big lifts lead. */
 export function commonExercises(logsA: WorkoutLog[], logsB: WorkoutLog[], programs: ProgramMap): string[] {
-  const count = (logs: WorkoutLog[]) => {
-    const m = new Map<string, number>()
-    for (const l of logs) for (const pe of performedExercises(l, programs[l.programId])) if (pe.bestE1rmKg > 0) m.set(pe.name, (m.get(pe.name) ?? 0) + 1)
-    return m
-  }
-  const a = count(logsA)
-  const b = count(logsB)
+  const a = bestE1rmByExercise(logsA, programs)
+  const b = bestE1rmByExercise(logsB, programs)
   return [...a.keys()]
-    .filter((n) => b.has(n))
+    .filter((n) => (a.get(n) ?? 0) > 0 && (b.get(n) ?? 0) > 0)
     .sort((x, y) => a.get(y)! + b.get(y)! - (a.get(x)! + b.get(x)!) || x.localeCompare(y))
 }
 

@@ -1,4 +1,4 @@
-import { cx } from '../../../ui/cx'
+import { cx } from '../../../ui'
 
 export interface WeekMeterProps {
   done: number

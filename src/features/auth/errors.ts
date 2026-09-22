@@ -13,6 +13,7 @@ export type AuthErrorKey =
   | 'errEmailConfirmation'
   | 'errInviteStarted'
   | 'errSessionExpired'
+  | 'errPasswordRejected'
 
 export type AuthContext = 'login' | 'join' | 'password'
 
@@ -51,7 +52,7 @@ export function authErrorKey(e: unknown, ctx: AuthContext, online = typeof navig
         return 'errGeneric'
     }
   }
-  if (code === 'weak_password') return 'errWeakPassword'
+  if (code === 'weak_password') return 'errPasswordRejected'
   if (code === 'auth') return 'errSessionExpired'
   return 'errGeneric'
 }

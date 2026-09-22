@@ -11,6 +11,7 @@ import { authErrorKey, type AuthErrorKey } from './errors'
 import { getLastProfile, setLastProfile } from './lastProfile'
 import { AUTH, SETUP_GUIDE_URL } from './messages'
 import { PasswordField } from './PasswordField'
+import { FormError } from './PasswordRules'
 import { ProfileTile } from './ProfileTile'
 import { useLoginProfiles } from './useLoginProfiles'
 import './install'
@@ -73,8 +74,11 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthScreen glow={current ? memberColorVar(current.color) : undefined} className="auth--login">
+    <AuthScreen glow={current ? memberColorVar(current.color) : undefined} className="auth--login" texture={false}>
       <section className="auth-hero" aria-labelledby="auth-title">
+        <span className="auth__texture" aria-hidden="true">
+          Είμαστε
+        </span>
         <BrandMark size={64} className="auth-hero__mark" />
         <h1 id="auth-title" className="auth-hero__title">
           <span>Eimaste</span> <span className="auth-hero__cool">Cool</span>
@@ -84,124 +88,137 @@ export default function LoginPage() {
         <p className="auth-hero__lede">{t('taglineSub')}</p>
       </section>
 
-      <section className="auth-panel" aria-labelledby="auth-who">
-        <div className="auth-panel__head">
-          <h2 id="auth-who" className="auth-panel__title">
-            {t('whosTraining')}
-          </h2>
-          <p className="auth-panel__hint">{demo ? t('pickHintDemo') : t('pickHint')}</p>
-        </div>
+      <div className="auth-side">
+        <section className="auth-panel" aria-labelledby="auth-who">
+          <div className="auth-panel__head">
+            <h2 id="auth-who" className="auth-panel__title">
+              {t('whosTraining')}
+            </h2>
+            <p className="auth-panel__hint">{demo ? t('pickHintDemo') : t('pickHint')}</p>
+          </div>
 
-        {status === 'loading' && !profiles.length ? (
-          <ul className="auth-tiles" aria-hidden="true">
-            {[0, 1, 2].map((i) => (
-              <li key={i} className="auth-tile-wrap">
-                <div className="auth-tile auth-tile--skeleton">
-                  <Skeleton width={54} height={54} radius={999} />
-                  <Skeleton width={64} height={12} />
-                  <Skeleton width={44} height={9} />
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+          {status === 'loading' && !profiles.length ? (
+            <ul className="auth-tiles" aria-hidden="true">
+              {[0, 1, 2].map((i) => (
+                <li key={i} className="auth-tile-wrap">
+                  <div className="auth-tile auth-tile--skeleton">
+                    <Skeleton width={54} height={54} radius={999} />
+                    <Skeleton width={64} height={12} />
+                    <Skeleton width={44} height={9} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : null}
 
-        {status === 'error' ? (
-          <Banner
-            tone="danger"
-            role="alert"
-            title={t('loadError')}
-            action={
-              <Button size="sm" variant="secondary" icon="refresh" onClick={retry}>
-                {c('retry')}
+          {status === 'error' ? (
+            <Banner
+              tone="danger"
+              role="alert"
+              title={t('loadError')}
+              action={
+                <Button size="sm" variant="secondary" icon="refresh" onClick={retry}>
+                  {c('retry')}
+                </Button>
+              }
+            >
+              {t(loadError === 'errOffline' ? 'errOffline' : 'errGeneric')}
+            </Banner>
+          ) : null}
+
+          {status === 'ready' && !profiles.length ? (
+            <EmptyState
+              icon="users"
+              title={t('noProfilesTitle')}
+              body={t('noProfilesBody')}
+              action={
+                <a className="auth-link" href={SETUP_GUIDE_URL} target="_blank" rel="noreferrer">
+                  {t('setupGuide')}
+                  <Icon name="external" size={14} />
+                </a>
+              }
+            />
+          ) : null}
+
+          {profiles.length ? (
+            <ul className="auth-tiles">
+              {profiles.map((p) => (
+                <ProfileTile
+                  key={p.id}
+                  profile={p}
+                  selected={selected === p.slug}
+                  busy={busy === p.slug}
+                  disabled={!!busy && busy !== p.slug}
+                  onSelect={pick}
+                />
+              ))}
+            </ul>
+          ) : null}
+
+          {current && !current.joined ? (
+            <div className="auth-note" role="status">
+              <Icon name="link" size={18} />
+              <div>
+                <p className="auth-note__title">{t('notJoinedTitle', { name: current.name })}</p>
+                <p className="auth-note__body">{t('notJoinedBody')}</p>
+              </div>
+            </div>
+          ) : null}
+
+          {demo && error ? (
+            <Banner tone="danger" role="alert">
+              {t(error)}
+            </Banner>
+          ) : null}
+
+          {!demo && current?.joined ? (
+            <form className="auth-form" onSubmit={submit} noValidate>
+              <input
+                className="visually-hidden"
+                type="text"
+                name="username"
+                autoComplete="username"
+                value={current.slug}
+                readOnly
+                tabIndex={-1}
+                aria-hidden="true"
+              />
+              <PasswordField
+                ref={pwRef}
+                label={t('passwordFor', { name: current.name })}
+                name="password"
+                autoComplete="current-password"
+                enterKeyHint="go"
+                value={password}
+                onChange={(v) => {
+                  setPassword(v)
+                  if (error) setError(null)
+                }}
+                error={!!error}
+                describedBy={error ? 'auth-login-error' : undefined}
+              />
+              {error ? <FormError id="auth-login-error">{t(error)}</FormError> : null}
+              <Button type="submit" variant="primary" size="lg" block loading={!!busy} disabled={!password} iconRight="arrow-right">
+                {busy ? t('signingIn') : t('signIn')}
               </Button>
-            }
-          >
-            {t(loadError === 'errOffline' ? 'errOffline' : 'errGeneric')}
-          </Banner>
-        ) : null}
+              <p className="auth-form__foot">{t('forgot')}</p>
+            </form>
+          ) : null}
+        </section>
 
-        {status === 'ready' && !profiles.length ? (
-          <EmptyState
-            icon="users"
-            title={t('noProfilesTitle')}
-            body={t('noProfilesBody')}
-            action={
+        {demo ? (
+          <footer className="auth-demo">
+            <span className="auth-demo__dot" aria-hidden="true" />
+            <p>
+              <strong>{t('demoTitle')}</strong> · {t('demoBody')}{' '}
               <a className="auth-link" href={SETUP_GUIDE_URL} target="_blank" rel="noreferrer">
                 {t('setupGuide')}
-                <Icon name="external" size={14} />
+                <Icon name="external" size={13} />
               </a>
-            }
-          />
+            </p>
+          </footer>
         ) : null}
-
-        {profiles.length ? (
-          <ul className="auth-tiles">
-            {profiles.map((p) => (
-              <ProfileTile key={p.id} profile={p} selected={selected === p.slug} busy={busy === p.slug} disabled={!!busy && busy !== p.slug} onSelect={pick} />
-            ))}
-          </ul>
-        ) : null}
-
-        {current && !current.joined ? (
-          <div className="auth-note" role="status">
-            <Icon name="link" size={18} />
-            <div>
-              <p className="auth-note__title">{t('notJoinedTitle', { name: current.name })}</p>
-              <p className="auth-note__body">{t('notJoinedBody')}</p>
-            </div>
-          </div>
-        ) : null}
-
-        {demo && error ? (
-          <Banner tone="danger" role="alert">
-            {t(error)}
-          </Banner>
-        ) : null}
-
-        {!demo && current?.joined ? (
-          <form className="auth-form" onSubmit={submit} noValidate>
-            <input className="visually-hidden" type="text" name="username" autoComplete="username" value={current.slug} readOnly tabIndex={-1} aria-hidden="true" />
-            <PasswordField
-              ref={pwRef}
-              label={t('passwordFor', { name: current.name })}
-              name="password"
-              autoComplete="current-password"
-              enterKeyHint="go"
-              value={password}
-              onChange={(v) => {
-                setPassword(v)
-                if (error) setError(null)
-              }}
-              error={!!error}
-              describedBy={error ? 'auth-login-error' : undefined}
-            />
-            {error ? (
-              <p id="auth-login-error" className="auth-error" role="alert">
-                <Icon name="alert" size={16} />
-                {t(error)}
-              </p>
-            ) : null}
-            <Button type="submit" variant="primary" size="lg" block loading={!!busy} disabled={!password} iconRight="arrow-right">
-              {busy ? t('signingIn') : t('signIn')}
-            </Button>
-            <p className="auth-form__foot">{t('forgot')}</p>
-          </form>
-        ) : null}
-      </section>
-
-      {demo ? (
-        <footer className="auth-demo">
-          <span className="auth-demo__dot" aria-hidden="true" />
-          <p>
-            <strong>{t('demoTitle')}</strong> · {t('demoBody')}{' '}
-            <a className="auth-link" href={SETUP_GUIDE_URL} target="_blank" rel="noreferrer">
-              {t('setupGuide')}
-              <Icon name="external" size={13} />
-            </a>
-          </p>
-        </footer>
-      ) : null}
+      </div>
     </AuthScreen>
   )
 }

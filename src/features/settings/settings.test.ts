@@ -10,7 +10,20 @@ const index = (logs: WorkoutLog[]) => Object.fromEntries(logs.map((l) => [l.id, 
 
 describe('summarizeImport', () => {
   const logs = [
-    mkLog({ week: 1, day: 0, doneAt: at('2026-03-23'), ex: { 0: { sets: [['30', '8'], ['32.5', '7'], ['', '', false]] } } }),
+    mkLog({
+      week: 1,
+      day: 0,
+      doneAt: at('2026-03-23'),
+      ex: {
+        0: {
+          sets: [
+            ['30', '8'],
+            ['32.5', '7'],
+            ['', '', false],
+          ],
+        },
+      },
+    }),
     mkLog({ week: 1, day: 1, done: false, doneAt: null, ex: { 0: { sets: [['60', '8', false]] } } }),
     mkLog({ week: 2, day: 0, doneAt: at('2026-03-30'), ex: { 0: { sets: [['35', '8']] }, 1: { sets: [['15', '10']] } } }),
   ]
@@ -51,7 +64,9 @@ describe('inferProgramStart', () => {
     // Wed 25 Mar 2026 in week 1 -> Mon 23 Mar
     expect(inferProgramStart([mkLog({ week: 1, day: 1, doneAt: at('2026-03-25') })])).toBe('2026-03-23')
     // Only week 2 known: Thu 2 Apr (week of Mon 30 Mar) -> start Mon 23 Mar
-    expect(inferProgramStart([mkLog({ week: 2, day: 2, doneAt: at('2026-04-02') }), mkLog({ week: 3, day: 0, doneAt: at('2026-04-06') })])).toBe('2026-03-23')
+    expect(inferProgramStart([mkLog({ week: 2, day: 2, doneAt: at('2026-04-02') }), mkLog({ week: 3, day: 0, doneAt: at('2026-04-06') })])).toBe(
+      '2026-03-23',
+    )
   })
   it('ignores unfinished workouts and returns null without any', () => {
     expect(inferProgramStart([mkLog({ week: 1, day: 0, done: false, doneAt: null })])).toBeNull()
@@ -64,7 +79,9 @@ describe('buildMyData', () => {
   const other = 'thanos'
   const tables = {
     logs: index([mkLog({ week: 1, day: 1 }), mkLog({ week: 1, day: 0 }), mkLog({ member: other, week: 1, day: 0 })]),
-    weights: Object.fromEntries([mkWeight('stelios', '2026-03-24', 81), mkWeight('stelios', '2026-03-23', 82), mkWeight(other, '2026-03-23', 70)].map((w) => [w.id, w])),
+    weights: Object.fromEntries(
+      [mkWeight('stelios', '2026-03-24', 81), mkWeight('stelios', '2026-03-23', 82), mkWeight(other, '2026-03-23', 70)].map((w) => [w.id, w]),
+    ),
     mealPlans: {},
     checkins: {},
     cheers: Object.fromEntries(
@@ -90,7 +107,21 @@ describe('buildMyData', () => {
   })
 
   it('writes my workouts as a logbook CSV that imports back', () => {
-    const logs = [mkLog({ week: 1, day: 0, doneAt: at('2026-01-05'), ex: { 0: { sets: [['40', '8'], ['42.5', '6']] } } })]
+    const logs = [
+      mkLog({
+        week: 1,
+        day: 0,
+        doneAt: at('2026-01-05'),
+        ex: {
+          0: {
+            sets: [
+              ['40', '8'],
+              ['42.5', '6'],
+            ],
+          },
+        },
+      }),
+    ]
     const csv = myWorkoutsCSV(me, { logs: index([...logs, mkLog({ member: other, week: 1, day: 0 })]), programs: { [MINI.id]: MINI } })
     expect(csv.charCodeAt(0)).toBe(0xfeff)
     const rows = parseCSV(csv)

@@ -3,7 +3,7 @@ import { useT } from '../../../i18n'
 import type { ISODate } from '../../../lib/dates'
 import { addDays, startOfWeek } from '../../../lib/dates'
 import { fmtDate, fmtPct } from '../../../lib/format'
-import { glanceTotals, type AthleteGlance } from '../lib/glance'
+import { glanceTotals, needsPush, needsSetup, type AthleteGlance } from '../lib/glance'
 import { M } from '../messages'
 import { GlanceRow } from './GlanceRow'
 
@@ -20,12 +20,17 @@ export function GlanceCard({ rows, today, meId, onAdd }: GlanceCardProps) {
   const totals = glanceTotals(rows)
   const weekStart = startOfWeek(today)
   const range = `${fmtDate(weekStart, 'dayMonth')} – ${fmtDate(addDays(weekStart, 6), 'dayMonth')}`
-  const needPush = rows.filter((r) => r.flags.includes('behind') || r.flags.includes('noWeighIn') || r.flags.includes('lowFood')).length
+  const needPush = rows.filter(needsPush).length
+  const toSetUp = rows.filter(needsSetup).length
 
   const badge =
     rows.length === 0 ? null : needPush > 0 ? (
       <Tag tone="warn" icon="alert">
         {needPush === 1 ? t('needsAttentionOne') : t('needsAttention', { n: needPush })}
+      </Tag>
+    ) : toSetUp > 0 ? (
+      <Tag tone="neutral" icon="calendar">
+        {t('toSetUp', { n: toSetUp })}
       </Tag>
     ) : (
       <Tag tone="good" icon="check">
@@ -54,8 +59,14 @@ export function GlanceCard({ rows, today, meId, onAdd }: GlanceCardProps) {
             <div className="glance-strip__cell">
               <dt className="micro">{t('workoutsThisWeek')}</dt>
               <dd className="num glance-strip__value">
-                {totals.weekDone}
-                <span className="glance-strip__of">/{totals.weekTarget}</span>
+                {totals.weekTarget > 0 || totals.weekDone > 0 ? (
+                  <>
+                    {totals.weekDone}
+                    <span className="glance-strip__of">/{totals.weekTarget}</span>
+                  </>
+                ) : (
+                  <span className="glance-strip__of">–</span>
+                )}
               </dd>
             </div>
             <div className="glance-strip__cell">
@@ -72,7 +83,8 @@ export function GlanceCard({ rows, today, meId, onAdd }: GlanceCardProps) {
               </dd>
             </div>
           </dl>
-          {needPush === 0 ? <p className="glance__cheer">{t('allGood')}</p> : null}
+          {needPush === 0 && toSetUp === 0 ? <p className="glance__cheer">{t('allGood')}</p> : null}
+          {toSetUp > 0 && toSetUp === rows.length ? <p className="glance__cheer">{t('setUpHint')}</p> : null}
           <ul className="glance__rows">
             {rows.map((r) => (
               <GlanceRow key={r.member.id} row={r} isMe={r.member.id === meId} />

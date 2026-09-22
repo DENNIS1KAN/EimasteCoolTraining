@@ -1,0 +1,31 @@
+import { getLang, localeOf } from '../../i18n'
+
+/** Time of day in the current locale: "18:40". */
+export function fmtTime(ms: number): string {
+  return new Intl.DateTimeFormat(localeOf(getLang()), { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(ms))
+}
+
+/** "5–2" with an en dash. */
+export const fmtScore = (a: number, b: number): string => `${a}–${b}`
+
+/** Program week + progress: "W3 · 11/60". */
+export const fmtProgress = (weekLabel: string, done: number, total: number): string => `${weekLabel} · ${done}/${total}`
+
+/** Human list: "A, B and C" / "Α, Β και Γ". */
+export function fmtList(names: string[]): string {
+  try {
+    return new Intl.ListFormat(localeOf(getLang()), { style: 'long', type: 'conjunction' }).format(names)
+  } catch {
+    return names.join(', ')
+  }
+}
+
+/** Link to the head-to-head page. */
+export const compareHref = (a: { slug: string }, b: { slug: string }): string =>
+  `/squad/compare?a=${encodeURIComponent(a.slug)}&b=${encodeURIComponent(b.slug)}`
+
+export const memberHref = (m: { slug: string }): string => `/member/${encodeURIComponent(m.slug)}`
+export const memberWorkoutHref = (m: { slug: string }, week: number, day: number): string =>
+  `/member/${encodeURIComponent(m.slug)}/workout/${week}/${day}`
+export const liftHref = (m: { slug: string }, exercise: string): string =>
+  `/lift/${encodeURIComponent(m.slug)}/${encodeURIComponent(exercise)}`

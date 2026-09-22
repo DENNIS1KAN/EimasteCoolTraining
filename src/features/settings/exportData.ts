@@ -28,7 +28,9 @@ export interface MyDataExport {
 
 const byId = <T extends { id: string }>(a: T, b: T) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
 const mine = <T extends { memberId: string; id: string }>(rows: Record<string, T>, id: string): T[] =>
-  Object.values(rows).filter((r) => r.memberId === id).sort(byId)
+  Object.values(rows)
+    .filter((r) => r.memberId === id)
+    .sort(byId)
 
 /** Everything that belongs to one member: their profile, logs, weigh-ins, plans, check-ins and cheers. */
 export function buildMyData(me: Member, t: ExportTables, version: string, now = Date.now()): MyDataExport {

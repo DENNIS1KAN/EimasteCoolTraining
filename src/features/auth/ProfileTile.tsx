@@ -38,18 +38,20 @@ export function ProfileTile({ profile: p, selected, busy, disabled, onSelect }: 
               <Spinner size={22} decorative />
             </span>
           ) : null}
+          {pending ? (
+            <span className="auth-tile__badge auth-tile__badge--pending" aria-hidden="true">
+              <Icon name="clock" size={12} strokeWidth={2.4} />
+            </span>
+          ) : null}
           {selected && !busy && !pending ? (
-            <span className="auth-tile__check" aria-hidden="true">
+            <span className="auth-tile__badge" aria-hidden="true">
               <Icon name="check" size={12} strokeWidth={2.6} />
             </span>
           ) : null}
         </span>
         <span className="auth-tile__name">{p.name}</span>
         {pending ? (
-          <span className="auth-tile__role auth-tile__role--pending">
-            <Icon name="clock" size={12} strokeWidth={2.2} />
-            {t('invitePending')}
-          </span>
+          <span className="auth-tile__role auth-tile__role--pending">{t('invitePending')}</span>
         ) : (
           <span className="auth-tile__role">
             {p.role === 'coach' ? <Icon name="whistle" size={12} strokeWidth={2.2} /> : null}

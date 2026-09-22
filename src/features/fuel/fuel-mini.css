@@ -1,0 +1,87 @@
+/* Home "Fuel today" mini card (mockup: screen A, right mini card). Tokens only. */
+.fu-mini.ui-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 12px 14px 11px;
+  border-radius: var(--r-mini);
+  color: var(--ink);
+  text-decoration: none;
+}
+.fu-mini__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.fu-mini__chev {
+  color: var(--muted);
+  flex: none;
+}
+.fu-mini__body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  min-width: 0;
+}
+.fu-mini__ring {
+  font-size: 17px;
+  line-height: 1;
+  color: var(--ink);
+}
+.fu-mini__nums {
+  min-width: 0;
+}
+.fu-mini__v {
+  font-size: 26px;
+  line-height: 0.9;
+  color: var(--ink);
+}
+.fu-mini__s {
+  margin-top: 3px;
+  font: 700 11px/14px var(--font-body);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.fu-mini__plan {
+  white-space: normal;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--ink);
+}
+.fu-mini__foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 8px;
+  min-width: 0;
+  font: 700 11.5px/14px var(--font-body);
+  color: var(--ink-2);
+}
+.fu-mini__foot svg {
+  flex: none;
+  color: var(--muted);
+}
+.fu-mini__none {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.fu-mini__noneic {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+  color: var(--muted);
+}
+.fu-mini__nonet {
+  font: 800 13.5px/17px var(--font-body);
+  color: var(--ink-2);
+}

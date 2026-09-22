@@ -10,6 +10,7 @@ import {
   goalView,
   historyRows,
   latestEntry,
+  maintainGauge,
   phaseOf,
   rangeFrom,
   stepperStart,
@@ -103,6 +104,14 @@ describe('goalView', () => {
     const off = goalView({ startKg: 80, currentKg: 81.5, goalKg: 80.5, weeklyRateKg: 0.2, today })!
     expect(off.reached).toBe(false)
     expect(off.bar).toBeCloseTo(0.5, 10)
+  })
+})
+
+describe('maintainGauge', () => {
+  it('centers the goal, places the current weight and clamps at the ends', () => {
+    expect(maintainGauge(80, 80)).toEqual({ pos: 0.5, bandFrom: 0.375, bandTo: 0.625 })
+    expect(maintainGauge(81, 80).pos).toBeCloseTo(0.75, 10)
+    expect(maintainGauge(70, 80).pos).toBe(0)
   })
 })
 

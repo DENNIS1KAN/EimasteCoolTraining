@@ -8,7 +8,7 @@ const M = defineMessages(
   {
     loading: 'Loading Eimaste Cool Training',
     loadingShort: 'Loading…',
-    title: "Couldn't start",
+    title: 'Couldn’t start',
     body: 'Something went wrong while opening the app. Check your connection and try again. If it keeps happening, tell your coach.',
     retry: 'Try again',
     details: 'Details',

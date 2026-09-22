@@ -17,7 +17,19 @@ const ms = (d: string) => fromISODate(d).getTime()
 const programShort = (p: Program | null | undefined) => (p ? p.name.split(' · ')[0].trim() : '')
 
 /** Daily weigh-ins as faint dots under the smoothed trend line, with the goal and the program start. */
-export function WeightChartCard({ member, model, range, program }: { member: Member; model: WeightModel; range: Range; program: Program | null }) {
+export function WeightChartCard({
+  member,
+  model,
+  range,
+  program,
+  height = 188,
+}: {
+  member: Member
+  model: WeightModel
+  range: Range
+  program: Program | null
+  height?: number
+}) {
   const t = useT(M)
   const unit = member.settings.unit
   const color = memberColorVar(member.color)
@@ -30,10 +42,18 @@ export function WeightChartCard({ member, model, range, program }: { member: Mem
     const raw = pts.map((p) => ({ x: ms(p.date), y: toDisplay(p.kg, unit) }))
     const trend = pts.map((p) => ({ x: ms(p.date), y: Math.round(kgToUnit(p.trendKg, unit) * 100) / 100 }))
     const goal = member.goalWeightKg != null ? toDisplay(member.goalWeightKg, unit) : null
-    const showGoal = goal != null && goalFits([...raw, ...trend].map((p) => p.y), goal, unit)
+    const showGoal =
+      goal != null &&
+      goalFits(
+        [...raw, ...trend].map((p) => p.y),
+        goal,
+        unit,
+      )
     const start = member.programStart
     const markers: ChartMarker[] =
-      start && program && start > pts[0].date && start <= model.today ? [{ x: ms(start), label: t('programStart', { program: programShort(program) }) }] : []
+      start && program && start > pts[0].date && start <= model.today
+        ? [{ x: ms(start), label: t('programStart', { program: programShort(program) }) }]
+        : []
     const refLines: RefLine[] = showGoal ? [{ y: goal, label: t('goalLine', { value: fmtNum(goal, 1, 1) }) }] : []
     const series: LineSeries[] = [
       { id: 'daily', label: t('daily'), color, points: raw, line: false },
@@ -69,7 +89,7 @@ export function WeightChartCard({ member, model, range, program }: { member: Mem
           series={chart.series}
           refLines={chart.refLines}
           markers={chart.markers}
-          height={188}
+          height={height}
           yPadding={0.08}
           legend={false}
           table="hidden"

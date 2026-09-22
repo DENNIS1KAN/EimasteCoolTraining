@@ -243,3 +243,16 @@ describe('fmtMetric', () => {
     expect(fmtMetric('goal', null)).toBe('—')
   })
 })
+
+describe('weightChangeTone', () => {
+  it('rewards moving toward the goal', async () => {
+    const { weightChangeTone, changeDir } = await import('./weight')
+    expect(weightChangeTone(-1.5, 82, 79)).toBe('good')
+    expect(weightChangeTone(1, 82, 79)).toBe('warn')
+    expect(weightChangeTone(0.8, 72, 75)).toBe('good')
+    expect(weightChangeTone(0.8, 72, null)).toBe('neutral')
+    expect(weightChangeTone(0.01, 72, 75)).toBe('neutral')
+    expect(changeDir(-0.3)).toBe('down')
+    expect(changeDir(0)).toBe('flat')
+  })
+})

@@ -2,6 +2,9 @@
 
 /* ==================================================================== page layout */
 .body-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   /* room for the floating quick-log dock above the tab bar */
   padding-bottom: 84px;
 }
@@ -137,14 +140,31 @@
   max-width: 36ch;
 }
 .body-empty-hero__ghost {
-  font: 900 72px/0.8 var(--font-display);
-  color: var(--line-strong);
-  letter-spacing: -0.015em;
-  margin-top: 4px;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  margin-top: 6px;
+  overflow: visible;
 }
-.body-empty-hero__ghost small {
-  font-size: 22px;
-  margin-left: 4px;
+.body-empty-hero__ghost-line {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 2 6;
+  vector-effect: non-scaling-stroke;
+}
+.body-empty-hero__ghost-dot {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.body-empty-hero__ghost-end {
+  fill: var(--accent-strong);
+  stroke: var(--surface);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
 }
 
 /* ==================================================================== goal card */
@@ -461,7 +481,9 @@ button.body-history__row:focus-visible {
   place-items: center;
   background: var(--accent);
   color: var(--on-accent);
-  box-shadow: var(--shadow-accent), inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+  box-shadow:
+    var(--shadow-accent),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.08);
   transition: transform var(--dur-1) var(--ease);
 }
 .body-dock__save:active {
@@ -484,12 +506,17 @@ button.body-history__row:focus-visible {
 
 /* ==================================================================== sheets */
 .body-sheet__footer {
+  flex: 1;
+  min-width: 0;
   display: flex;
   gap: 10px;
   align-items: center;
 }
+.body-sheet__footer > .ui-btn {
+  flex: none;
+}
 .body-sheet__footer > .ui-btn--block {
-  flex: 1;
+  flex: 1 1 0;
 }
 .body-entry__stepper {
   display: flex;
@@ -585,4 +612,70 @@ button.body-history__row:focus-visible {
   font: 600 11px/15px var(--font-body);
   color: var(--muted);
   margin-bottom: 4px;
+}
+.body-dock__open {
+  text-align: left;
+  border-radius: var(--r-sm);
+  min-height: 44px;
+}
+.body-dock__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 800;
+}
+.body-dock__sub--wrap {
+  white-space: normal !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.body-dock__title svg {
+  color: var(--muted);
+}
+.body-dock--done {
+  min-height: 0;
+  padding: 7px 7px 7px 8px;
+  border-radius: var(--r-pill);
+  gap: 10px;
+}
+.body-dock--done .body-dock__done {
+  width: 34px;
+  height: 34px;
+}
+.body-dock--done .ui-btn {
+  border-radius: var(--r-pill);
+}
+.body-dock--card.body-dock--done {
+  border-radius: var(--r-xl);
+  padding: 10px 10px 10px 12px;
+}
+.body-dock__logged {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.body-goal__bar--gauge {
+  margin-top: 16px;
+}
+.body-goal__band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--b0);
+  width: calc(var(--b1) - var(--b0));
+  background: var(--good-soft);
+  box-shadow: inset 0 0 0 1px var(--good);
+  border-radius: 4px;
+}
+.body-goal__tick {
+  position: absolute;
+  left: 50%;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--ink-2);
 }

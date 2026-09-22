@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { MINI, mkLog } from '../../../lib/testing/fixtures'
+import { MINI, at, mkLog } from '../../../lib/testing/fixtures'
 import type { MemberSettings } from '../../../data/types'
 import {
   addSet,
   dayProgress,
+  doneAtFor,
   emptyLog,
   exerciseLog,
   finishLog,
   machineSuggestions,
   nextUp,
+  openSetsWithReps,
   rememberMachine,
   removeSet,
   setField,
@@ -160,6 +162,23 @@ describe('variants and machines', () => {
       mkLog({ week: 1, day: 1, ex: { 0: { m: 'Technogym', sets: [] }, 1: { m: ' ', sets: [] } } }),
     ]
     expect(machineSuggestions(s, logs)).toEqual(['Hammer', 'Rogue', 'Technogym'])
+  })
+})
+
+describe('doneAtFor / openSetsWithReps', () => {
+  const day = (d: string, h: number) => at(d, h)
+  const l = mkLog({ week: 2, day: 0, done: false, startedAt: day('2026-01-05', 18), ex: { 0: { sets: [['60', '8'], ['60', '7', false]] } } })
+  l.ex['0'].sets[0].at = day('2026-01-05', 18) + 60_000
+
+  it('uses now for today, the last set for an earlier day, else noon', () => {
+    expect(doneAtFor('2026-01-09', l, day('2026-01-09', 20))).toBe(day('2026-01-09', 20))
+    expect(doneAtFor('2026-01-05', l, day('2026-01-09', 20))).toBe(day('2026-01-05', 18) + 60_000)
+    expect(doneAtFor('2026-01-06', l, day('2026-01-09', 20))).toBe(day('2026-01-06', 12))
+  })
+
+  it('counts unticked sets that have reps', () => {
+    expect(openSetsWithReps(l)).toBe(1)
+    expect(openSetsWithReps(null)).toBe(0)
   })
 })
 

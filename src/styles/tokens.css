@@ -86,6 +86,9 @@
   --shadow-1: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 22px -12px rgba(16, 24, 40, 0.16);
   --shadow-2: 0 18px 40px -12px rgba(16, 24, 40, 0.28), 0 2px 6px rgba(16, 24, 40, 0.06);
   --shadow-accent: 0 10px 26px -10px rgba(150, 200, 0, 0.45);
+  --shadow-hero: 0 22px 44px -18px rgba(5, 10, 25, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 0 0 1px rgba(160, 180, 220, 0.08);
+  --on-member: #ffffff; /* avatar initials on a member color */
 
   /* ---------------------------------------------------------------- spacing (4px grid) */
   --s-1: 4px;

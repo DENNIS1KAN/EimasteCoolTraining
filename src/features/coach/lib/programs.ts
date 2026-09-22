@@ -88,3 +88,42 @@ export const programEnd = (p: Pick<Program, 'weeks'>, start: ISODate): ISODate =
 
 /** 0 = Monday … 6 = Sunday */
 export const weekdayIndex = (d: ISODate): number => (fromISODate(d).getDay() + 6) % 7
+
+/** "8-10" -> "8–10" (en dash between numbers); trims. */
+export const enDash = (s: string | undefined): string => (s ?? '').trim().replace(/(\d)\s*-\s*(?=\d)/g, '$1–')
+
+/** "~8-9" -> { approx: true, value: "8–9" } so the tilde can be typeset apart from condensed numerals. */
+export function splitApprox(s: string | undefined): { approx: boolean; value: string } {
+  const v = enDash(s)
+  return v.startsWith('~') ? { approx: true, value: v.slice(1).trim() } : { approx: false, value: v }
+}
+
+/** "N/A", "none", "-" and empty mean no last-set technique. */
+export const techniqueOf = (t: string | undefined): string | null => {
+  const v = (t ?? '').trim()
+  return !v || /^(n\/?a|none|-|–)$/i.test(v) ? null : v
+}
+
+/** Short focus tag for a day tab: "Upper (Strength Focus)" -> "STR"; "" when the day has no focus. */
+export function focusAbbr(dayName: string): string {
+  const focus = (dayName.match(/\(([^)]+)\)/) || [])[1]?.trim() ?? ''
+  const word = focus.split(/\s+/)[0] ?? ''
+  return word.slice(0, 3).toUpperCase()
+}
+
+export interface BlockGroup {
+  block: string
+  /** 1-based week numbers, consecutive. */
+  weeks: number[]
+}
+
+/** Consecutive weeks sharing a block label: [{ block: 'Foundation', weeks: [1..5] }, { block: 'Ramping', weeks: [6..12] }]. */
+export function blockGroups(p: Pick<Program, 'weeks'>): BlockGroup[] {
+  const out: BlockGroup[] = []
+  p.weeks.forEach((w, i) => {
+    const last = out[out.length - 1]
+    if (last && last.block === w.block) last.weeks.push(i + 1)
+    else out.push({ block: w.block, weeks: [i + 1] })
+  })
+  return out
+}

@@ -30,7 +30,8 @@ function palette(): string[] {
   const cs = getComputedStyle(document.documentElement)
   const v = (name: string, fallback: string) => cs.getPropertyValue(name).trim() || fallback
   const volt = v('--accent', '#d4ff3f')
-  return [volt, volt, volt, v('--m-blue', '#3987e5'), v('--m-orange', '#eb6834'), v('--m-aqua', '#1baf7a'), '#ffffff']
+  // --ink is near-white at night and near-black by day, so the neutral pieces always read.
+  return [volt, volt, volt, v('--m-blue', '#3987e5'), v('--m-orange', '#eb6834'), v('--m-aqua', '#1baf7a'), v('--ink', '#ffffff')]
 }
 
 export function celebrate(opts: CelebrateOptions = {}): void {

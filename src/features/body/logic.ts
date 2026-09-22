@@ -115,6 +115,15 @@ export function goalView(p: {
   }
 }
 
+/**
+ * Maintenance gauge: the track spans goal ± `spanKg`, the goal sits in the middle and the "on target" band covers
+ * ± half the maintenance band. Positions are 0..1 along the track.
+ */
+export function maintainGauge(currentKg: number, goalKg: number, spanKg = 2): { pos: number; bandFrom: number; bandTo: number } {
+  const half = MAINTAIN_BAND_KG / 2 / (2 * spanKg)
+  return { pos: clamp01(0.5 + (currentKg - goalKg) / (2 * spanKg)), bandFrom: 0.5 - half, bandTo: 0.5 + half }
+}
+
 /* ------------------------------------------------------------------ ranges */
 
 export type Range = '1M' | '3M' | 'all'

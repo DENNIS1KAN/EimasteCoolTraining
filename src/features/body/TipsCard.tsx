@@ -19,7 +19,9 @@ export function TipsCard({ dismissible = true }: { dismissible?: boolean }) {
     <Card as="section" className="body-tips" aria-labelledby="body-tips-title">
       <CardHeader
         title={<span id="body-tips-title">{t('tipsTitle')}</span>}
-        action={dismissible ? <IconButton icon="x" label={t('hideTips')} variant="ghost" size={36} onClick={() => dismissHint(HINT_ID)} /> : undefined}
+        action={
+          dismissible ? <IconButton icon="x" label={t('hideTips')} variant="ghost" size={36} onClick={() => dismissHint(HINT_ID)} /> : undefined
+        }
       />
       <ul className="body-tips__list">
         {TIPS.map((tip) => (

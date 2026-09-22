@@ -1,7 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import { BTS_PROGRAM } from '../../../data/programs'
 import { MINI, mkMember } from '../../../lib/testing/fixtures'
-import { membersOnProgram, programEnd, programIdFromName, programSummary, shortRandom, sortPrograms, weekdayIndex, weeklyPattern } from './programs'
+import {
+  blockGroups,
+  enDash,
+  focusAbbr,
+  membersOnProgram,
+  programEnd,
+  programIdFromName,
+  programSummary,
+  shortRandom,
+  sortPrograms,
+  splitApprox,
+  techniqueOf,
+  weekdayIndex,
+  weeklyPattern,
+} from './programs'
 
 describe('programSummary', () => {
   it('counts weeks, days and exercises', () => {
@@ -52,5 +66,32 @@ describe('misc', () => {
     expect(programEnd(BTS_PROGRAM, '2026-09-07')).toBe('2026-11-29')
     expect(weekdayIndex('2026-09-07')).toBe(0)
     expect(weekdayIndex('2026-09-13')).toBe(6)
+  })
+})
+
+describe('exercise text helpers', () => {
+  it('enDash / splitApprox', () => {
+    expect(enDash('8-10')).toBe('8–10')
+    expect(enDash('2 - 3 min')).toBe('2–3 min')
+    expect(enDash('Myo-reps')).toBe('Myo-reps')
+    expect(splitApprox('~8-9')).toEqual({ approx: true, value: '8–9' })
+    expect(splitApprox('10')).toEqual({ approx: false, value: '10' })
+    expect(splitApprox(undefined)).toEqual({ approx: false, value: '' })
+  })
+  it('techniqueOf / focusAbbr', () => {
+    expect(techniqueOf('N/A')).toBeNull()
+    expect(techniqueOf(' na ')).toBeNull()
+    expect(techniqueOf('')).toBeNull()
+    expect(techniqueOf('Failure')).toBe('Failure')
+    expect(focusAbbr('Upper (Strength Focus)')).toBe('STR')
+    expect(focusAbbr('Legs (Hypertrophy Focus)')).toBe('HYP')
+    expect(focusAbbr('Full')).toBe('')
+  })
+  it('blockGroups', () => {
+    expect(blockGroups(BTS_PROGRAM).map((g) => [g.block, g.weeks[0], g.weeks[g.weeks.length - 1]])).toEqual([
+      [BTS_PROGRAM.weeks[0].block, 1, 5],
+      [BTS_PROGRAM.weeks[11].block, 6, 12],
+    ])
+    expect(blockGroups({ weeks: [] })).toEqual([])
   })
 })

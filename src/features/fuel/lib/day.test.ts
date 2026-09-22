@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import type { Meal, MealPlan } from '../../../data/types'
-import { blankCheckin, daySummary, isBlankCheckin, mealMinutes, nextMealId, nextRating, toggleMeal } from './day'
+import { blankCheckin, daySummary, isBlankCheckin, mealMinutes, nextMealId, nextRating, planOnDate, toggleMeal } from './day'
 
-const meal = (id: string, time: string, kcal: number | null = null, protein: number | null = null): Meal => ({ id, name: id, time, items: '', kcal, protein })
+const meal = (id: string, time: string, kcal: number | null = null, protein: number | null = null): Meal => ({
+  id,
+  name: id,
+  time,
+  items: '',
+  kcal,
+  protein,
+})
 
 const plan = (meals: Meal[], extra: Partial<MealPlan> = {}): MealPlan => ({
   id: 'p1',
@@ -119,5 +126,26 @@ describe('check-in helpers', () => {
     expect(nextRating(null, 'on')).toBe('on')
     expect(nextRating('on', 'on')).toBeNull()
     expect(nextRating('on', 'off')).toBe('off')
+  })
+})
+
+describe('planOnDate', () => {
+  const old = plan([], { id: 'old', startDate: '2026-08-01', active: false })
+  const cur = plan([], { id: 'cur', startDate: '2026-09-10' })
+  const next = plan([], { id: 'next', startDate: '2026-10-01', active: false })
+  const plans = [next, cur, old]
+  it('prefers the plan of the check-in', () => {
+    expect(planOnDate(plans, cur, '2026-09-20', { ...blankCheckin('m1', '2026-09-20', 'old') })?.id).toBe('old')
+  })
+  it('uses the current plan once it started, else the newest started plan', () => {
+    expect(planOnDate(plans, cur, '2026-09-20')?.id).toBe('cur')
+    expect(planOnDate(plans, cur, '2026-09-01')?.id).toBe('old')
+  })
+  it('falls back to the current plan before any plan started', () => {
+    expect(planOnDate(plans, cur, '2026-07-01')?.id).toBe('cur')
+    expect(planOnDate([], null, '2026-07-01')).toBeNull()
+  })
+  it('ignores a check-in whose plan is gone', () => {
+    expect(planOnDate(plans, cur, '2026-09-20', blankCheckin('m1', '2026-09-20', 'deleted'))?.id).toBe('cur')
   })
 })

@@ -23,27 +23,33 @@ export interface PlanCardProps {
   plan: MealPlan
   author: Member | null
   meId: string | null
+  /** Show long notes in full from the start (desktop). */
+  notesOpen?: boolean
 }
 
 /** The plan in force: author, title, status, files and the coach's notes. */
-export function PlanCard({ plan, author, meId }: PlanCardProps) {
+export function PlanCard({ plan, author, meId, notesOpen }: PlanCardProps) {
   const t = useT(FM)
   const authorLine = useAuthorLine()
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(!!notesOpen)
   const notesId = useId()
   const long = isLong(plan.notes)
   const who = authorLine(plan, author, meId)
   return (
     <Card as="section" className="fu-plan" aria-labelledby={`${notesId}-t`}>
       <div className="fu-plan__head">
-        {author ? <Avatar member={author} size={36} decorative /> : <span className="fu-plan__noav" aria-hidden="true"><Icon name="fuel" size={18} /></span>}
+        {author ? (
+          <Avatar member={author} size={36} decorative />
+        ) : (
+          <span className="fu-plan__noav" aria-hidden="true">
+            <Icon name="fuel" size={18} />
+          </span>
+        )}
         <div className="fu-plan__titles">
           <h2 id={`${notesId}-t`} className="fu-plan__title">
             {plan.title}
           </h2>
-          <p className="fu-plan__sub">
-            {[who, t('updated', { when: fmtRelative(plan.updatedAt) })].filter(Boolean).join(' · ')}
-          </p>
+          <p className="fu-plan__sub">{[who, t('updated', { when: fmtRelative(plan.updatedAt) })].filter(Boolean).join(' · ')}</p>
         </div>
         {plan.active && (
           <Tag tone="good" icon="check" className="fu-plan__tag">

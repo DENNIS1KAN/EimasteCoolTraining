@@ -23,7 +23,7 @@ export function applyTheme(p: ThemePref = pref): void {
   else root.setAttribute('data-theme', p)
   const dark = p === 'dark' || (p === 'system' && window.matchMedia?.('(prefers-color-scheme: dark)').matches)
   const meta = document.querySelector('meta[name="theme-color"]')
-  if (meta) meta.setAttribute('content', dark ? '#0b0d10' : '#f4f5f2')
+  if (meta) meta.setAttribute('content', dark ? '#07090f' : '#f3f5f8')
 }
 
 export function setThemePref(p: ThemePref): void {

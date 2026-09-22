@@ -19,7 +19,7 @@ export interface AthleteGlance {
   stats: MemberStats
   /** Workouts finished this calendar week (Mon-Sun). */
   weekDone: number
-  /** Workouts the program schedules this calendar week (the weekly pattern before the start date). */
+  /** Workouts the program schedules this calendar week (0 before the start date or without a program). */
   weekTarget: number
   /** Scheduled workouts that fell on days before today this week. */
   weekDueSoFar: number
@@ -51,7 +51,8 @@ export function athleteGlance(d: SquadData, m: Member, today: ISODate): AthleteG
   const program = programOf(d, m)
   const start = m.programStart
   const weekStart = startOfWeek(today)
-  let weekTarget = stats.thisWeek.target
+  const started = !!program && !!start && start <= today
+  let weekTarget = 0
   let weekDueSoFar = 0
   if (program && start) {
     const days = dateRange(weekStart, addDays(weekStart, 6))
@@ -67,7 +68,9 @@ export function athleteGlance(d: SquadData, m: Member, today: ISODate): AthleteG
   if (!program) flags.push('noProgram')
   else if (!start) flags.push('notStarted')
   if (behindBy > 0) flags.push('behind')
-  if (daysSinceWeighIn == null || daysSinceWeighIn >= WEIGH_IN_STALE_DAYS) flags.push('noWeighIn')
+  // Weigh-ins are expected once the program runs (or once they have started weighing in).
+  const expectsWeighIns = started || lastWeighIn != null
+  if (expectsWeighIns && (daysSinceWeighIn == null || daysSinceWeighIn >= WEIGH_IN_STALE_DAYS)) flags.push('noWeighIn')
   if (stats.adherence14 != null && stats.adherence14 < LOW_ADHERENCE) flags.push('lowFood')
 
   return {
@@ -85,7 +88,12 @@ export function athleteGlance(d: SquadData, m: Member, today: ISODate): AthleteG
   }
 }
 
-const SEVERITY: Record<GlanceFlag, number> = { behind: 10, notStarted: 6, noProgram: 5, noWeighIn: 3, lowFood: 2 }
+const SEVERITY: Record<GlanceFlag, number> = { behind: 10, noWeighIn: 3, lowFood: 2, notStarted: 1, noProgram: 1 }
+
+/** Flags that mean "give them a push" (as opposed to "set them up"). */
+export const PUSH_FLAGS: GlanceFlag[] = ['behind', 'noWeighIn', 'lowFood']
+export const needsPush = (g: Pick<AthleteGlance, 'flags'>): boolean => g.flags.some((f) => PUSH_FLAGS.includes(f))
+export const needsSetup = (g: Pick<AthleteGlance, 'flags'>): boolean => g.flags.includes('notStarted') || g.flags.includes('noProgram')
 export const glanceSeverity = (g: AthleteGlance): number => g.flags.reduce((a, f) => a + SEVERITY[f], 0) + g.behindBy
 
 /** Everyone the coach keeps accountable, the ones needing attention first (then by name). */
@@ -108,7 +116,7 @@ export function glanceTotals(rows: AthleteGlance[]): GlanceTotals {
   const withPlan = rows.filter((r) => r.adherence != null)
   return {
     athletes: rows.length,
-    onTrack: rows.filter((r) => r.member.programStart && !r.flags.includes('behind')).length,
+    onTrack: rows.filter((r) => !needsSetup(r) && !r.flags.includes('behind')).length,
     weekDone: rows.reduce((a, r) => a + r.weekDone, 0),
     weekTarget: rows.reduce((a, r) => a + r.weekTarget, 0),
     adherence: withPlan.length ? withPlan.reduce((a, r) => a + (r.adherence as number), 0) / withPlan.length : null,

@@ -27,11 +27,15 @@ export interface NudgeState {
   readyAt: number | null
 }
 
-export function nudgeState(cheers: Record<string, Cheer> | Cheer[], fromId: string, toId: string, now: number): NudgeState {
-  if (fromId === toId) return { canNudge: false, lastAt: null, readyAt: null }
-  const lastAt = lastNudgeAt(cheers, fromId, toId)
+/** Cooldown from the time of the last nudge. */
+export function cooldown(lastAt: number | null, now: number): NudgeState {
   const readyAt = lastAt != null && now - lastAt < NUDGE_COOLDOWN_MS ? lastAt + NUDGE_COOLDOWN_MS : null
   return { canNudge: readyAt == null, lastAt, readyAt }
+}
+
+export function nudgeState(cheers: Record<string, Cheer> | Cheer[], fromId: string, toId: string, now: number): NudgeState {
+  if (fromId === toId) return { canNudge: false, lastAt: null, readyAt: null }
+  return cooldown(lastNudgeAt(cheers, fromId, toId), now)
 }
 
 /** Trim, collapse runs of whitespace and cap at NUDGE_MAX characters without splitting an emoji. */

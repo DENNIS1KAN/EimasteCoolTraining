@@ -1,0 +1,111 @@
+/* Password field, password rules and form errors: shared by the join page, login and Settings. Tokens only. */
+
+.auth-error {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: var(--danger-soft);
+  font: 700 13px/1.4 var(--font-body);
+  color: var(--ink);
+}
+.auth-error > svg {
+  margin-top: 1px;
+  color: var(--danger);
+}
+
+.auth-pw {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.auth-pw__label {
+  font: 700 12.5px/1.2 var(--font-body);
+  color: var(--ink-2);
+}
+.auth-pw__box {
+  position: relative;
+}
+.auth-pw__input {
+  width: 100%;
+  height: 52px;
+  padding: 0 54px 0 16px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  font: 700 17px/1 var(--font-body);
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  transition:
+    box-shadow var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease);
+}
+.auth-pw__input::placeholder {
+  color: var(--faint);
+}
+.auth-pw__input:focus {
+  outline: none;
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 0 2px var(--accent-strong),
+    0 0 0 4px var(--accent-soft);
+}
+.auth-pw.is-error .auth-pw__input {
+  box-shadow:
+    inset 0 0 0 2px var(--danger),
+    0 0 0 4px var(--danger-soft);
+}
+.auth-pw__eye {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-btn-sm);
+  color: var(--muted);
+  transition: color var(--dur-1) var(--ease);
+}
+.auth-pw__eye:hover,
+.auth-pw__eye[aria-pressed='true'] {
+  color: var(--ink);
+}
+
+.join-rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 0 2px;
+  list-style: none;
+}
+.join-rules li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: 700 12.5px/1.3 var(--font-body);
+  color: var(--muted);
+  transition: color var(--dur-1) var(--ease);
+}
+.join-rules__tick {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+  color: transparent;
+  transition:
+    background var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+.join-rules li.is-ok {
+  color: var(--ink);
+}
+.join-rules li.is-ok .join-rules__tick {
+  background: var(--accent);
+  box-shadow: none;
+  color: var(--on-accent);
+}

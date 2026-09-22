@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { useMe } from '../data/store'
 import { useT } from '../i18n'
 import { openAccountSheet } from './accountSheet'
@@ -8,7 +8,6 @@ import { IconButton } from './Button'
 import { cx } from './cx'
 import { Icon } from './Icon'
 import { UIM } from './messages'
-import { Link } from 'react-router'
 
 export interface PageHeaderProps {
   /** Small uppercase line above the title: "THU 24 SEP · WEEK 3 OF 12". */

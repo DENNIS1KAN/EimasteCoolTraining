@@ -178,3 +178,10 @@ export function Banner({ tone = 'info', icon, title, action, onDismiss, children
     </div>
   )
 }
+
+/* ------------------------------------------------------------------ LiveDot */
+
+/** The 7 px "live" dot (volt with a glow on night surfaces, ink on light surfaces). */
+export function LiveDot({ pulse, className }: { pulse?: boolean; className?: string }) {
+  return <i className={cx('ui-live-dot', pulse && 'ui-live-dot--pulse', className)} aria-hidden="true" />
+}

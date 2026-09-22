@@ -116,8 +116,9 @@ textarea {
   outline-offset: 2px;
 }
 
-html.ui-scroll-locked,
-html.ui-scroll-locked body {
+/* Set while a sheet is open. Only the root (viewport) stops scrolling: making <body> overflow:hidden would turn
+   it into a scroll container and break position:sticky in the page behind. */
+html.ui-scroll-locked {
   overflow: hidden;
   overscroll-behavior: none;
 }
