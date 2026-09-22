@@ -34,6 +34,7 @@ After this, every change pushed to `main` redeploys automatically.
    The result table lists the three members with their **join links**. Keep this tab open.
 3. Open **Authentication → Sign In / Providers → Email** and switch **Confirm email** **off**, then save.
    The app signs people in with a password only. Nobody receives e-mail, so confirmation must be off.
+   On the same page set **Minimum password length** to **8** (the app asks for at least 8 characters).
    Leave e-mail sending as it is: **don't set up custom SMTP** for this project. The logins use made-up
    addresses, and with custom SMTP Supabase would start mailing them (password resets, magic links).
 4. Open **Project Settings → API**, or click **Connect** at the top. Copy these two values:

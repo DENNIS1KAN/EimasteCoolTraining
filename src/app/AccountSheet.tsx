@@ -43,8 +43,8 @@ const M = defineMessages(
 )
 
 /*
- * Open state lives at module level so the sheet survives the router remount that a language switch causes
- * (App keys the HashRouter by language): tapping ΕΛ keeps the sheet open, now in Greek.
+ * Open state lives at module level so the sheet survives a remount of the shell. A language switch no longer
+ * remounts anything (it re-renders in place, keeping open forms), so tapping ΕΛ simply re-renders the sheet in Greek.
  */
 let keepOpen = false
 
