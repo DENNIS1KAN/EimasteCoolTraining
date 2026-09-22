@@ -6,6 +6,9 @@ import pkg from './package.json' with { type: 'json' }
 
 // `base: './'` + hash routing lets the same build run at https://<user>.github.io/<repo>/, on Vercel/Netlify,
 // or from any sub-folder, with no server rewrites.
+// ECT_PREVIEW=1 builds a self-contained preview (no service worker) into dist-preview/, e.g. for a sandboxed demo page.
+const preview = process.env.ECT_PREVIEW === '1'
+
 export default defineConfig({
   base: './',
   define: {
@@ -13,6 +16,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    !preview &&
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
@@ -47,6 +51,7 @@ export default defineConfig({
   ],
   build: {
     target: 'es2022',
+    outDir: preview ? 'dist-preview' : 'dist',
     chunkSizeWarningLimit: 900,
   },
   test: {
