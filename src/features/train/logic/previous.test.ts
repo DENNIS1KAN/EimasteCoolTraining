@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { MINI, at, mkLog } from '../../../lib/testing/fixtures'
 import type { Program } from '../../../data/types'
-import { buildHistoryIndex, convertWeight, placeholderFor, previousPerformance } from './previous'
+import { buildHistoryIndex, convertWeight, fillPlaceholderWeights, placeholderFor, placeholdersFor, previousPerformance } from './previous'
 
 const programs: Record<string, Program> = { [MINI.id]: MINI }
 const cur = (week: number, day: number) => ({ id: `stelios__mini__w${week}d${day}`, programId: MINI.id, week, day })
@@ -78,5 +78,34 @@ describe('placeholderFor', () => {
     expect(placeholderFor(null, 1, { w: '60' })).toEqual({ w: '60', r: '' })
     expect(placeholderFor(null, 0, undefined)).toBeNull()
     expect(placeholderFor({ ...prev, sets: [] }, 1, { w: ' ' })).toBeNull()
+  })
+})
+
+describe('placeholdersFor', () => {
+  const set = (w: string, r = '', ok = false) => ({ w, r, ok, at: null })
+  it("carries the weight typed above down to every following set when there's no last time", () => {
+    expect(placeholdersFor(null, [set('50'), set(''), set('')])).toEqual([null, { w: '50', r: '' }, { w: '50', r: '' }])
+    expect(placeholdersFor(null, [set(''), set('')])).toEqual([null, null])
+  })
+})
+
+describe('fillPlaceholderWeights', () => {
+  const day = MINI.weeks[1].days[0]
+  const prev = { logId: 'x', programId: MINI.id, week: 1, day: 0, at: 0, sets: [{ w: '67.5', r: '10', weight: 67.5, reps: 10 }] }
+
+  it('gives un-ticked sets with reps and no weight the grey placeholder weight', () => {
+    const log = mkLog({ week: 2, day: 0, done: false, ex: { 0: { sets: [['', '10', false], ['', '8', false]] }, 1: { sets: [['40', '8', false], ['', '8', false]] } } })
+    const out = fillPlaceholderWeights(log, day, [prev, null])
+    expect(out.ex['0'].sets.map((s) => s.w)).toEqual(['67.5', '67.5'])
+    // no last time for exercise 2: the set above's weight
+    expect(out.ex['1'].sets.map((s) => s.w)).toEqual(['40', '40'])
+  })
+
+  it('leaves typed weights, ticked sets, empty sets and bodyweight history alone', () => {
+    const log = mkLog({ week: 2, day: 0, done: false, ex: { 0: { sets: [['70', '10', false], ['', '', false], ['', '9', true]] } } })
+    expect(fillPlaceholderWeights(log, day, [prev, null])).toBe(log)
+    const bw = { ...prev, sets: [{ w: '', r: '12', weight: null, reps: 12 }] }
+    const reps = mkLog({ week: 2, day: 0, done: false, ex: { 0: { sets: [['', '12', false]] } } })
+    expect(fillPlaceholderWeights(reps, day, [bw, null])).toBe(reps)
   })
 })

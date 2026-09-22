@@ -20,7 +20,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: ['icons/*.png', 'icons/*.svg', 'config.js'],
+      // config.js is deliberately NOT listed here: anything in includeAssets lands in the precache manifest, and a
+      // precached copy is served cache-first (it would keep an old, e.g. demo, config after the keys are added).
+      includeAssets: ['icons/*.png', 'icons/*.svg'],
       manifest: {
         name: 'Eimaste Cool Training',
         short_name: 'Eimaste Cool',
@@ -39,10 +41,15 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-        // config.js must always come from the network so a new Supabase key takes effect immediately.
+        // config.js must always come from the network so a new Supabase key takes effect immediately; the cached copy
+        // is only the offline fallback (and the fallback on a stalled gym connection, after a few seconds).
         globIgnores: ['config.js'],
         runtimeCaching: [
-          { urlPattern: ({ url }) => url.pathname.endsWith('/config.js'), handler: 'NetworkFirst', options: { cacheName: 'ect-config' } },
+          {
+            urlPattern: ({ url }) => url.pathname.endsWith('/config.js'),
+            handler: 'NetworkFirst',
+            options: { cacheName: 'ect-config', networkTimeoutSeconds: 4 },
+          },
         ],
         navigateFallback: 'index.html',
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,

@@ -30,6 +30,9 @@ export const UIM = defineMessages(
     personalRecord: 'Personal record',
     unread: '{n} unread',
     newItems: 'new',
+    rangeBoth: 'Enter a number from {min} to {max}',
+    rangeMin: 'Enter at least {min}',
+    rangeMax: 'Enter at most {max}',
   },
   {
     close: 'Κλείσιμο',
@@ -59,5 +62,8 @@ export const UIM = defineMessages(
     personalRecord: 'Προσωπικό ρεκόρ',
     unread: '{n} μη αναγνωσμένα',
     newItems: 'νέα',
+    rangeBoth: 'Βάλε αριθμό από {min} έως {max}',
+    rangeMin: 'Βάλε τουλάχιστον {min}',
+    rangeMax: 'Βάλε το πολύ {max}',
   },
 )

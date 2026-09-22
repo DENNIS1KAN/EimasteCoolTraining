@@ -6,9 +6,10 @@ import { Card, Chip, PRBadge, cx } from '../../ui'
 import { Link } from 'react-router'
 import { SpecStrip } from './ExerciseCard'
 import type { ViewExercise } from './logic/view'
+import { textLang } from './logic/format'
 import { lastSetTechnique } from './logic/techniques'
 import { LIFT, M } from './messages'
-import { useTechniqueText } from './techniqueText'
+import { useTechniqueLabel, useTechniqueText } from './techniqueText'
 
 interface Props {
   x: ViewExercise
@@ -25,13 +26,14 @@ export function ReadOnlyExercise({ x, e, total, intro, unit, slug }: Props) {
   const l = useT(LIFT)
   const tech = lastSetTechnique(e, intro)
   const techText = useTechniqueText(tech)
+  const techLabel = useTechniqueLabel(tech)
   return (
     <Card as="article" className={cx('tr-ex tr-ro', x.skipped && 'is-skipped')} aria-labelledby={`ro-${x.index}`}>
       <div className="tr-ex__head">
         <div className="tr-ex__title">
           <p className="tr-ex__n">{t('exerciseN', { n: x.index + 1, total })}</p>
           <h2 className="tr-ex__name" id={`ro-${x.index}`}>
-            <Link to={`/lift/${slug}/${encodeURIComponent(x.name)}`} title={l('viewLift', { name: x.name })} lang="en">
+            <Link to={`/lift/${slug}/${encodeURIComponent(x.name)}`} title={l('viewLift', { name: x.name })} lang={textLang(x.name)}>
               {x.name}
             </Link>
           </h2>
@@ -43,7 +45,7 @@ export function ReadOnlyExercise({ x, e, total, intro, unit, slug }: Props) {
           {x.v ? <Chip icon="swap">{t('swapped')}</Chip> : null}
           {tech ? (
             <Chip icon="flame" title={techText ?? undefined}>
-              {t('lastSet', { t: tech.label })}
+              {t('lastSet', { t: techLabel ?? tech.label })}
             </Chip>
           ) : null}
         </div>

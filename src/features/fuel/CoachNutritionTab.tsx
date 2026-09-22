@@ -41,7 +41,7 @@ function buildRows(
     const plans = plansAll.filter((p) => p.memberId === member.id).sort(byNewest)
     const plan = currentPlan(plans, member.id)
     const mine = cis.filter((c) => c.memberId === member.id)
-    const a = recentAdherence(mine, plan, today, 14)
+    const a = recentAdherence(mine, plan, today, 14, mealPlans)
     const last = lastCheckinDate(mine, member.id)
     const recentNote = mine.filter((c) => c.note.trim() && c.date >= addDays(today, -6)).sort((x, y) => (x.date < y.date ? 1 : -1))[0]
     return {

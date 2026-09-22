@@ -13,7 +13,7 @@ import { CheckinCard } from './CheckinCard'
 import { DayStrip } from './DayStrip'
 import { saveCheckin, useFuelData, useNow } from './hooks'
 import { fuelDays, heatRange, loggedAverage, ratingStreak, recentAdherence } from './lib/adherence'
-import { blankCheckin, daySummary, minutesOf, nextMealId, nextRating, planOnDate, toggleMeal } from './lib/day'
+import { adoptPlan, blankCheckin, daySummary, minutesOf, nextMealId, nextRating, planOnDate, ticksFor, toggleMeal } from './lib/day'
 import { MealsCard } from './MealsCard'
 import { FM } from './messages'
 import { OlderPlans } from './OlderPlans'
@@ -36,8 +36,9 @@ export default function FuelPage() {
   const data = useFuelData(me?.id)
 
   const checkin = data.byDate.get(date) ?? null
-  const plan = planOnDate(data.plans, data.current, date, checkin)
-  const ticked = useMemo(() => checkin?.meals ?? [], [checkin])
+  const plan = planOnDate(data.plans, data.current, date, checkin, today)
+  // In terms of the plan shown: after a mid-day plan change, this morning's ticks carry over to the new plan's meals.
+  const ticked = useMemo(() => ticksFor(checkin, plan, data.plans), [checkin, plan, data.plans])
   const summary = useMemo(() => daySummary(plan, ticked), [plan, ticked])
   const nextId = date === today && plan ? nextMealId(plan.meals, ticked, minutesOf(now)) : null
 
@@ -45,15 +46,16 @@ export default function FuelPage() {
     const r = heatRange(today, 4)
     const days = fuelDays(data.checkins, data.allPlans, data.current, r.from, r.to, today)
     if (!data.current) return { days, ratio: loggedAverage(days), streak: ratingStreak(data.checkins, today) }
-    const a = recentAdherence(data.checkins, data.current, today, 28)
-    return { days, ratio: a && a.days > 0 ? a.ratio : null, streak: onPlanStreak(data.checkins, data.current, today) }
+    const a = recentAdherence(data.checkins, data.current, today, 28, data.allPlans)
+    return { days, ratio: a && a.days > 0 ? a.ratio : null, streak: onPlanStreak(data.checkins, data.current, today, data.allPlans) }
   }, [data, today])
 
   if (!me) return null
 
   const isToday = date === today
   const write = (fn: (c: NutritionCheckin) => NutritionCheckin, opts?: { debounceMs?: number }) => {
-    const base = checkin ?? blankCheckin(me.id, date, plan?.id ?? null)
+    // The first change after a new plan took over moves the day onto it (ticks carried over).
+    const base = checkin ? adoptPlan(checkin, plan, data.plans) : blankCheckin(me.id, date, plan?.id ?? null)
     const next = fn(base)
     saveCheckin(next, !!checkin, opts)
     return next
@@ -78,8 +80,8 @@ export default function FuelPage() {
   const dayStatus = (d: string) => {
     const c = data.byDate.get(d)
     if (!c) return null
-    const p = planOnDate(data.plans, data.current, d, c)
-    const s = daySummary(p, c.meals)
+    const p = planOnDate(data.plans, data.current, d, c, today)
+    const s = daySummary(p, ticksFor(c, p, data.plans))
     const full = c.rating === 'on' || (s.mealsTotal > 0 && s.mealsTicked === s.mealsTotal)
     return full ? 'full' : 'part'
   }
@@ -162,6 +164,7 @@ export default function FuelPage() {
       waterL={checkin?.waterL ?? null}
       waterTargetL={plan?.waterL ?? null}
       note={checkin?.note ?? ''}
+      coachSelf={me.role === 'coach'}
       onRate={onRate}
       onWater={onWater}
       onNote={onNote}

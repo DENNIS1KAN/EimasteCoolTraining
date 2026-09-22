@@ -71,6 +71,20 @@ describe('TrainPage', () => {
     expect(screen.getByRole('timer', { name: /Rest timer/ })).toBeTruthy()
   })
 
+  it("stops the rest timer when someone else signs in (it never shows another member's rest)", () => {
+    seed({ logs: [week1] })
+    at2('/train/2/0')
+    act(() => {
+      fireEvent.click(within(document.getElementById('ex-0')!).getByRole('button', { name: 'Mark set 1 done' }))
+    })
+    expect(getRest()?.memberId).toBe(ME)
+    act(() => {
+      setState((s) => ({ meId: 'thanos', members: { ...s.members, thanos: mkMember({ id: 'thanos', name: 'Thanos', programId: MINI.id }) } }))
+    })
+    expect(getRest()).toBeNull()
+    expect(screen.queryByRole('timer', { name: /Rest timer/ })).toBeNull()
+  })
+
   it('focuses the reps input when there is nothing to reuse', () => {
     seed()
     at2('/train/1/0')
@@ -85,6 +99,12 @@ describe('TrainPage', () => {
   it('finishes the workout from the sheet and shows the completion card', () => {
     seed({ logs: [week1] })
     at2('/train/2/0')
+    // Nothing logged yet: no "Finish" in the header, only at the end of the list
+    expect(screen.queryByRole('button', { name: 'Finish' })).toBeNull()
+    const bench = document.getElementById('ex-0')!
+    act(() => {
+      fireEvent.click(within(bench).getByRole('button', { name: 'Mark set 1 done' }))
+    })
     act(() => {
       fireEvent.click(screen.getByRole('button', { name: 'Finish' }))
     })
@@ -92,7 +112,7 @@ describe('TrainPage', () => {
       fireEvent.click(screen.getByRole('radio', { name: /Great/ }))
     })
     act(() => {
-      fireEvent.click(screen.getByRole('button', { name: 'Finish workout' }))
+      fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Finish workout' }))
     })
     const log = getState().logs[W2_UPPER]
     expect(log).toMatchObject({ done: true, feel: 5 })
@@ -101,9 +121,28 @@ describe('TrainPage', () => {
     expect(screen.getByRole('link', { name: /Next: Lower · Week 1/ })).toBeTruthy()
   })
 
+  it('fills the grey last-time weight into sets finished with reps only', () => {
+    seed({ logs: [week1] })
+    at2('/train/2/0')
+    const bench = document.getElementById('ex-0')!
+    act(() => {
+      fireEvent.change(within(bench).getByLabelText('Set 1 reps'), { target: { value: '10' } })
+    })
+    act(() => {
+      fireEvent.click(screen.getByRole('button', { name: 'Finish workout' }))
+    })
+    // the sheet's preview already counts the volume of 50 kg × 10
+    expect(screen.getByText('500 kg')).toBeTruthy()
+    act(() => {
+      fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Finish workout' }))
+    })
+    expect(getState().logs[W2_UPPER].ex['0'].sets[0]).toMatchObject({ w: '50', r: '10', ok: false })
+  })
+
   it('asks for a start date when the program has none, and saves it', () => {
     seed({ member: { programStart: null } })
     at2('/train/1/0')
+    expect(screen.queryByRole('button', { name: /Finish/ })).toBeNull()
     act(() => {
       fireEvent.click(screen.getByRole('button', { name: 'Start the program' }))
     })

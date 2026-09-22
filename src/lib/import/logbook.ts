@@ -15,6 +15,7 @@ import { fromISODate, isISODate, isoFromMs, type ISODate } from '../dates'
 import { kgToUnit, parseNum, unitToKg } from '../units'
 import { logTime } from '../stats/lifts'
 import { headerIndex, isBlankRow, parseCSV, toCSV, type Delimiter } from './csv'
+import { issue, type ImportIssue, type IssueKey } from './issues'
 
 export const LOGBOOK_CSV_COLUMNS = [
   'week',
@@ -45,7 +46,8 @@ export interface LogbookImportOptions {
 
 export interface LogbookImportResult {
   logs: WorkoutLog[]
-  warnings: string[]
+  /** Rows that were skipped or adjusted, for issueText(). */
+  warnings: ImportIssue[]
 }
 
 /** Sets per exercise beyond which a set number is treated as a typo. */
@@ -122,20 +124,32 @@ function resolveVariant(e: ProgramExercise, performed: string): 0 | 1 | 2 | null
 
 const matchesExercise = (e: ProgramExercise, name: string): boolean => resolveVariant(e, name) !== null && !!norm(name)
 
+/** Why a row landed on a different exercise than its "order" says. */
+interface ExerciseNote {
+  key: IssueKey
+  vars: Record<string, string | number>
+}
+
 /**
  * Exercise index for a row. The program_exercise name wins when it identifies another position (the
  * program may have been reordered); otherwise "order" is used, then the names.
  */
-function resolveExercise(day: ProgramDay, order: number | null, programName: string, performed: string): { index: number; note?: string } | null {
+function resolveExercise(day: ProgramDay, order: number | null, programName: string, performed: string): { index: number; note?: ExerciseNote } | null {
   const byOrder = order != null && order <= day.ex.length ? order - 1 : -1
   const pn = norm(programName)
   if (pn) {
     if (byOrder >= 0 && norm(day.ex[byOrder].n) === pn) return { index: byOrder }
     const byName = day.ex.findIndex((e) => norm(e.n) === pn)
-    if (byName >= 0) return { index: byName, note: byOrder >= 0 ? `found "${programName}" at position ${byName + 1}, not ${order}` : undefined }
+    if (byName >= 0) {
+      const note: ExerciseNote | undefined =
+        byOrder >= 0 ? { key: 'exerciseMoved', vars: { name: programName, found: byName + 1, order: order as number } } : undefined
+      return { index: byName, note }
+    }
   }
   if (byOrder >= 0) {
-    return pn ? { index: byOrder, note: `"${programName}" is not in this workout; used position ${order} (${day.ex[byOrder].n})` } : { index: byOrder }
+    return pn
+      ? { index: byOrder, note: { key: 'exerciseNotInDay', vars: { name: programName, order: order as number, used: day.ex[byOrder].n } } }
+      : { index: byOrder }
   }
   const byPerformed = day.ex.findIndex((e) => matchesExercise(e, performed))
   return byPerformed >= 0 ? { index: byPerformed } : null
@@ -173,20 +187,21 @@ interface Group {
 export function importLogbookCSV(text: string, opts: LogbookImportOptions): LogbookImportResult {
   const { program } = opts
   const defaultUnit: Unit = opts.unit ?? 'kg'
-  const warnings: string[] = []
+  const warnings: ImportIssue[] = []
   const warnOnce = new Set<string>()
-  const warn = (msg: string, key?: string) => {
-    if (key && warnOnce.has(key)) return
-    if (key) warnOnce.add(key)
-    warnings.push(msg)
+  const warn = (w: ImportIssue, once?: string) => {
+    if (once && warnOnce.has(once)) return
+    if (once) warnOnce.add(once)
+    warnings.push(w)
   }
   const rows = parseCSV(text)
-  if (rows.length === 0 || rows.every(isBlankRow)) return { logs: [], warnings: ['The file is empty.'] }
+  if (rows.length === 0 || rows.every(isBlankRow)) return { logs: [], warnings: [issue('fileEmpty')] }
   const col = headerIndex(rows[0], LOGBOOK_CSV_COLUMNS)
   const missing: string[] = (['week', 'workout', 'set', 'weight', 'reps'] as const).filter((c) => col[c] == null)
   if (col.order == null && col.program_exercise == null && col.exercise == null) missing.push('order')
   if (missing.length) {
-    return { logs: [], warnings: [`Missing column${missing.length > 1 ? 's' : ''} ${missing.join(', ')}. Expected: ${LOGBOOK_CSV_COLUMNS.join(',')}.`] }
+    const vars = { cols: missing.join(', '), expected: LOGBOOK_CSV_COLUMNS.join(',') }
+    return { logs: [], warnings: [issue(missing.length > 1 ? 'missingColumns' : 'missingColumn', vars)] }
   }
 
   const groups = new Map<string, Group>()
@@ -200,22 +215,22 @@ export function importLogbookCSV(text: string, opts: LogbookImportOptions): Logb
     }
     const week = positiveInt(get('week'))
     if (week == null || week > program.weeks.length) {
-      warn(`Row ${rowNo}: week "${get('week')}" is not a week of ${program.name} (1-${program.weeks.length}); skipped.`)
+      warn(issue('badWeek', { week: get('week'), program: program.name, max: program.weeks.length }, rowNo))
       continue
     }
     const pw = program.weeks[week - 1]
     const dayRes = resolveDay(pw, get('workout'))
     if (!dayRes) {
-      warn(`Row ${rowNo}: workout "${get('workout')}" is not a day of week ${week} (${pw.days.map(dayShortName).join(', ')}); skipped.`)
+      warn(issue('badWorkout', { workout: get('workout'), week, days: pw.days.map(dayShortName).join(', ') }, rowNo))
       continue
     }
-    if (dayRes.ambiguous) warn(`Several days of week ${week} are called "${get('workout')}"; rows were matched to the first.`, `amb:${week}:${norm(get('workout'))}`)
+    if (dayRes.ambiguous) warn(issue('ambiguousDay', { week, workout: get('workout') }), `amb:${week}:${norm(get('workout'))}`)
     const key = `${week}:${dayRes.day}`
     const g: Group = groups.get(key) ?? { week, day: dayRes.day, finished: new Set(), ex: new Map() }
     groups.set(key, g)
 
     const fin = parseFinishDate(get('finished_on'))
-    if (fin === undefined) warn(`Row ${rowNo}: finished_on "${get('finished_on')}" is not a date (YYYY-MM-DD); ignored.`)
+    if (fin === undefined) warn(issue('badFinishDate', { value: get('finished_on') }, rowNo))
     else if (fin) g.finished.add(fin)
 
     // A row without exercise or set only marks the workout (e.g. finished with nothing logged).
@@ -225,25 +240,26 @@ export function importLogbookCSV(text: string, opts: LogbookImportOptions): Logb
     const exRes = resolveExercise(day, positiveInt(get('order')), get('program_exercise'), get('exercise'))
     if (!exRes) {
       const name = get('program_exercise') || get('exercise')
-      const what = [get('order') && `#${get('order')}`, name && `"${name}"`].filter(Boolean).join(' ')
-      warn(`Row ${rowNo}: cannot find exercise ${what} in ${day.name} (week ${week}); skipped.`)
+      const order = get('order')
+      const key = order && name ? 'exerciseNotFoundAtNamed' : order ? 'exerciseNotFoundAt' : name ? 'exerciseNotFound' : 'noExercise'
+      warn(issue(key, { order, name, day: day.name, week }, rowNo))
       continue
     }
-    if (exRes.note) warn(`Row ${rowNo}: ${exRes.note}.`, `ex:${key}:${exRes.index}:${exRes.note}`)
+    if (exRes.note) warn(issue(exRes.note.key, exRes.note.vars, rowNo), `ex:${key}:${exRes.index}:${exRes.note.key}:${JSON.stringify(exRes.note.vars)}`)
     const e = day.ex[exRes.index]
     const setNo = positiveInt(get('set'))
     if (setNo == null || setNo > MAX_SETS) {
-      warn(`Row ${rowNo}: set "${get('set')}" is not a set number between 1 and ${MAX_SETS}; skipped.`)
+      warn(issue('badSet', { set: get('set'), max: MAX_SETS }, rowNo))
       continue
     }
     let unit = parseUnit(get('unit'))
     if (unit === undefined) {
-      warn(`Row ${rowNo}: unknown unit "${get('unit')}"; used the workout's unit.`, `unit:${norm(get('unit'))}`)
+      warn(issue('unknownUnit', { unit: get('unit') }, rowNo), `unit:${norm(get('unit'))}`)
       unit = null
     }
     let ok = parseYesNo(get('done'))
     if (ok === null) {
-      warn(`Row ${rowNo}: done "${get('done')}" is not yes/no; treated as no.`)
+      warn(issue('badDone', { value: get('done') }, rowNo))
       ok = false
     }
 
@@ -251,21 +267,21 @@ export function importLogbookCSV(text: string, opts: LogbookImportOptions): Logb
     let x = g.ex.get(exRes.index)
     if (!x) {
       const v = resolveVariant(e, performed)
-      if (v === null) warn(`Row ${rowNo}: "${performed}" is not ${e.n} or one of its substitutions; logged as ${e.n}.`, `var:${key}:${exRes.index}`)
+      if (v === null) warn(issue('unknownVariant', { performed, exercise: e.n }, rowNo), `var:${key}:${exRes.index}`)
       x = { v: v ?? 0, performed, m: '', sets: new Map() }
       g.ex.set(exRes.index, x)
     } else if (norm(performed) && !norm(x.performed)) {
       // the first rows had no performed name: this row decides the variant
       const v = resolveVariant(e, performed)
-      if (v === null) warn(`Row ${rowNo}: "${performed}" is not ${e.n} or one of its substitutions; logged as ${e.n}.`, `var:${key}:${exRes.index}`)
+      if (v === null) warn(issue('unknownVariant', { performed, exercise: e.n }, rowNo), `var:${key}:${exRes.index}`)
       x.v = v ?? 0
       x.performed = performed
     } else if (norm(performed) && norm(performed) !== norm(x.performed)) {
-      warn(`Row ${rowNo}: "${performed}" differs from "${x.performed}" logged earlier for ${e.n} in week ${week}; kept "${x.performed}".`, `mix:${key}:${exRes.index}`)
+      warn(issue('mixedVariant', { performed, earlier: x.performed, exercise: e.n, week }, rowNo), `mix:${key}:${exRes.index}`)
     }
     if (!x.m) x.m = get('machine')
     const prev = x.sets.get(setNo)
-    if (prev) warn(`Row ${rowNo}: set ${setNo} of ${e.n} (week ${week}, ${dayShortName(day)}) repeats row ${prev.row}; the later row wins.`)
+    if (prev) warn(issue('repeatedSet', { set: setNo, exercise: e.n, week, day: dayShortName(day), prev: prev.row }, rowNo))
     x.sets.set(setNo, { set: { w: get('weight'), r: get('reps'), ok }, unit, row: rowNo })
   }
 
@@ -287,9 +303,9 @@ function majorityUnit(g: Group, fallback: Unit): Unit {
   return best
 }
 
-function buildLog(g: Group, opts: LogbookImportOptions, defaultUnit: Unit, now: number, warn: (m: string, k?: string) => void): WorkoutLog | null {
+function buildLog(g: Group, opts: LogbookImportOptions, defaultUnit: Unit, now: number, warn: (w: ImportIssue) => void): WorkoutLog | null {
   const unit = majorityUnit(g, defaultUnit)
-  const label = `Week ${g.week}, ${dayShortName(opts.program.weeks[g.week - 1].days[g.day])}`
+  const where = { week: g.week, day: dayShortName(opts.program.weeks[g.week - 1].days[g.day]) }
   const ex: Record<string, ExerciseLog> = {}
   let converted = false
   let content = false
@@ -304,9 +320,9 @@ function buildLog(g: Group, opts: LogbookImportOptions, defaultUnit: Unit, now: 
     if (x.m || sets.some((s) => s.w || s.r || s.ok)) content = true
     ex[String(index)] = { v: x.v, m: x.m, sets }
   }
-  if (converted) warn(`${label} mixes kg and lb; weights were converted to ${unit}.`)
+  if (converted) warn(issue('mixedUnits', { ...where, unit }))
   const dates = [...g.finished].sort()
-  if (dates.length > 1) warn(`${label} has several finish dates (${dates.join(', ')}); used ${dates[dates.length - 1]}.`)
+  if (dates.length > 1) warn(issue('severalFinishDates', { ...where, dates: dates.join(', '), used: dates[dates.length - 1] }))
   const finishedOn = dates[dates.length - 1]
   if (!content && !finishedOn) return null // nothing trained yet: no log
   return {
@@ -335,9 +351,21 @@ function workoutLabel(week: ProgramWeek, day: number): string {
 }
 
 /**
+ * A logged weight or reps cell as a plain number, so the column sums in a spreadsheet: "72,5" (typed on a Greek
+ * keyboard) and "72.50" both become 72.5, written with the file's decimal mark. Anything that isn't a plain
+ * number (a range, a note) is kept as typed.
+ */
+function numCell(v: string, decimal: '.' | ','): string | number {
+  const n = parseNum(v)
+  if (n == null) return v
+  return decimal === '.' ? n : String(n).replace('.', ',')
+}
+
+/**
  * Export logs in the logbook format (one row per set, logs ordered by program, week and day). Logs whose
  * program, week or day is unknown are left out. A finished log without sets gets one row without exercise,
- * so the finish survives a round trip.
+ * so the finish survives a round trip. Weights and reps are numbers with a dot decimal, or a decimal comma
+ * for a ';' file (the Greek / European Excel convention).
  */
 export function exportLogbookCSV(
   logs: readonly WorkoutLog[],
@@ -348,6 +376,7 @@ export function exportLogbookCSV(
     ? Object.fromEntries((programs as readonly Program[]).map((p) => [p.id, p]))
     : (programs as Record<string, Program>)
   const rows: (string | number)[][] = [[...LOGBOOK_CSV_COLUMNS]]
+  const decimal = opts.delimiter === ';' ? ',' : '.'
   const sorted = [...logs].sort((a, b) => (a.programId < b.programId ? -1 : a.programId > b.programId ? 1 : a.week - b.week || a.day - b.day))
   for (const l of sorted) {
     const pw = byId[l.programId]?.weeks[l.week - 1]
@@ -364,7 +393,22 @@ export function exportLogbookCSV(
       const e = day.ex[i]
       const x = l.ex[String(i)]
       x.sets.forEach((s, j) =>
-        rows.push([l.week, pw.block, workout, i + 1, exerciseName(e, x.v), e.n, j + 1, s.w, l.unit, s.r, s.ok ? 'yes' : 'no', finished, j >= workingSets(e) ? 'yes' : 'no', x.m]),
+        rows.push([
+          l.week,
+          pw.block,
+          workout,
+          i + 1,
+          exerciseName(e, x.v),
+          e.n,
+          j + 1,
+          numCell(s.w, decimal),
+          l.unit,
+          numCell(s.r, decimal),
+          s.ok ? 'yes' : 'no',
+          finished,
+          j >= workingSets(e) ? 'yes' : 'no',
+          x.m,
+        ]),
       )
     }
     if (rows.length === start && l.done) rows.push([l.week, pw.block, workout, '', '', '', '', '', l.unit, '', '', finished, '', ''])

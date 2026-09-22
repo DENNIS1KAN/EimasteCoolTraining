@@ -1,15 +1,21 @@
 /*
  * App shell: bottom tab bar (phones), left sidebar (≥ 1024px), banners, page frame, boot screens, brand.
- * Built from tokens only (src/styles/tokens.css). The shell owns --tabbar-h:
- *   phones:  bar = --tabbar-h + --safe-bottom (50 + 34 = 84 on a notched iPhone, 56 without an inset)
+ * Built from tokens only (src/styles/tokens.css). The shell owns --tabbar-h, the tab bar's FOOTPRINT above the
+ * home-indicator inset, including the raised Train button:
+ *   phones:  bar = --tabbar-bar + --safe-bottom (50 + 34 = 84 on a notched iPhone, 56 without an inset),
+ *            and the Train button rises --tabbar-raise (20) above it, so --tabbar-h = bar + 20
  *   desktop: 0 (the bar becomes a sidebar)
- * Fixed bottom UI in pages sits at calc(var(--tabbar-h) + var(--safe-bottom) + 8px).
+ * Fixed bottom UI in pages sits at calc(var(--tabbar-h) + var(--safe-bottom) + 8px): 8px above the Train button.
+ * Floating bars registered with useFloatingBar (src/ui/floating.ts) publish --float-stack; the page keeps that much
+ * extra room at the bottom so its last card never hides behind them.
  */
 
 :root:has(.app-shell),
 .app-shell {
   /* 50px bar + the home-indicator inset (84 on a notched iPhone); 56px when there is no inset. */
-  --tabbar-h: calc(50px + max(0px, calc(6px - var(--safe-bottom, 0px))));
+  --tabbar-bar: calc(50px + max(0px, calc(6px - var(--safe-bottom, 0px))));
+  --tabbar-raise: 20px;
+  --tabbar-h: calc(var(--tabbar-bar) + var(--tabbar-raise));
 }
 
 @media (min-width: 1024px) {
@@ -71,8 +77,24 @@
   max-width: calc(var(--content-max, 720px) + 2 * var(--gutter, 16px));
   margin: 0 auto;
   padding: max(calc(var(--safe-top, 0px) + 6px), 16px) max(var(--gutter, 16px), env(safe-area-inset-right, 0px))
-    calc(var(--tabbar-h) + var(--safe-bottom, 0px) + 28px) max(var(--gutter, 16px), env(safe-area-inset-left, 0px));
+    calc(var(--tabbar-h) + var(--safe-bottom, 0px) + 18px + var(--float-stack, 0px))
+    max(var(--gutter, 16px), env(safe-area-inset-left, 0px));
   outline: none;
+}
+
+/* Installed iPhone app: the status bar is black-translucent (white clock over the page). A band behind it keeps
+   the clock readable in light mode and stops content from scrolling visibly under it. 0px tall elsewhere. */
+.app-statusbar {
+  position: fixed;
+  z-index: var(--z-bar, 40);
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--safe-top, 0px);
+  background: var(--statusbar);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  pointer-events: none;
 }
 
 .app-banners {
@@ -96,6 +118,10 @@
   position: relative;
 }
 
+.app-page-error {
+  padding-top: 8vh;
+}
+
 .app-page-fallback {
   display: grid;
   place-items: center;
@@ -113,7 +139,7 @@
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: start;
-  height: calc(var(--tabbar-h) + var(--safe-bottom, 0px));
+  height: calc(var(--tabbar-bar) + var(--safe-bottom, 0px));
   padding: 6px max(8px, env(safe-area-inset-right, 0px)) var(--safe-bottom, 0px) max(8px, env(safe-area-inset-left, 0px));
   background: var(--tabbar);
   -webkit-backdrop-filter: blur(22px) saturate(1.5);
@@ -183,6 +209,82 @@
 }
 .app-tab:not([aria-current='page']):active .app-tab__pill {
   background: var(--surface-3);
+}
+
+/* Train: the raised volt button in the middle of the bar. It takes the pill's 28px in the flow (so the label lines
+   up with the others) and its top sits --tabbar-raise above the bar's top edge (7px = 1px hairline + 6px padding),
+   ringed in the bar's color like a notch. */
+.app-tab__fab {
+  --fab: 52px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--fab);
+  height: var(--fab);
+  margin: calc(-7px - var(--tabbar-raise, 20px)) 0 calc(28px - var(--fab) + 7px + var(--tabbar-raise, 20px));
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow:
+    0 0 0 4px var(--tabbar-solid),
+    0 10px 24px -8px var(--accent-glow);
+  transition:
+    transform var(--dur-1) var(--ease),
+    box-shadow 200ms var(--ease);
+}
+.app-tab__fab svg {
+  width: 24px;
+  height: 24px;
+}
+.app-tab--primary[aria-current='page'] .app-tab__fab {
+  box-shadow:
+    0 0 0 3px var(--tabbar-solid),
+    0 0 0 5px var(--accent-strong),
+    0 12px 28px -6px var(--accent-glow);
+}
+.app-tab--primary:active .app-tab__fab {
+  transform: scale(0.94);
+}
+@media (hover: hover) {
+  .app-tab--primary:not([aria-current='page']):hover .app-tab__fab {
+    box-shadow:
+      0 0 0 4px var(--tabbar-solid),
+      0 12px 28px -6px var(--accent-glow);
+  }
+}
+.app-tab--primary:focus-visible {
+  outline: none;
+}
+.app-tab--primary:focus-visible .app-tab__fab {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 6px;
+}
+/* Workout in progress: a small ink dot on the volt (pulsing), plus a breathing glow. */
+.app-tab__live {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--on-accent);
+  animation: app-live 2s var(--ease) infinite;
+}
+.app-tab--primary.is-live .app-tab__fab {
+  animation: app-fab-glow 2.4s var(--ease) infinite;
+}
+@keyframes app-live {
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes app-fab-glow {
+  50% {
+    box-shadow:
+      0 0 0 4px var(--tabbar-solid),
+      0 10px 30px -4px var(--accent-glow);
+  }
 }
 
 .app-tab:focus-visible {
@@ -649,9 +751,14 @@
     animation-duration: 1.6s;
   }
   .app-tab__pill,
+  .app-tab__fab,
   .app-side-link,
   .app-side-link__icon {
     transition: none;
+  }
+  .app-tab__live,
+  .app-tab--primary.is-live .app-tab__fab {
+    animation: none;
   }
 }
 @keyframes boot-fade {

@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
+import { useMe } from '../../data/store'
 import { useT } from '../../i18n'
 import { fmtClock } from '../../lib/format'
-import { Icon, cx } from '../../ui'
+import { FLOAT_PRIORITY, Icon, cx, useFloatingBar } from '../../ui'
 import { useIsActiveHost, useNow } from './hooks'
 import { adjustRest, restFraction, restRemaining, stopRest, useRest } from './logic/restTimer'
 import { M } from './messages'
@@ -12,11 +13,17 @@ import './train.css'
  * The live rest timer: a night-island bar floating above the tab bar. Its state lives in a module-level store
  * (logic/restTimer), so it keeps counting across screens. Mount it on the Train page; the app shell can also
  * mount `<RestTimerHost global />` to show it everywhere (only one host ever renders).
+ * A timer belongs to the member who started it: signing out or switching profile stops it.
  */
 export function RestTimerHost({ global = false }: { global?: boolean }) {
   const active = useIsActiveHost(global)
   const rest = useRest()
-  if (!active || !rest) return null
+  const meId = useMe()?.id ?? null
+  const foreign = !!rest && rest.memberId !== meId
+  useEffect(() => {
+    if (foreign) stopRest()
+  }, [foreign])
+  if (!active || !rest || foreign) return null
   return <RestTimerBar />
 }
 
@@ -36,6 +43,9 @@ function RestTimerBar() {
   const now = useNow(counting ? 250 : 1000, !!rest)
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const ref = useRef<HTMLDivElement>(null)
+  // Stacks above other floating bars (the Body quick-log dock) instead of covering them; toasts sit above both.
+  const offset = useFloatingBar(ref, FLOAT_PRIORITY.timer, !!rest)
   if (!rest) return null
 
   const left = restRemaining(rest, now)
@@ -61,7 +71,13 @@ function RestTimerBar() {
   )
 
   return (
-    <div className={cx('tr-rest night', over && 'is-over')} role="timer" aria-label={over ? t('restDoneAria') : t('restAria', { t: clock })}>
+    <div
+      ref={ref}
+      className={cx('tr-rest night', over && 'is-over')}
+      style={{ ['--float-off' as string]: `${offset}px` }}
+      role="timer"
+      aria-label={over ? t('restDoneAria') : t('restAria', { t: clock })}
+    >
       <div className="tr-rest__bar" aria-hidden="true">
         {over ? (
           <i className="tr-rest__fill is-full" />

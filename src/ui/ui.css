@@ -331,26 +331,41 @@
 }
 
 /* ==================================================================== PageHeader */
+/* Grid: [back] [eyebrow / title / sub] [actions]. The back button and the actions are centered on the FIRST title
+   line (--ph-line = the title's line box), so a title that wraps to 2–3 lines keeps one alignment axis and a
+   wrapping eyebrow never pushes them around. The text column is display:contents so its parts sit in the grid. */
 .ui-page-header {
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
+  --ph-line: 30.4px; /* 32px × 0.95 */
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto;
+  align-content: end;
   min-height: 48px;
   padding-top: 2px;
   min-width: 0;
 }
+.ui-page-header--greeting {
+  --ph-line: 33px;
+}
 .ui-page-header__back {
-  align-self: center;
-  margin-left: -2px;
+  grid-column: 1;
+  grid-row: 2 / 4;
+  align-self: start;
+  margin: calc((var(--ph-line) - 40px) / 2) 12px 0 -2px;
 }
 .ui-page-header__text {
-  flex: 1;
-  min-width: 0;
+  display: contents;
 }
 .ui-page-header__eyebrow {
+  grid-column: 2;
+  grid-row: 1;
   margin-bottom: 4px;
 }
 .ui-page-header__title {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
+  min-width: 0;
   font: 900 32px/0.95 var(--font-display);
   letter-spacing: 0.005em;
   text-transform: uppercase;
@@ -365,15 +380,21 @@
   text-transform: none;
 }
 .ui-page-header__sub {
+  grid-column: 2;
+  grid-row: 3;
   margin-top: 4px;
   font: 600 13px/18px var(--font-body);
   color: var(--ink-2);
 }
 .ui-page-header__actions {
+  grid-column: 3;
+  grid-row: 2 / 4;
+  align-self: start;
   display: flex;
   align-items: center;
   gap: 10px;
-  flex: none;
+  min-height: 44px;
+  margin: calc((var(--ph-line) - 44px) / 2) 0 0 12px;
 }
 .ui-page-header__account {
   display: grid;
@@ -884,6 +905,12 @@
   padding: 0 10px;
   border-radius: 9px;
   font-size: 12px;
+}
+/* The small track is 36px (items 30px): extend each item's hit area to 44px tall. */
+.ui-seg--sm .ui-seg__item::after {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
 }
 .ui-seg--lg {
   height: 46px;
@@ -1512,6 +1539,7 @@
   align-self: center;
 }
 .ui-banner__close {
+  position: relative;
   display: grid;
   place-items: center;
   width: 36px;
@@ -1520,6 +1548,12 @@
   border-radius: 10px;
   color: var(--ink-2);
   flex: none;
+}
+.ui-banner__close::after {
+  /* 44 px hit area */
+  content: '';
+  position: absolute;
+  inset: -4px;
 }
 .ui-banner--warn {
   background: var(--warn-soft);

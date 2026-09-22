@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState, type MouseEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import type { FileRef, MealPlan } from '../../data/types'
 import { getBackend, put, remove, update, useMe, useStore } from '../../data/store'
 import { useT } from '../../i18n'
 import { COMMON } from '../../i18n/common'
 import { todayISO } from '../../lib/dates'
+import { fmtRelative } from '../../lib/format'
 import { uuid } from '../../lib/ids'
-import { Button, ButtonLink, Card, ConfirmSheet, EmptyState, PageHeader, toast, useIsDesktop } from '../../ui'
+import { Banner, Button, ButtonLink, Card, ConfirmSheet, EmptyState, PageHeader, toast, useIsDesktop } from '../../ui'
 import { mayOpenEditor } from './access'
 import { BasicsSection } from './editor/BasicsSection'
 import { FilesSection } from './editor/FilesSection'
@@ -26,6 +27,7 @@ import {
   validateDraft,
   type PlanDraft,
 } from './lib/draft'
+import { clearDraft, draftKey, loadDraft, storeDraft, type StoredDraft } from './lib/draftStore'
 import { orphanedFiles } from './lib/files'
 import { FM } from './messages'
 import './fuel.css'
@@ -63,15 +65,35 @@ export default function MealPlanEditorPage() {
 
   const [id] = useState(() => (isNew ? uuid() : planId))
   const [initial] = useState<PlanDraft | null>(() => (isNew ? emptyDraft(todayISO()) : existing ? draftFromPlan(existing) : null))
-  const [draft, setDraft] = useState<PlanDraft | null>(initial)
+  // Unsaved work survives leaving the editor any way at all (a tab, the sidebar, the phone's back gesture, a reload):
+  // it is stored on every change and picked up again here.
+  const key = member && valid ? draftKey(member.id, isNew ? 'new' : planId) : null
+  const [restored, setRestored] = useState<StoredDraft | null>(() => {
+    const s = key && initial ? loadDraft(key) : null
+    return s && !sameDraft(s.draft, initial as PlanDraft) ? s : null
+  })
+  const [draft, setDraft] = useState<PlanDraft | null>(() => restored?.draft ?? initial)
   const [showErrors, setShowErrors] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
   const [done, setDone] = useState(false)
   const [copied, setCopied] = useState(false)
-  const uploads = useUploads(member?.id ?? null, (ref) => setDraft((d) => (d ? { ...d, files: [...d.files, ref] } : d)))
-
   const dirty = !!draft && !!initial && !sameDraft(draft, initial)
+  // Read at unmount: the files the stored draft still points at are kept for it.
+  const keepRef = useRef<FileRef[]>([])
+  keepRef.current = dirty && !done && draft ? draft.files : []
+  const uploads = useUploads(member?.id ?? null, (ref) => setDraft((d) => (d ? { ...d, files: [...d.files, ref] } : d)), {
+    // Uploads from the earlier visit that no saved plan uses: this session owns them again (deleted if discarded).
+    adopt: restored ? orphanedFiles(restored.draft.files, Object.values(mealPlans), '') : undefined,
+    keepOnUnmount: () => keepRef.current,
+  })
+
+  useEffect(() => {
+    if (!key || done) return
+    if (dirty && draft) storeDraft(key, draft)
+    else clearDraft(key)
+  }, [key, draft, dirty, done])
+
   useEffect(() => {
     if (!dirty || done) return
     const onBeforeUnload = (e: BeforeUnloadEvent) => e.preventDefault()
@@ -123,6 +145,7 @@ export default function MealPlanEditorPage() {
       createdAt: existing?.createdAt ?? Date.now(),
     })
     put('mealPlans', plan)
+    if (key) clearDraft(key)
     if (plan.active) for (const o of othersToDeactivate(Object.values(mealPlans), member.id, id)) update('mealPlans', o.id, { active: false })
     const removed = (existing?.files ?? []).filter((f) => !plan.files.some((g) => g.path === f.path))
     dropFiles(orphanedFiles(removed, Object.values(mealPlans), id))
@@ -135,6 +158,7 @@ export default function MealPlanEditorPage() {
   const del = () => {
     if (!existing) return
     setDone(true)
+    if (key) clearDraft(key)
     remove('mealPlans', existing.id)
     // The active plan is gone: the newest remaining one takes over.
     const successor = existing.active ? memberPlans.find((p) => p.id !== existing.id) : undefined
@@ -144,6 +168,29 @@ export default function MealPlanEditorPage() {
     toast(t('deletedToast'))
     navigate(backPath)
   }
+
+  // Back to the saved plan (or a blank one): this session's uploads stay tracked and go if never saved.
+  const discardRestored = () => {
+    setRestored(null)
+    setShowErrors(false)
+    setDraft(initial)
+    if (key) clearDraft(key)
+  }
+  const restoredBanner = restored && (
+    <Banner
+      tone="info"
+      icon="history"
+      role="status"
+      onDismiss={() => setRestored(null)}
+      action={
+        <Button variant="ghost" size="sm" icon="refresh" onClick={discardRestored}>
+          {t('discardDraft')}
+        </Button>
+      }
+    >
+      {t('draftRestored', { when: fmtRelative(restored.savedAt) })}
+    </Banner>
+  )
 
   const duplicate = () => {
     if (!previous) return
@@ -193,6 +240,7 @@ export default function MealPlanEditorPage() {
   return (
     <div className="fu-page fu-ed">
       {header}
+      {restoredBanner}
       <div className={isDesktop ? 'fu-cols' : 'stack fu-ed__stack'}>
         {isDesktop ? (
           <>
@@ -218,16 +266,18 @@ export default function MealPlanEditorPage() {
           </>
         )}
       </div>
-      <div className="fu-ed__bar">
-        {dirty && <span className="fu-ed__dirty">{t('unsaved')}</span>}
-        {existing && (
-          <Button variant="ghost" icon="trash" className="fu-ed__del" onClick={() => setConfirmDelete(true)}>
-            {t('deletePlan')}
+      <div className="fu-ed__dock">
+        <div className="fu-ed__bar">
+          {dirty && <span className="fu-ed__dirty">{t('unsaved')}</span>}
+          {existing && (
+            <Button variant="ghost" icon="trash" className="fu-ed__del" onClick={() => setConfirmDelete(true)}>
+              {t('deletePlan')}
+            </Button>
+          )}
+          <Button icon="check" loading={busy} onClick={save} className="fu-ed__save">
+            {busy ? t('uploading') : t('savePlan')}
           </Button>
-        )}
-        <Button icon="check" loading={busy} onClick={save} className="fu-ed__save">
-          {busy ? t('uploading') : t('savePlan')}
-        </Button>
+        </div>
       </div>
       <ConfirmSheet
         open={confirmDelete}
@@ -246,6 +296,8 @@ export default function MealPlanEditorPage() {
         danger
         onConfirm={() => {
           setDone(true)
+          if (key) clearDraft(key)
+          uploads.discard()
           navigate(backPath)
         }}
         onClose={() => setConfirmLeave(false)}

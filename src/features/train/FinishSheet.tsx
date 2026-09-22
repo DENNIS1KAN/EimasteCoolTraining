@@ -3,11 +3,13 @@ import type { Program, ProgramDay, Unit, WorkoutLog } from '../../data/types'
 import { dayShortName } from '../../data/programs'
 import { useT } from '../../i18n'
 import { todayISO } from '../../lib/dates'
-import { fmtDuration, fmtNum, fmtVolume } from '../../lib/format'
+import { fmtNum, fmtVolume } from '../../lib/format'
 import { sessionSummary } from '../../lib/stats'
 import { kgToUnit } from '../../lib/units'
 import { Banner, Button, DateField, PRBadge, Sheet, TextArea, cx } from '../../ui'
-import { doneAtFor, openSetsWithReps } from './logic/log'
+import { DurationValue, SetsValue } from './DoneCard'
+import { textLang } from './logic/format'
+import { doneAtFor, openSetsWithReps, setTally } from './logic/log'
 import { logPRs } from './logic/prs'
 import { M } from './messages'
 
@@ -51,9 +53,9 @@ export function FinishSheet({ open, onClose, log, program, day, week, unit, prio
     if (!log) return null
     const doneAt = doneAtFor(date, log, now)
     const done = { ...log, done: true, doneAt }
-    return { doneAt, summary: sessionSummary(done, program), prs: logPRs(done, program, priorBest) }
+    return { doneAt, summary: sessionSummary(done, program), tally: setTally(done, day), prs: logPRs(done, program, priorBest) }
     // `now` is intentionally left out: the preview is taken when the inputs change.
-  }, [log, date, program, priorBest])
+  }, [log, date, program, day, priorBest])
 
   const s = preview?.summary
   const open_ = openSetsWithReps(log)
@@ -75,13 +77,15 @@ export function FinishSheet({ open, onClose, log, program, day, week, unit, prio
         <dl className="tr-finish__stats">
           <div>
             <dt>{t('duration')}</dt>
-            <dd className="num">{s?.durationMs ? fmtDuration(Math.max(60_000, s.durationMs)) : '—'}</dd>
+            <dd className="num">
+              <DurationValue ms={s?.durationMs ?? null} />
+            </dd>
           </div>
           <div>
             <dt>{t('sets')}</dt>
             <dd className="num">
-              {s?.setsDone ?? 0}
-              <small> / {s?.setsPrescribed ?? 0}</small>
+              {/* Without a log yet, still out of the day's prescribed sets (never "0 / 0"). */}
+              <SetsValue tally={preview?.tally ?? setTally(null, day)} />
             </dd>
           </div>
           <div>
@@ -92,7 +96,7 @@ export function FinishSheet({ open, onClose, log, program, day, week, unit, prio
             <dt>{t('exercises')}</dt>
             <dd className="num">
               {s?.exercises ?? 0}
-              <small> / {day.ex.length}</small>
+              <small>/{day.ex.length}</small>
             </dd>
           </div>
         </dl>
@@ -104,7 +108,7 @@ export function FinishSheet({ open, onClose, log, program, day, week, unit, prio
               {preview.prs.map((pr) => (
                 <li key={pr.exercise}>
                   <PRBadge />
-                  <span className="tr-finish__pr-name" lang="en">
+                  <span className="tr-finish__pr-name" lang={textLang(pr.exercise)}>
                     {pr.exercise}
                   </span>
                   <span className="num tr-finish__pr-v">

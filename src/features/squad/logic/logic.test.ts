@@ -129,6 +129,17 @@ describe('league', () => {
     expect(mvps(week)).toEqual([T])
     expect(mvps(standings(d, [S], 'week', '2026-03-31'))).toEqual([])
   })
+  it("doesn't score the weigh-ins of a member whose weight is private (squad mates never receive them)", () => {
+    const weights = [mkWeight('eleni', '2026-03-30', 70), mkWeight('eleni', '2026-03-31', 69.8), mkWeight(T, '2026-03-31', 80)]
+    const members = [stelios, thanos, eleni, dennis]
+    const onHerPhone = standings(squad({ members, logs, weights }), [S, T, 'eleni'], 'all', '2026-03-31')
+    // A squad mate's phone doesn't receive her weigh-ins (database policy): the standings must still match.
+    const onMatePhone = standings(squad({ members, logs, weights: weights.filter((w) => w.memberId !== 'eleni') }), [S, T, 'eleni'], 'all', '2026-03-31')
+    expect(onHerPhone).toEqual(onMatePhone)
+    expect(onHerPhone.find((r) => r.memberId === 'eleni')?.points.weighIns).toBe(0)
+    // Shared weights still score.
+    expect(onHerPhone.find((r) => r.memberId === T)?.points.weighIns).toBe(1)
+  })
   it('computes the week range Monday to Sunday', () => {
     expect(weekRange('2026-03-31')).toEqual({ from: '2026-03-30', to: '2026-04-05' })
   })

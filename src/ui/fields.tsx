@@ -11,7 +11,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react'
-import { useT } from '../i18n'
+import { getLang, localeOf, useLang, useT, type Lang } from '../i18n'
 import { cx } from './cx'
 import { Icon, renderIcon, type IconName } from './Icon'
 import { UIM } from './messages'
@@ -57,6 +57,17 @@ export function canonicalDecimal(draft: string): string {
   if (s.startsWith('.')) s = '0' + s
   if (s.startsWith('-.')) s = '-0' + s.slice(1)
   return s
+}
+
+/**
+ * A canonical decimal ("67.5") as the user should see it in an input: the decimal comma in Greek ("67,5"), so a
+ * prefilled or copied value matches what the keyboard types and the rest of the UI prints. Storage stays canonical:
+ * parseDecimal / canonicalDecimal read either separator back.
+ */
+export function displayDecimal(canonical: string | number | null | undefined, lang: Lang = getLang()): string {
+  if (canonical == null) return ''
+  const s = String(canonical)
+  return lang === 'el' ? s.replace('.', ',') : s
 }
 
 /** Number of decimals in a step (0.1 -> 1, 2.5 -> 1, 0.25 -> 2, 1 -> 0). */
@@ -166,7 +177,13 @@ export interface NumberFieldProps
   fieldClassName?: string
 }
 
-/** Decimal input that accepts a comma, uses inputMode="decimal" and clamps to min/max on blur. */
+const fmtBound = (n: number, lang: Lang) => new Intl.NumberFormat(localeOf(lang), { maximumFractionDigits: 3 }).format(n)
+
+/**
+ * Decimal input that accepts a comma and uses inputMode="decimal". Values arrive and leave canonical ("57.5"); on
+ * screen they use the language's separator ("57,5" in Greek). min/max are validated, never forced: an out-of-range
+ * entry stays as typed, is not committed by the blur, and shows a range error (unless the caller passes `error`).
+ */
 export function NumberField({
   label,
   hint,
@@ -187,31 +204,45 @@ export function NumberField({
 }: NumberFieldProps) {
   const auto = useId()
   const fid = id ?? auto
+  const t = useT(UIM)
+  const lang = useLang()
   const ext = value == null ? '' : String(value)
-  const [draft, setDraft] = useState(ext)
+  const [draft, setDraft] = useState(() => displayDecimal(ext, lang))
   const [lastExt, setLastExt] = useState(ext)
+  const [rangeShown, setRangeShown] = useState(false)
   if (ext !== lastExt) {
     setLastExt(ext)
-    if (canonicalDecimal(draft) !== ext) setDraft(ext)
+    if (canonicalDecimal(draft) !== ext) setDraft(displayDecimal(ext, lang))
   }
   const allowNeg = min == null || min < 0
+  const parsed = parseDecimal(canonicalDecimal(draft))
+  const outOfRange = parsed != null && ((min != null && parsed < min) || (max != null && parsed > max))
+  const rangeError =
+    rangeShown && outOfRange
+      ? min != null && max != null
+        ? t('rangeBoth', { min: fmtBound(min, lang), max: fmtBound(max, lang) })
+        : min != null
+          ? t('rangeMin', { min: fmtBound(min, lang) })
+          : t('rangeMax', { max: fmtBound(max!, lang) })
+      : null
+  const shownError = error ?? rangeError
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const next = sanitizeDecimalDraft(e.target.value, decimals, allowNeg)
     if (next === null) return
     setDraft(next)
+    setRangeShown(false)
     const c = canonicalDecimal(next)
     if (c !== ext) onChange(c)
   }
 
   const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
-    const n = parseDecimal(canonicalDecimal(draft))
-    if (n != null) {
-      let v = roundTo(n, decimals)
-      if (min != null && v < min) v = min
-      if (max != null && v > max) v = max
-      const out = String(v)
-      const shown = draft.includes(',') ? out.replace('.', ',') : out
+    if (parsed != null && outOfRange) {
+      // Keep what was typed (a half-typed "17" must never become a stored 100) and say what's allowed.
+      setRangeShown(true)
+    } else if (parsed != null) {
+      const out = String(roundTo(parsed, decimals))
+      const shown = draft.includes(',') || lang === 'el' ? out.replace('.', ',') : out
       if (shown !== draft) setDraft(shown)
       if (out !== ext) onChange(out)
     } else if (draft !== '' && canonicalDecimal(draft) === '') {
@@ -221,7 +252,7 @@ export function NumberField({
   }
 
   return (
-    <FieldShell id={fid} label={label} hint={hint} error={error} className={cx(size === 'lg' && 'ui-field--lg', fieldClassName)}>
+    <FieldShell id={fid} label={label} hint={hint} error={shownError} className={cx(size === 'lg' && 'ui-field--lg', fieldClassName)}>
       <div className={cx('ui-control', size === 'lg' && 'ui-control--lg')}>
         <input
           id={fid}
@@ -230,8 +261,8 @@ export function NumberField({
           autoComplete="off"
           spellCheck={false}
           className={cx('ui-control__input', 'ui-control__input--num', className)}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={describedBy(fid, hint, error, extraDesc)}
+          aria-invalid={shownError ? true : undefined}
+          aria-describedby={describedBy(fid, hint, shownError, extraDesc)}
           value={draft}
           onChange={handleChange}
           onBlur={handleBlur}

@@ -15,6 +15,7 @@ import {
   removeSet,
   setField,
   setMachine,
+  setTally,
   setVariant,
   tickSet,
   unfinishLog,
@@ -198,22 +199,38 @@ describe('dayProgress / nextUp', () => {
     ex: { 0: { sets: [['60', '8'], ['60', '7'], ['', '', false]] }, 1: { sets: [['40', '10'], ['', '', false]] } },
   })
 
-  it('counts ticked sets against prescribed plus extra sets', () => {
+  it('counts ticked sets against the prescribed sets; extra rows only in the per-exercise totals', () => {
     const p = dayProgress(log, upper)
     expect(p.exercises.map((x) => [x.done, x.total, x.complete])).toEqual([
       [2, 3, true],
       [1, 2, false],
     ])
     expect(p.setsDone).toBe(3)
-    expect(p.setsTotal).toBe(5)
+    expect(p.setsTotal).toBe(4)
+    expect(p.setsExtra).toBe(0)
     expect(p.current).toBe(1)
+  })
+
+  it('counts extra sets apart', () => {
+    const extra = mkLog({ week: 2, day: 0, done: false, ex: { 0: { sets: [['60', '8'], ['60', '7'], ['60', '6']] } } })
+    const p = dayProgress(extra, upper)
+    expect([p.setsDone, p.setsTotal, p.setsExtra]).toEqual([2, 4, 1])
   })
 
   it('is empty without a log', () => {
     const p = dayProgress(null, upper)
     expect(p.setsDone).toBe(0)
     expect(p.setsTotal).toBe(4)
+    expect(p.setsExtra).toBe(0)
     expect(p.current).toBe(0)
+  })
+
+  it('setTally uses the prescribed sets as the one denominator, even without a log', () => {
+    expect(setTally(null, upper)).toEqual({ done: 0, prescribed: 4, extra: 0 })
+    // done: un-ticked sets with reps count; the third set of exercise 1 is an extra
+    const done = mkLog({ week: 2, day: 0, done: true, ex: { 0: { sets: [['60', '8'], ['60', '7', false], ['60', '6']] }, 1: { sets: [['40', '10']] } } })
+    expect(setTally(done, upper)).toEqual({ done: 3, prescribed: 4, extra: 1 })
+    expect(setTally({ ...done, done: false }, upper)).toEqual({ done: 3, prescribed: 4, extra: 0 })
   })
 
   it('finds the next open set, then the next exercise, then done', () => {

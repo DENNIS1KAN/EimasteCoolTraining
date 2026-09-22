@@ -88,6 +88,29 @@ export function memberPatch(m: Member): { data: Json; updated_at: number } {
   return { data, updated_at: m.updatedAt }
 }
 
+/**
+ * The part of a member's profile to merge on the server (patch_member): only the `changed` fields, e.g.
+ * ["goal", "settings.machines"] -> { goal, settings: { machines } }. Undefined `changed` = the whole profile.
+ * Removed values are sent as null so they are cleared rather than kept.
+ */
+export function memberDataPatch(m: Member, changed?: string[]): Json {
+  const data = memberPatch(m).data
+  if (!changed) return data
+  const out: Json = {}
+  for (const path of changed) {
+    const [k, sub] = path.split('.', 2)
+    if ((MEMBER_COLUMNS as readonly string[]).includes(k)) continue
+    if (sub === undefined) {
+      out[k] = data[k] ?? null
+      continue
+    }
+    const parent = isObj(data[k]) ? data[k] : {}
+    const target = isObj(out[k]) ? out[k] : (out[k] = {})
+    target[sub] = parent[sub] ?? null
+  }
+  return out
+}
+
 /* ------------------------------------------------------------------ all tables */
 
 /** Domain row -> table row. The whole object goes into `data`; columns duplicate what RLS and uniqueness need. */
@@ -249,6 +272,7 @@ export function toBackendError(e: unknown, status?: number): BackendError {
   const err = (c: BackendErrorCode, m?: string) => new BackendError(c, m || message || c)
 
   // Exceptions raised by our SQL functions.
+  if (/\btoo_many_attempts\b/.test(message)) return err('rate_limited', 'Too many attempts. Wait a while and try again.')
   if (/\binvalid_invite\b/.test(message)) return err('invalid_invite', 'This invite link is not valid (any more).')
   if (/\balready_joined\b/.test(message)) return err('already_joined', 'This member has already joined. Sign in instead.')
   if (/\balready_linked\b/.test(message)) return err('conflict', 'This login already belongs to another member.')
@@ -261,6 +285,7 @@ export function toBackendError(e: unknown, status?: number): BackendError {
     code === 'ABORT_ERR' ||
     name === 'AuthRetryableFetchError' ||
     st === 0 ||
+    st === 408 ||
     (st != null && st >= 502 && st <= 504) ||
     /^PGRST00[0-3]$/.test(code) ||
     NETWORK_RE.test(message) ||
@@ -269,8 +294,23 @@ export function toBackendError(e: unknown, status?: number): BackendError {
     return err('network', 'No connection. Changes are saved on this device and sync later.')
   }
 
-  if (code === 'email_not_confirmed' || /email not confirmed|confirmation (is )?required|requires? (e-?mail )?confirmation/i.test(message)) {
+  // Only sent when Supabase tries to e-mail the new login, i.e. while "Confirm email" is still on.
+  if (
+    code === 'email_not_confirmed' ||
+    code === 'email_address_not_authorized' ||
+    /email not confirmed|confirmation (is )?required|requires? (e-?mail )?confirmation/i.test(message)
+  ) {
     return err('email_confirmation_on', 'E-mail confirmation is switched on in Supabase. Switch "Confirm email" off (see SETUP).')
+  }
+  if (code === 'email_address_invalid') {
+    return err('config', 'Supabase refused the login e-mail domain. Set authEmailDomain in config.js to a real domain you own (see SETUP).')
+  }
+  if (st === 429 || /^over_.*_limit$/.test(code) || /rate limit|too many requests/i.test(message)) {
+    return err('rate_limited', 'Too many attempts. Wait a minute and try again.')
+  }
+  // Server trouble that usually passes (overload, restarts, deadlocks): retried, never treated as a refusal.
+  if ((st != null && st >= 500 && st !== 501) || st === 425 || code === '40P01' || code === '40001' || code === '53300') {
+    return err('unavailable', 'The server had a problem. Changes are saved on this device and sync later.')
   }
   if (
     code === 'weak_password' ||

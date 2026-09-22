@@ -4,10 +4,11 @@ import { exerciseName, exerciseVideo, warmupSetCount } from '../../data/programs
 import { useT } from '../../i18n'
 import { fmtNum } from '../../lib/format'
 import { Chip, Icon, TextField, cx } from '../../ui'
-import { fmtRange } from './logic/format'
+import { fmtRange, textLang } from './logic/format'
 import type { Technique } from './logic/techniques'
 import { warmupRamp } from './logic/warmup'
 import { M } from './messages'
+import { useTechniqueLabel } from './techniqueText'
 
 export interface ExtrasActions {
   variant: (exercise: number, v: 0 | 1 | 2) => void
@@ -32,6 +33,7 @@ interface Props {
 export function ExerciseExtras({ index, e, v, machine, machineOptions, unit, workingWeight, tech, techText, actions }: Props) {
   const t = useT(M)
   const ids = useId()
+  const techLabel = useTechniqueLabel(tech)
   const ramp = warmupRamp(workingWeight, warmupSetCount(e), unit)
   const variants = ([0, 1, 2] as const).filter((k) => k === 0 || (k === 1 ? !!e.s1 : !!e.s2))
   const name = exerciseName(e, v)
@@ -43,7 +45,7 @@ export function ExerciseExtras({ index, e, v, machine, machineOptions, unit, wor
         <section className="tr-xp__sec">
           <h4 className="micro">{t('technique')}</h4>
           <p className="tr-xp__p">
-            <b>{tech.label}</b> · {techText}
+            <b>{techLabel}</b> · {techText}
           </p>
         </section>
       ) : null}
@@ -133,7 +135,7 @@ export function ExerciseExtras({ index, e, v, machine, machineOptions, unit, wor
       {e.note ? (
         <section className="tr-xp__sec">
           <h4 className="micro">{t('coachNote')}</h4>
-          <p className="tr-xp__p" lang="en">
+          <p className="tr-xp__p" lang={textLang(e.note)}>
             {e.note}
           </p>
         </section>

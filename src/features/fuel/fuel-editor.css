@@ -122,22 +122,50 @@
   padding-right: 2px;
 }
 
-/* sticky save bar */
-.fu-ed__bar {
+/*
+ * Sticky save bar. Phones: a full-bleed dock that reaches down to the tab bar's top edge (under the raised Train
+ * button), fading in from the page background, so the form scrolls away under it instead of peeking through a gap.
+ * Desktop: a compact pill at the right; the rest of the dock lets clicks through to the cards under it.
+ */
+.fu-ed__dock {
   position: sticky;
   z-index: var(--z-bar);
-  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 8px);
+  bottom: calc(var(--tabbar-h) + var(--safe-bottom) - var(--tabbar-raise, 0px));
+  margin: 6px calc(-1 * var(--gutter)) 0;
+  padding: 16px var(--gutter) calc(8px + var(--tabbar-raise, 0px));
+  background: linear-gradient(to bottom, transparent, var(--bg) 16px);
+}
+.fu-ed__bar {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 14px;
   padding: 8px;
   border-radius: var(--r-xl);
-  background: var(--tabbar);
-  -webkit-backdrop-filter: blur(22px) saturate(1.5);
-  backdrop-filter: blur(22px) saturate(1.5);
+  background: var(--surface);
+  border: 1px solid var(--card-border);
   box-shadow: var(--shadow-2);
+}
+@media (min-width: 1024px) {
+  .fu-ed__dock {
+    bottom: calc(var(--safe-bottom) + 16px);
+    display: flex;
+    justify-content: flex-end;
+    margin: 14px 0 0;
+    padding: 0;
+    background: none;
+    pointer-events: none;
+  }
+  .fu-ed__bar {
+    pointer-events: auto;
+    max-width: 100%;
+    background: var(--tabbar);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    backdrop-filter: blur(22px) saturate(1.5);
+  }
+  .fu-ed__dirty {
+    padding-right: 6px;
+  }
 }
 .fu-ed__dirty {
   flex: 1;

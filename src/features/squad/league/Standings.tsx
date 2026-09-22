@@ -37,8 +37,9 @@ export function Standings({ rows, members, meId, action }: { rows: Standing[]; m
           const leader = r.rank === 1 && r.points.total > 0
           return (
             <li key={m.id} className={`sq-stand${isMe ? ' is-me' : ''}${leader ? ' is-leader' : ''}`}>
-              <span className="sq-stand__rank num" aria-label={t('rankN', { n: r.rank })}>
-                {leader ? <Icon name="crown" size={18} /> : r.rank}
+              <span className="sq-stand__rank num">
+                <span aria-hidden="true">{leader ? <Icon name="crown" size={18} /> : r.rank}</span>
+                <span className="visually-hidden">{t(leader ? 'rankLeader' : 'rankN', { n: r.rank })}</span>
               </span>
               <Avatar member={m} size={40} you={isMe} decorative />
               <div className="sq-stand__main">

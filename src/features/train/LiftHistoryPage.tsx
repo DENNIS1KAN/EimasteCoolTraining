@@ -10,7 +10,7 @@ import { e1rm, exerciseHistory, personalRecords, type ExercisePoint } from '../.
 import { kgToUnit } from '../../lib/units'
 import { Avatar, BigNumber, ButtonLink, Card, CardHeader, Chip, Delta, EmptyState, Icon, PRBadge, PageHeader, memberColorVar } from '../../ui'
 import { LineChart, type LineSeries } from '../../ui/charts'
-import { setSeparator } from './logic/format'
+import { setSeparator, textLang } from './logic/format'
 import { LIFT } from './messages'
 import './train.css'
 import './lift.css'
@@ -79,7 +79,7 @@ function LiftHistory({ me, member, name }: { me: Member; member: Member; name: s
       <PageHeader
         back
         eyebrow={t('eyebrow', { name: member.name })}
-        title={<span lang="en">{name}</span>}
+        title={<span lang={textLang(name)}>{name}</span>}
         actions={
           <Link to={`/member/${member.slug}`} className="lf-avatar" aria-label={member.name}>
             <Avatar member={member} size={40} you={isMe} decorative />

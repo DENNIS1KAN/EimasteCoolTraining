@@ -106,7 +106,7 @@ export default function BodyPage() {
         memberId={me.id}
         unit={unit}
         entry={edit.entry}
-        startValue={stepperStart(model.latest?.kg, unit)}
+        startValue={stepperStart(model.latest?.kg, unit, me.goalWeightKg)}
       />
     </div>
   )

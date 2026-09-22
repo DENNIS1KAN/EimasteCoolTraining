@@ -18,24 +18,39 @@ const drop = (f: FileRef) => {
     .catch(() => undefined)
 }
 
+export interface UploadsOptions {
+  /** Uploads of an earlier session that a restored draft still points at: treated as this session's own. */
+  adopt?: FileRef[]
+  /**
+   * Read when the editor unmounts without saving: the files a stored draft still references (they are kept for it).
+   * Everything else uploaded in the session is deleted.
+   */
+  keepOnUnmount?: () => FileRef[]
+}
+
 /**
  * Uploads files for a plan being edited. Files uploaded in this session but never saved into a plan are
- * deleted again when the editor closes, so abandoned drafts leave nothing behind in storage.
+ * deleted again when the editor closes, so abandoned drafts leave nothing behind in storage. Files a stored draft
+ * still points at (see lib/draftStore) survive until that draft is saved or discarded.
  */
-export function useUploads(memberId: string | null, onUploaded: (ref: FileRef) => void) {
+export function useUploads(memberId: string | null, onUploaded: (ref: FileRef) => void, opts: UploadsOptions = {}) {
   const t = useT(FM)
   const [pending, setPending] = useState<PendingUpload[]>([])
-  const session = useRef<FileRef[]>([])
+  const session = useRef<FileRef[]>(opts.adopt ?? [])
   const committed = useRef(false)
   const alive = useRef(true)
   const cb = useRef(onUploaded)
   cb.current = onUploaded
+  const keepRef = useRef(opts.keepOnUnmount)
+  keepRef.current = opts.keepOnUnmount
 
   useEffect(() => {
     alive.current = true
     return () => {
       alive.current = false
-      if (!committed.current) session.current.forEach(drop)
+      if (committed.current) return
+      const keep = new Set((keepRef.current?.() ?? []).map((f) => f.path))
+      session.current.filter((f) => !keep.has(f.path)).forEach(drop)
     }
   }, [])
 
@@ -76,5 +91,8 @@ export function useUploads(memberId: string | null, onUploaded: (ref: FileRef) =
     session.current = []
   }
 
-  return { pending, upload, commit }
+  /** The draft was thrown away: delete everything uploaded for it. */
+  const discard = () => commit([])
+
+  return { pending, upload, commit, discard }
 }

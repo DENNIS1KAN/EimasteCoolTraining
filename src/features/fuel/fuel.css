@@ -714,15 +714,42 @@ button.fu-meal__body {
 }
 
 /* ------------------------------------------------------------------ adherence */
+/*
+ * Stats on the left, the heatmap hugging the right edge, and the heatmap's "less ■■■■■ more" scale on its own row
+ * across the whole card. The scale needs ~200px, more than the heatmap column has on a phone (it used to push the
+ * card, and the page, sideways at 360px), so the heatmap wrapper and the chart root are flattened into this grid.
+ */
 .fu-adh.ui-card {
-  display: flex;
-  align-items: stretch;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    'stats heat'
+    'foot foot';
+  column-gap: 14px;
+  row-gap: 10px;
   padding: 14px;
 }
+.fu-adh__heat,
+.fu-adh .ch-heatmap {
+  display: contents;
+}
+.fu-adh .ch-box {
+  grid-area: heat;
+  min-width: 0;
+}
+.fu-adh .ch-plot--fit {
+  left: auto;
+  right: 0;
+}
+.fu-adh .ch-foot {
+  grid-area: foot;
+  justify-content: flex-end;
+  min-width: 0;
+  margin-top: 0;
+}
 .fu-adh__stats {
-  flex: 0 0 auto;
-  width: 122px;
+  grid-area: stats;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -762,10 +789,6 @@ button.fu-meal__body {
 }
 .fu-adh__streak.is-on svg {
   color: var(--accent-strong);
-}
-.fu-adh__heat {
-  flex: 1;
-  min-width: 0;
 }
 
 /* ------------------------------------------------------------------ earlier plans */

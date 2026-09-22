@@ -31,7 +31,10 @@ export function PointsExplainer({ defaultOpen }: { defaultOpen?: boolean }) {
           {RULES.map((r) => (
             <li key={r.key}>
               <Icon name={r.icon} size={16} />
-              <span>{t(r.label)}</span>
+              <span>
+                {t(r.label)}
+                {r.key === 'weighIn' ? <small className="sq-rules__note">{t('ruleWeighInNote')}</small> : null}
+              </span>
               <b className="sq-rules__pts num">+{POINTS[r.key]}</b>
             </li>
           ))}

@@ -43,3 +43,27 @@ export const fmtTime = (ms: number): string =>
 
 /** Separator between sets in "55 × 10, 55 × 9". Greek writes decimals with a comma, so it uses a middle dot. */
 export const setSeparator = (): string => (getLang() === 'el' ? ' · ' : ', ')
+
+/** A duration split for compact stat tiles ("48′", "1h 10′"): whole minutes, at least one. */
+export function durationParts(ms: number): { h: number; m: number } {
+  const min = Math.max(1, Math.round(ms / 60000))
+  return { h: Math.floor(min / 60), m: min % 60 }
+}
+
+const GREEK = /[Ͱ-Ͽἀ-῿]/
+
+/**
+ * The language of a program string (day or exercise name) for its `lang` attribute: 'el' when it has Greek
+ * letters (so CSS uppercase drops the tonos: "ΠΟΔΙΑ", not "ΠΌΔΙΑ"), else 'en' (the built-in program is English).
+ */
+export const textLang = (s: string): 'el' | 'en' => (GREEK.test(s) ? 'el' : 'en')
+
+/** Uppercase that follows Greek rules (no tonos on capitals: "Ώμοι" -> "ΩΜΟΙ", "ΐ" -> "Ϊ"); Latin is untouched. */
+export function upperText(s: string): string {
+  if (!GREEK.test(s)) return s.toUpperCase()
+  return s
+    .normalize('NFD')
+    .replace(/([Ͱ-Ͽἀ-῿][̀-ͯ]*?)[́͂̓̔]/g, '$1')
+    .normalize('NFC')
+    .toLocaleUpperCase('el')
+}

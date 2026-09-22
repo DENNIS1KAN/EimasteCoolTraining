@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { BackendError } from '../../data/backend/types'
 import { authErrorKey, isFatalJoinError } from './errors'
-import { checkPassword, MIN_PASSWORD } from './password'
+import { translate } from '../../i18n'
+import { AUTH } from './messages'
+import { checkPassword, MIN_PASSWORD, PASSWORD_VARS } from './password'
 import { getLastProfile, setLastProfile } from './lastProfile'
 import { detectPlatform, isIosOtherBrowser } from './install'
 
@@ -52,14 +54,22 @@ describe('authErrorKey', () => {
 })
 
 describe('checkPassword', () => {
-  it('needs 6+ characters and a matching confirmation', () => {
-    expect(MIN_PASSWORD).toBe(6)
+  it('needs 8+ characters and a matching confirmation', () => {
+    expect(MIN_PASSWORD).toBe(8)
     expect(checkPassword('', '')).toEqual({ longEnough: false, matches: false, ok: false })
-    expect(checkPassword('12345', '12345')).toEqual({ longEnough: false, matches: true, ok: false })
-    expect(checkPassword('123456', '')).toEqual({ longEnough: true, matches: false, ok: false })
-    expect(checkPassword('123456', '123457')).toEqual({ longEnough: true, matches: false, ok: false })
-    expect(checkPassword('123456', '123456')).toEqual({ longEnough: true, matches: true, ok: true })
+    expect(checkPassword('1234567', '1234567')).toEqual({ longEnough: false, matches: true, ok: false })
+    expect(checkPassword('12345678', '')).toEqual({ longEnough: true, matches: false, ok: false })
+    expect(checkPassword('12345678', '12345679')).toEqual({ longEnough: true, matches: false, ok: false })
+    expect(checkPassword('12345678', '12345678')).toEqual({ longEnough: true, matches: true, ok: true })
     expect(checkPassword('καλημέρα', 'καλημέρα').ok).toBe(true)
+  })
+
+  it('puts the minimum into every password message', () => {
+    for (const lang of ['en', 'el'] as const)
+      for (const k of ['ruleLength', 'errWeakPassword', 'errPasswordRejected'] as const) {
+        expect(AUTH[lang][k], `${lang}.${k}`).toContain('{min}')
+        expect(translate(AUTH, k, PASSWORD_VARS, lang)).toContain('8')
+      }
   })
 })
 

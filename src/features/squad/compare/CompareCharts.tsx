@@ -7,7 +7,7 @@ import { kgToUnit } from '../../../lib/units'
 import { logsOf, weightSeries, weightsOf, type SquadData } from '../../../lib/stats'
 import { Card, EmptyState, Segmented, Select, memberColorVar } from '../../../ui'
 import { BarChart, LineChart } from '../../../ui/charts'
-import { commonExercises, lastWeeks, liftDuelPoints, raceSeries, raceStart, weeklyVolume, weightChangeSeries } from '../logic/compare'
+import { commonExercises, liftDuelPoints, raceSeries, raceStart, volumeWeeks, weeklyVolume, weightChangeSeries } from '../logic/compare'
 import type { WeightAccess } from '../logic/visibility'
 import { SQ } from '../messages'
 
@@ -18,7 +18,7 @@ export function ChartCard({ title, sub, action, children, className }: { title: 
     <Card as="section" className={`sq-chart${className ? ` ${className}` : ''}`}>
       <div className="sq-chart__head">
         <div>
-          <h3 className="sq-chart__title">{title}</h3>
+          <h2 className="sq-chart__title">{title}</h2>
           {sub ? <p className="sq-chart__sub">{sub}</p> : null}
         </div>
         {action}
@@ -72,22 +72,27 @@ export function RaceChart({ a, b, data, today }: Duo) {
   )
 }
 
-/** Training volume per calendar week, last 6 weeks, side by side. */
+const VOLUME_WEEKS = 6
+
+/** Training volume per calendar week, side by side: the last 6 weeks, or fewer when the race started more recently. */
 export function VolumeChart({ a, b, data, today, unit }: Duo & { unit: Unit }) {
   const t = useT(SQ)
   const { weeks, va, vb } = useMemo(() => {
-    const ws = lastWeeks(today, 6)
+    const la = logsOf(data, a.id)
+    const lb = logsOf(data, b.id)
+    const ws = volumeWeeks(today, raceStart([a.programStart, b.programStart], [...la, ...lb], today), VOLUME_WEEKS)
     const scale = (kg: number) => (unit === 'lb' ? kgToUnit(kg, 'lb') / 1000 : kg / 1000)
     return {
       weeks: ws,
-      va: weeklyVolume(logsOf(data, a.id), data.programs, ws).map(scale),
-      vb: weeklyVolume(logsOf(data, b.id), data.programs, ws).map(scale),
+      va: weeklyVolume(la, data.programs, ws).map(scale),
+      vb: weeklyVolume(lb, data.programs, ws).map(scale),
     }
-  }, [a.id, b.id, data, today, unit])
+  }, [a.id, b.id, a.programStart, b.programStart, data, today, unit])
   const any = va.some((v) => v > 0) || vb.some((v) => v > 0)
   const u = unit === 'lb' ? 'k lb' : 't'
+  const full = weeks.length >= VOLUME_WEEKS
   return (
-    <ChartCard title={t('volumeTitle')} sub={t('volumeSub', { unit: u })}>
+    <ChartCard title={t('volumeTitle')} sub={t(full ? 'volumeSub' : 'volumeSubStart', { unit: u })}>
       {any ? (
         <BarChart
           categories={weeks.map((w) => fmtDate(w, 'short'))}
@@ -99,7 +104,7 @@ export function VolumeChart({ a, b, data, today, unit }: Duo & { unit: Unit }) {
           height={190}
           formatY={(n) => fmtNum(n, 1)}
           formatTooltipY={(n) => `${fmtNum(n, 1)} ${u}`}
-          ariaLabel={t('volumeAria', { a: a.name, b: b.name })}
+          ariaLabel={t(full ? 'volumeAria' : 'volumeAriaStart', { a: a.name, b: b.name })}
         />
       ) : (
         <EmptyState compact icon="dumbbell-plate" title={t('volumeEmpty')} />

@@ -25,7 +25,8 @@ export function OverviewTab() {
   const crown = mvpIds(week)
   const pair = defaultPair(competitors, me, allTime)
   const h2h = useHeadToHead(stats, pair?.[0] ?? null, pair?.[1] ?? null)
-  const coaches = useMemo(() => sortedMembers(data).filter((m) => !m.competes), [data])
+  // Outside the league: the coach, and any athlete who doesn't compete (CoachRow tags them differently).
+  const sideline = useMemo(() => sortedMembers(data).filter((m) => !m.competes), [data])
   const anyActivity = useMemo(() => Object.values(data.logs).some((l) => l.done), [data.logs])
 
   const ordered = useMemo(() => {
@@ -41,7 +42,7 @@ export function OverviewTab() {
     return (
       <div className="stack">
         <EmptyState icon="users" title={t('emptySquadTitle')} body={t('emptySquadBody')} />
-        {coaches.map((c) => (
+        {sideline.map((c) => (
           <CoachRow key={c.id} member={c} isMe={c.id === me?.id} athletes={0} />
         ))}
       </div>
@@ -83,9 +84,9 @@ export function OverviewTab() {
           />
         ))}
       </div>
-      {coaches.length > 0 && (
+      {sideline.length > 0 && (
         <div className="sq-coach-list">
-          {coaches.map((c) => (
+          {sideline.map((c) => (
             <CoachRow key={c.id} member={c} isMe={c.id === me?.id} athletes={competitors.length} />
           ))}
         </div>

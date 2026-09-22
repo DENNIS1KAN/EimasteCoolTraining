@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Avatar, Button, ButtonLink, Card, CardHeader, memberColorVar, NumberField, PageHeader, Switch, Tag, TextField, toast } from '../../../ui'
+import { Avatar, Button, ButtonLink, Card, CardHeader, ConfirmSheet, memberColorVar, NumberField, PageHeader, Switch, Tag, TextField, toast } from '../../../ui'
 import { useT } from '../../../i18n'
 import { COMMON } from '../../../i18n/common'
 import { update, useStore } from '../../../data/store'
@@ -12,6 +12,7 @@ import { todayISO } from '../../../lib/dates'
 import { programWeekOn } from '../../../lib/stats'
 import { lastActiveAt } from '../lib/glance'
 import { ColorPicker } from '../components/ColorPicker'
+import { useLeaveGuard } from '../hooks/useLeaveGuard'
 import { M } from '../messages'
 import { ProgramSection } from './ProgramSection'
 import { CoachNoteCard } from './CoachNoteCard'
@@ -40,6 +41,8 @@ export function MemberEditor({ member, viewer }: MemberEditorProps) {
   const dirty = edited != null && !draftEquals(edited, base)
   const [showErrors, setShowErrors] = useState(false)
   const set = (patch: Partial<MemberDraft>) => setEdited({ ...draft, ...patch })
+  // Leaving with unsaved profile edits (back arrow, tab bar, any link) asks first.
+  const guard = useLeaveGuard(dirty)
 
   const { errors } = fromDraft(draft, unit)
   const err = (k: keyof DraftErrors): string | null => {
@@ -153,6 +156,17 @@ export function MemberEditor({ member, viewer }: MemberEditorProps) {
           </Button>
         </div>
       ) : null}
+
+      <ConfirmSheet
+        open={guard.pending != null}
+        title={t('leaveTitle')}
+        body={t('leaveBody', { name: member.name })}
+        confirmLabel={t('discard')}
+        cancelLabel={t('keepEditing')}
+        danger
+        onConfirm={guard.leave}
+        onClose={guard.stay}
+      />
     </div>
   )
 }

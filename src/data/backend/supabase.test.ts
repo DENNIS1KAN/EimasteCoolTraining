@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Cheer, Member, Program, WorkoutLog } from '../types'
 import { BackendError } from './types'
-import { PAGE_SIZE, SupabaseBackend } from './supabase'
+import { PAGE_SIZE, SupabaseBackend, guardAnonymous } from './supabase'
 
 /* ------------------------------------------------------------------ fake supabase-js client */
 
@@ -34,6 +34,7 @@ function makeClient() {
   let handler: Handler = () => ok([])
   const realtime: { table: string; cb: (p: unknown) => void }[] = []
   let authListener: ((event: string) => void) | null = null
+  let session: unknown = null
 
   const builder = (q: Query) => {
     const b = {
@@ -68,7 +69,8 @@ function makeClient() {
     from: vi.fn((table: string) => builder({ table, op: 'select', filters: [] })),
     rpc: vi.fn((name: string, args?: unknown) => builder({ rpc: name, args, op: 'rpc', filters: [] })),
     auth: {
-      getSession: vi.fn(async (): Promise<{ data: { session: unknown }; error: unknown }> => ({ data: { session: null }, error: null })),
+      getSession: vi.fn(async (): Promise<{ data: { session: unknown }; error: unknown }> => ({ data: { session }, error: null })),
+      refreshSession: vi.fn(async (): Promise<{ data: { session: unknown }; error: unknown }> => ({ data: { session }, error: null })),
       signInWithPassword: vi.fn(async (): Promise<{ data: unknown; error: unknown }> => ({ data: { session: { access_token: 't' } }, error: null })),
       signUp: vi.fn(async (): Promise<{ data: { session: unknown }; error: unknown }> => ({ data: { session: { access_token: 't' } }, error: null })),
       signOut: vi.fn(async () => ({ error: null })),
@@ -92,6 +94,10 @@ function makeClient() {
       handler = h
     },
     emitAuth: (event: string) => authListener?.(event),
+    /** A signed-in user (data requests need one). */
+    signedIn: () => {
+      session = { user: { id: 'u1' }, access_token: 't' }
+    },
   }
 }
 
@@ -130,6 +136,8 @@ const logRow = (i: number) => ({ id: `log-${String(i).padStart(5, '0')}`, member
 /* ------------------------------------------------------------------ tests */
 
 describe('loadAll', () => {
+  beforeEach(() => sb.signedIn())
+
   it('reads every table in pages until a short page', async () => {
     const total = 2500
     sb.handle((q) => {
@@ -272,6 +280,31 @@ describe('join', () => {
     expect(sb.client.auth.signOut).toHaveBeenCalledWith({ scope: 'local' })
   })
 
+  it('treats a claim that resolves nothing as a wrong code (the database records the attempt)', async () => {
+    sb.handle(authFlow(ok(null)))
+    expect((await rejection(backend.join('stelios', 'WRONG1', 'secret1'))).code).toBe('invalid_invite')
+    expect(sb.client.auth.signOut).toHaveBeenCalledWith({ scope: 'local' })
+  })
+
+  it('reports too many wrong codes', async () => {
+    sb.handle(authFlow({ data: null, error: { message: 'too_many_attempts', code: 'P0001' }, status: 400 }))
+    expect((await rejection(backend.join('stelios', 'ABC234', 'secret1'))).code).toBe('rate_limited')
+  })
+
+  it('detects e-mail confirmation from the e-mail errors of the built-in mailer', async () => {
+    sb.handle(authFlow())
+    sb.client.auth.signUp.mockResolvedValueOnce({
+      data: { session: null },
+      error: { name: 'AuthApiError', message: 'Email address not authorized', status: 400, code: 'email_address_not_authorized' },
+    })
+    expect((await rejection(backend.join('stelios', 'ABC234', 'secret1'))).code).toBe('email_confirmation_on')
+    sb.client.auth.signUp.mockResolvedValueOnce({
+      data: { session: null },
+      error: { name: 'AuthApiError', message: 'email rate limit exceeded', status: 429, code: 'over_email_send_rate_limit' },
+    })
+    expect((await rejection(backend.join('stelios', 'ABC234', 'secret1'))).code).toBe('email_confirmation_on')
+  })
+
   it('refuses unknown members and members who joined with another link, without touching auth', async () => {
     sb.handle(authFlow())
     expect((await rejection(backend.join('nobody', 'ABC234', 'secret1'))).code).toBe('invalid_invite')
@@ -312,6 +345,8 @@ describe('session events', () => {
 })
 
 describe('writes', () => {
+  beforeEach(() => sb.signedIn())
+
   const member = { id: 'id-stelios', slug: 'stelios', role: 'athlete', joined: true, name: 'Stelios', updatedAt: 9 } as Member
   const log = { id: 'id-stelios__bts-12__w1d0', memberId: 'id-stelios', updatedAt: 5 } as WorkoutLog
   const cheer = { id: 'c1', fromId: 'a', toId: 'b', createdAt: 1, seenAt: 2, updatedAt: 3 } as Cheer
@@ -321,10 +356,35 @@ describe('writes', () => {
     expect(sb.queries).toHaveLength(0)
   })
 
-  it('updates only the profile data of a member', async () => {
-    sb.handle(() => ok([{ id: 'id-stelios' }]))
-    await backend.put('members', member)
+  const stored = { id: 'id-stelios', slug: 'stelios', role: 'athlete', user_id: 'u1', updated_at: 12, data: { name: 'Stelios', goal: 'Coach goal' } }
+
+  it('merges a member profile on the server and returns the stored version', async () => {
+    sb.handle(() => ok([stored]))
+    const saved = (await backend.put('members', member)) as Member
     const q = sb.queries[0]
+    expect([q.rpc, q.args]).toEqual(['patch_member', { p_id: 'id-stelios', p_patch: { name: 'Stelios' }, p_at: 9 }])
+    expect(saved).toMatchObject({ id: 'id-stelios', name: 'Stelios', goal: 'Coach goal', joined: true, updatedAt: 12 })
+  })
+
+  it('sends only the fields this device changed', async () => {
+    sb.handle(() => ok([stored]))
+    const m = { ...member, goal: 'Bench 100', settings: { unit: 'lb', machines: { 'Leg Press': 'Hammer' }, weightVisibility: 'private' } } as Member
+    await backend.put('members', m, ['goal', 'settings.unit', 'settings.weightVisibility', 'slug'])
+    expect(sb.queries[0].args).toEqual({
+      p_id: 'id-stelios',
+      p_patch: { goal: 'Bench 100', settings: { unit: 'lb', weightVisibility: 'private' } },
+      p_at: 9,
+    })
+  })
+
+  it('falls back to a whole-profile update when the database predates patch_member', async () => {
+    sb.handle((q) =>
+      q.rpc === 'patch_member'
+        ? { data: null, error: { code: 'PGRST202', message: 'Could not find the function public.patch_member(p_at, p_id, p_patch) in the schema cache' }, status: 404 }
+        : ok([stored]),
+    )
+    await backend.put('members', member, ['name'])
+    const q = sb.queries[1]
     expect([q.table, q.op, q.filters]).toEqual(['members', 'update', [['id', 'id-stelios']]])
     expect(q.payload).toEqual({ data: { name: 'Stelios' }, updated_at: 9 })
   })
@@ -332,6 +392,40 @@ describe('writes', () => {
   it('reports a member update that changed nothing as forbidden', async () => {
     sb.handle(() => ok([]))
     expect((await rejection(backend.put('members', member))).code).toBe('forbidden')
+  })
+
+  it('never writes without a signed-in session (supabase-js would fall back to the anon key)', async () => {
+    sb.client.auth.getSession.mockResolvedValueOnce({ data: { session: null }, error: { name: 'AuthRetryableFetchError', message: 'Failed to fetch', status: 0 } })
+    expect((await rejection(backend.put('logs', log))).code).toBe('network')
+    sb.client.auth.getSession.mockResolvedValueOnce({ data: { session: null }, error: null })
+    expect((await rejection(backend.put('logs', log))).code).toBe('auth')
+    sb.client.auth.getSession.mockResolvedValueOnce({
+      data: { session: null },
+      error: { name: 'AuthApiError', message: 'Invalid Refresh Token: Refresh Token Not Found', status: 400, code: 'refresh_token_not_found' },
+    })
+    expect((await rejection(backend.loadAll())).code).toBe('auth')
+    expect(sb.queries).toHaveLength(0)
+  })
+
+  it('renews a token the server refused and tries once more', async () => {
+    let calls = 0
+    sb.handle(() => (++calls === 1 ? { data: null, error: { message: 'JWT expired', code: 'PGRST303' }, status: 401 } : ok(null)))
+    await backend.put('logs', log)
+    expect(sb.client.auth.refreshSession).toHaveBeenCalledTimes(1)
+    expect(sb.queries).toHaveLength(2)
+
+    sb.handle(() => ({ data: null, error: { message: 'JWT expired', code: 'PGRST303' }, status: 401 }))
+    sb.client.auth.refreshSession.mockResolvedValueOnce({ data: { session: null }, error: { name: 'AuthRetryableFetchError', message: 'Failed to fetch', status: 0 } })
+    expect((await rejection(backend.put('logs', log))).code).toBe('network')
+    sb.client.auth.refreshSession.mockResolvedValueOnce({ data: { session: null }, error: { name: 'AuthApiError', message: 'Invalid Refresh Token', status: 400, code: 'refresh_token_not_found' } })
+    expect((await rejection(backend.put('logs', log))).code).toBe('auth')
+  })
+
+  it('treats rate limits and server errors as temporary', async () => {
+    sb.handle(() => ({ data: null, error: { message: 'Too Many Requests', code: '' }, status: 429 }))
+    expect((await rejection(backend.put('logs', log))).code).toBe('rate_limited')
+    sb.handle(() => ({ data: null, error: { message: 'deadlock detected', code: '40P01' }, status: 500 }))
+    expect((await rejection(backend.put('logs', log))).code).toBe('unavailable')
   })
 
   it('upserts data rows by id', async () => {
@@ -407,6 +501,8 @@ describe('realtime', () => {
 })
 
 describe('files', () => {
+  beforeEach(() => sb.signedIn())
+
   it('uploads under the member folder with a safe name and a content type', async () => {
     const file = new File(['%PDF'], 'Διατροφή plan.PDF', { type: '' })
     const ref = await backend.uploadFile('id-stelios', file)
@@ -440,6 +536,8 @@ describe('files', () => {
 })
 
 describe('coach tools', () => {
+  beforeEach(() => sb.signedIn())
+
   it('reads invites and calls the coach RPCs', async () => {
     sb.handle((q) =>
       q.table === 'member_invites'
@@ -462,5 +560,32 @@ describe('coach tools', () => {
     expect((await rejection(backend.resetInvite('x', false))).code).toBe('forbidden')
     sb.handle(() => ({ data: null, error: { message: 'slug_taken', code: '23505' }, status: 409 }))
     expect((await rejection(backend.createMember({ slug: 'dennis', name: 'D', role: 'athlete', color: 'red' }))).code).toBe('conflict')
+  })
+})
+
+describe('guardAnonymous', () => {
+  const next = vi.fn(async () => new Response('[]'))
+  const guarded = guardAnonymous('anon-key', next as unknown as typeof fetch)
+  const req = (url: string, auth?: string) => guarded(url, { headers: new Headers(auth ? { Authorization: auth, apikey: 'anon-key' } : { apikey: 'anon-key' }) })
+
+  beforeEach(() => next.mockClear())
+
+  it('lets requests with a user token through', async () => {
+    await req('https://abc.supabase.co/rest/v1/workout_logs?select=*', 'Bearer user-jwt')
+    await req('https://abc.supabase.co/storage/v1/object/meal-plans/x.pdf', 'Bearer user-jwt')
+    expect(next).toHaveBeenCalledTimes(2)
+  })
+
+  it('lets the public login list and auth requests use the anon key', async () => {
+    await req('https://abc.supabase.co/rest/v1/rpc/login_profiles', 'Bearer anon-key')
+    await req('https://abc.supabase.co/auth/v1/token?grant_type=refresh_token', 'Bearer anon-key')
+    expect(next).toHaveBeenCalledTimes(2)
+  })
+
+  it('stops data requests that would go out as anonymous, as a lost connection', async () => {
+    await expect(req('https://abc.supabase.co/rest/v1/workout_logs', 'Bearer anon-key')).rejects.toMatchObject({ name: 'AbortError' })
+    await expect(req('https://abc.supabase.co/rest/v1/rpc/patch_member')).rejects.toMatchObject({ name: 'AbortError' })
+    await expect(req('https://abc.supabase.co/storage/v1/object/sign/meal-plans/x', 'Bearer anon-key')).rejects.toThrow(/Failed to fetch/)
+    expect(next).not.toHaveBeenCalled()
   })
 })

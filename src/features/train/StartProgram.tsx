@@ -6,7 +6,9 @@ import { useT } from '../../i18n'
 import { addDays, isISODate, nextMonday, todayISO } from '../../lib/dates'
 import { fmtDate } from '../../lib/format'
 import { Button, Card, Chip, DateField, cx, toast } from '../../ui'
+import { textLang } from './logic/format'
 import { M } from './messages'
+import { useProgramName } from './programText'
 
 /** Pick day 1 of the program. Used by the Train page's start card and the Home hero's sheet. */
 export function StartProgramForm({ me, program, onSaved }: { me: Member; program: Program; onSaved?: () => void }) {
@@ -41,7 +43,7 @@ export function StartProgramForm({ me, program, onSaved }: { me: Member; program
             return (
               <li key={i} className={cx('tr-rhythm__d', !pday && 'is-rest')}>
                 <span className="tr-rhythm__wd">{d ? fmtDate(d, 'weekday') : ''}</span>
-                <span className="tr-rhythm__w" lang={pday ? 'en' : undefined}>
+                <span className="tr-rhythm__w" lang={pday ? textLang(dayShortName(pday)) : undefined}>
                   {pday ? dayShortName(pday) : t('restWord')}
                 </span>
               </li>
@@ -59,9 +61,12 @@ export function StartProgramForm({ me, program, onSaved }: { me: Member; program
 /** Shown on the Train page while the program has no start date. Browsing workouts still works below it. */
 export function StartProgramCard({ me, program }: { me: Member; program: Program }) {
   const t = useT(M)
+  const name = useProgramName(program)
   return (
     <Card as="section" className="tr-startcard" aria-labelledby="tr-start-title">
-      <p className="eyebrow">{program.name}</p>
+      <p className="eyebrow" lang={textLang(name)}>
+        {name}
+      </p>
       <h2 className="tr-startcard__title" id="tr-start-title">
         {t('startTitle')}
       </h2>

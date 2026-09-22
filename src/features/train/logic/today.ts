@@ -1,7 +1,19 @@
 /** What the Home screen's workout hero should say today (pure, so every state is tested). */
 import type { Member, Program, WorkoutLog } from '../../../data/types'
 import { addDays, diffDays, type ISODate } from '../../../lib/dates'
-import { isCountedSet, logDate, logTime, nextWorkout, programWeekOn, scheduleStatus, scheduledDate, type WorkoutRef } from '../../../lib/stats'
+import {
+  isCountedSet,
+  logDate,
+  logTime,
+  programWeekOn,
+  programWorkouts,
+  refKey,
+  sameRef,
+  scheduledDate,
+  upcomingWorkout,
+  workoutOn,
+  type WorkoutRef,
+} from '../../../lib/stats'
 
 /** A session started this long ago and never finished is no longer "in progress". */
 export const STALE_SESSION_MS = 12 * 60 * 60 * 1000
@@ -38,6 +50,10 @@ export function liveLog(logs: WorkoutLog[], now: number): WorkoutLog | null {
   return best
 }
 
+/**
+ * The hero's state. "Next" is calendar-aligned (upcomingWorkout): after a missed week the athlete carries on with
+ * this week's workouts instead of being sent back to the oldest missed one (missed ones stay in the week strip).
+ */
 export function todayState({ member, program, logs, today, now }: TodayInput): TodayState {
   if (!program || !program.weeks.length) return { kind: 'no-program' }
   const mine = logs.filter((l) => l.programId === program.id)
@@ -45,7 +61,7 @@ export function todayState({ member, program, logs, today, now }: TodayInput): T
   const live = liveLog(mine, now)
   if (live) return { kind: 'in-progress', ref: { week: live.week, day: live.day }, log: live }
 
-  const next = nextWorkout(program, mine)
+  const next = upcomingWorkout(program, start, mine, today)
   const doneToday = mine.filter((l) => l.done && logDate(l) === today).sort((a, b) => logTime(b) - logTime(a))[0]
   if (doneToday) {
     return {
@@ -60,11 +76,20 @@ export function todayState({ member, program, logs, today, now }: TodayInput): T
   if (!start) return { kind: 'not-started', next }
   if (start > today) return { kind: 'starts-soon', start, inDays: diffDays(today, start), next }
 
-  const st = scheduleStatus(program, start, mine, today)
-  if (st.behindBy > 0) return { kind: 'train', ref: next, scheduledToday: !!st.today, behindBy: st.behindBy }
-  const todayDone = st.today ? mine.some((l) => l.done && l.week === st.today!.week && l.day === st.today!.day) : true
-  if (st.today && !todayDone) return { kind: 'train', ref: next, scheduledToday: true, behindBy: 0 }
+  // Due today or overdue (a workout missed earlier this week, or anything left after the last week): train it.
+  if (scheduledDate(program, start, next) <= today) {
+    return { kind: 'train', ref: next, scheduledToday: sameRef(next, workoutOn(program, start, today)), behindBy: overdueFrom(program, start, mine, next, today) }
+  }
   return { kind: 'rest', next, nextDate: nextTrainingDate(program, start, next, addDays(today, 1)) }
+}
+
+/** Workouts from `from` on (in training order) that were scheduled before today and aren't done: the ones to catch up. */
+function overdueFrom(p: Program, start: ISODate, logs: WorkoutLog[], from: WorkoutRef, today: ISODate): number {
+  const done = new Set(logs.filter((l) => l.done).map((l) => refKey(l)))
+  const order = (r: WorkoutRef) => r.week * 1000 + r.day
+  let n = 0
+  for (const r of programWorkouts(p)) if (order(r) >= order(from) && !done.has(refKey(r)) && scheduledDate(p, start, r) < today) n++
+  return n
 }
 
 /**

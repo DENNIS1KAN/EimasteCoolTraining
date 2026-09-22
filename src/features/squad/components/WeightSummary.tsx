@@ -19,7 +19,7 @@ export interface WeightSummaryProps {
   className?: string
 }
 
-/** Weight as the viewer may see it: "80.9 kg ↓1.5 kg", only "↓1.5 kg" (change), or "Private". */
+/** Weight as the viewer may see it: "80.9 kg ↓1.5 kg", only "↓1.5 kg" (change), "Private", or "—" before the first weigh-in. */
 export function WeightSummary({ member, weight, access, unit, showValue = true, className }: WeightSummaryProps) {
   const t = useT(SQ)
   if (access === 'hidden') {
@@ -30,7 +30,15 @@ export function WeightSummary({ member, weight, access, unit, showValue = true, 
       </span>
     )
   }
-  if (!weight) return <span className={`sq-weight sq-weight--none${className ? ` ${className}` : ''}`}>{t('noWeighIn')}</span>
+  if (!weight) {
+    // A dash in the numeral style, like the other empty stats; the words are for screen readers and on hover.
+    return (
+      <span className={`sq-weight sq-weight--none num${className ? ` ${className}` : ''}`} title={t('noWeighIn')}>
+        <span aria-hidden="true">—</span>
+        <span className="visually-hidden">{t('noWeighIn')}</span>
+      </span>
+    )
+  }
   const change = weight.changeKg
   const delta = (
     <Delta

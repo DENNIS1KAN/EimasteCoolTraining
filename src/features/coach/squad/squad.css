@@ -12,6 +12,17 @@
   }
 }
 
+/* ------------------------------------------------------------------ glance header */
+
+/* The status tag drops under the title when both don't fit (Greek on a phone), instead of squeezing it. */
+.glance > .ui-card-header {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.glance > .ui-card-header > .ui-card-header__text {
+  flex: 1 1 auto;
+}
+
 /* ------------------------------------------------------------------ glance summary strip */
 
 .glance-strip {
@@ -36,6 +47,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* Narrow phones: columns follow their labels ("ΠΡΟΠΟΝΗΣΕΙΣ" is wider than a third), equal again when roomy. */
+@media (max-width: 399px) {
+  .glance-strip {
+    grid-template-columns: repeat(3, auto);
+  }
+  .glance-strip__cell {
+    padding: 0 10px;
+  }
 }
 .glance-strip__value {
   margin: 0;
@@ -114,6 +134,10 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--muted);
+}
+.glance-row__meta > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .glance-row__action {
   display: flex;
@@ -271,7 +295,9 @@
   margin-top: 1px;
   font-size: 12.5px;
   font-weight: 600;
+  line-height: 17px;
   color: var(--ink-2);
+  overflow-wrap: anywhere;
 }
 .member-row__sub {
   display: flex;

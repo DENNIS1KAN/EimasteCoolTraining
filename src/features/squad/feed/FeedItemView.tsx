@@ -1,16 +1,17 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
+import { useStore } from '../../../data/store'
 import type { Member, Unit } from '../../../data/types'
 import { useT } from '../../../i18n'
-import { fmtDuration, fmtNum, fmtVolume, fmtWeight } from '../../../lib/format'
+import { fmtNum, fmtVolume, fmtWeight } from '../../../lib/format'
 import { kgToUnit } from '../../../lib/units'
 import type { FeedItem } from '../../../lib/stats'
 import { Avatar, Delta, Icon, PRBadge } from '../../../ui'
 import { BadgeMedal, useBadgeText } from '../badges'
 import { KudosBar } from '../KudosBar'
-import { fmtTime, memberHref, memberWorkoutHref } from '../format'
+import { fmtSessionDuration, fmtTime, memberHref, memberWorkoutHref } from '../format'
 import { kudosOwner } from '../logic/feedGroups'
-import { cheerLine } from '../logic/nudges'
+import { cheerLine, isReply } from '../logic/nudges'
 import { weightAccess } from '../logic/visibility'
 import { changeDir, weightChangeTone } from '../logic/weight'
 import { SQ } from '../messages'
@@ -31,6 +32,12 @@ export interface FeedItemViewProps {
 export function FeedItemView({ item, members, me, unit, compact, timeLabel }: FeedItemViewProps) {
   const t = useT(SQ)
   const badgeText = useBadgeText()
+  // A "Cheer back" is stored as a nudge that points at the one it answers; it reads as a reply, not a nudge.
+  const reply = useStore((s) => {
+    if (item.kind !== 'nudge') return false
+    const c = s.cheers[item.cheerId]
+    return !!c && isReply(c)
+  })
   const m = members[item.memberId]
   if (!m) return null
   const name = (x: Member | undefined) => (x ? (x.id === me?.id ? t('youCap') : x.name) : '?')
@@ -59,12 +66,12 @@ export function FeedItemView({ item, members, me, unit, compact, timeLabel }: Fe
   switch (item.kind) {
     case 'workout': {
       const s = item.summary
-      const href = memberWorkoutHref(m, item.week, item.day)
+      const href = memberWorkoutHref(m, item.week, item.day, item.programId)
       const meta = [
         t('weekShort', { n: item.week }),
         t('setsN', { n: s.setsDone }),
         s.volumeKg > 0 ? fmtVolume(s.volumeKg, unit) : null,
-        s.durationMs ? fmtDuration(s.durationMs) : null,
+        s.durationMs ? fmtSessionDuration(s.durationMs) : null,
       ].filter(Boolean)
       body = (
         <>
@@ -165,11 +172,16 @@ export function FeedItemView({ item, members, me, unit, compact, timeLabel }: Fe
     case 'nudge':
     case 'message': {
       const to = members[item.toId]
+      // Spoken / hover label of the arrow: "nudged Thanos", or "nudged you" when it's addressed to the viewer.
+      const toMe = !!to && to.id === me?.id
+      const arrowTitle = toMe
+        ? t(reply ? 'cheeredYouBack' : item.kind === 'message' ? 'wroteYou' : 'nudgedYou')
+        : t(item.kind === 'message' ? 'messaged' : reply ? 'cheeredBackTo' : 'nudged', { name: name(to) })
       body = (
         <>
           <p className="sq-feed__line">
             {who}
-            <Icon name="arrow-right" size={14} className="sq-feed__arrow" title={item.kind === 'message' ? t('messaged', { name: name(to) }) : t('nudged', { name: name(to) })} />
+            <Icon name="arrow-right" size={14} className="sq-feed__arrow" title={arrowTitle} />
             {to ? (
               <Link to={memberHref(to)} className="sq-feed__who">
                 {name(to)}

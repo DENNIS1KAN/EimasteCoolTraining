@@ -10,7 +10,7 @@ import { authErrorKey, isFatalJoinError, type AuthErrorKey } from './errors'
 import { InstallGuide } from './InstallGuide'
 import { setLastProfile } from './lastProfile'
 import { AUTH } from './messages'
-import { checkPassword } from './password'
+import { checkPassword, PASSWORD_VARS } from './password'
 import { PasswordField } from './PasswordField'
 import { FormError, PasswordRules } from './PasswordRules'
 import { useLoginProfiles } from './useLoginProfiles'
@@ -215,7 +215,7 @@ function JoinFlow({ slug, code }: { slug: string; code: string }) {
             error={confirm.length > 0 && password.length > 0 && !check.matches && confirm.length >= password.length}
           />
           <PasswordRules id="join-rules" check={check} />
-          {error ? <FormError>{t(error)}</FormError> : null}
+          {error ? <FormError>{t(error, PASSWORD_VARS)}</FormError> : null}
           <Button type="submit" variant="primary" size="lg" block loading={busy} disabled={!check.ok} iconRight="arrow-right">
             {busy ? t('joining') : t('joinCta')}
           </Button>

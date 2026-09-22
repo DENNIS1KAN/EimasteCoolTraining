@@ -38,7 +38,8 @@ export function WeightTrendChart({ memberId, days = 90, height = 200 }: { member
       const pts = weightSeries(entries).filter((p) => p.date >= from)
       if (pts.length < 2) return null
       const raw = pts.map((p) => ({ x: ms(p.date), y: toDisplay(p.kg, unit) }))
-      const trend = pts.map((p) => ({ x: ms(p.date), y: Math.round(kgToUnit(p.trendKg, unit) * 100) / 100 }))
+      // Unrounded: the formatters round once (to 0.1), so the chart agrees with the stats shown elsewhere.
+      const trend = pts.map((p) => ({ x: ms(p.date), y: kgToUnit(p.trendKg, unit) }))
       const goal = member.goalWeightKg != null ? toDisplay(member.goalWeightKg, unit) : null
       const refLines: RefLine[] =
         goal != null &&
@@ -67,7 +68,7 @@ export function WeightTrendChart({ memberId, days = 90, height = 200 }: { member
         id: 'change',
         label: t('changeAxis'),
         color,
-        points: pts.map((p) => ({ x: ms(p.date), y: Math.round(kgToUnit(p.trendKg, unit) * 100) / 100 })),
+        points: pts.map((p) => ({ x: ms(p.date), y: kgToUnit(p.trendKg, unit) })),
         area: true,
       },
     ]

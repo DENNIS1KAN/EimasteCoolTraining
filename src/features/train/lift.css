@@ -2,9 +2,12 @@
 .lf-page .ui-page-header__title {
   overflow-wrap: anywhere;
 }
+/* Header avatar linking to the member's profile (also used by the member workout page). */
 .lf-avatar {
   display: inline-grid;
   border-radius: 50%;
+  color: inherit;
+  text-decoration: none;
 }
 .lf-avatar:focus-visible {
   outline: 2px solid var(--accent-strong);

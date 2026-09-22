@@ -4,7 +4,20 @@ import { ChartTable, type TableMode } from './ChartTable'
 import { useScrub, useWidth } from './hooks'
 import { Legend } from './Legend'
 import { DASH, M } from './messages'
-import { barPath, crisp, groupLayout, labelStride, linearScale, niceDomain, r2, textWidth, yTickCount, type GroupLayout, type LinearScale } from './scale'
+import {
+  barPath,
+  crisp,
+  formatResolution,
+  groupLayout,
+  labelStride,
+  linearScale,
+  niceDomain,
+  r2,
+  textWidth,
+  yTickCount,
+  type GroupLayout,
+  type LinearScale,
+} from './scale'
 import { LiveReading, readingText, Tooltip, type TipRow } from './Tooltip'
 
 export interface BarSeries {
@@ -92,7 +105,9 @@ function layoutBars(p: BarChartProps, W: number): Layout | null {
     hi = Math.max(0, ...vals)
   }
   const integer = vals.every(Number.isInteger)
-  const nd = niceDomain(lo, hi === lo ? lo + 1 : hi, yTickCount(plotH), integer)
+  // At most 4 labelled gridlines (spec), on steps the y labels can print exactly (no "3 t" on a 2.5 t grid).
+  const count = yTickCount(plotH)
+  const nd = niceDomain(lo, hi === lo ? lo + 1 : hi, count, integer, { maxIntervals: count, resolution: formatResolution(p.formatY, lo, hi) })
   const y = linearScale(nd.domain, [top + plotH, top])
   const yText = nd.ticks.map((v) => ({ v, text: p.formatY(v), y: y(v) }))
   const left = Math.max(16, ...yText.map((l) => textWidth(l.text, FONT))) + 8

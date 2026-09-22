@@ -14,7 +14,10 @@ import './squad.css'
 
 const MAX_SHOWN = 3
 
-/** Unseen nudges and messages for the viewer (newest first), with "Cheer back" and dismiss. Null when empty. */
+/**
+ * Unseen nudges and messages for the viewer (newest first), with "Cheer back" and dismiss. A cheer-back reads as
+ * "cheered you back" and can't be cheered back itself (no ping-pong). Null when empty.
+ */
 export function CheerInbox(): JSX.Element | null {
   const t = useT(SQ)
   const me = useMe()
@@ -72,7 +75,7 @@ export function CheerInbox(): JSX.Element | null {
               </Link>
               <div className="sq-inbox__body">
                 <p className="sq-inbox__meta">
-                  <b>{from.name}</b> {c.kind === 'message' ? t('wroteYou') : t('nudgedYou')}
+                  <b>{from.name}</b> {reply ? t('cheeredYouBack') : c.kind === 'message' ? t('wroteYou') : t('nudgedYou')}
                   <span className="sq-dot" aria-hidden="true">
                     ·
                   </span>

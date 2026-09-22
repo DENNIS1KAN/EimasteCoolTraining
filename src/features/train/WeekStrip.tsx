@@ -3,8 +3,11 @@ import type { Program } from '../../data/types'
 import { useT } from '../../i18n'
 import { fmtPct } from '../../lib/format'
 import { cx } from '../../ui'
+import { textLang } from './logic/format'
 import { blockGroups } from './logic/program'
 import { M } from './messages'
+import { useBlockLabel } from './programText'
+import { scrollBehavior } from './scroll'
 
 interface Props {
   program: Program
@@ -24,6 +27,7 @@ export function WeekStrip({ program, week, currentWeek, completion, onSelect }: 
   const t = useT(M)
   const scroller = useRef<HTMLDivElement>(null)
   const groups = blockGroups(program)
+  const blockLabel = useBlockLabel()
   const [overflows, setOverflows] = useState(true)
 
   useEffect(() => {
@@ -46,7 +50,7 @@ export function WeekStrip({ program, week, currentWeek, completion, onSelect }: 
     const chip = el?.querySelector<HTMLElement>(`[data-week="${week}"]`)
     if (!el || !chip) return
     const left = chip.offsetLeft - el.clientWidth / 2 + chip.offsetWidth / 2
-    el.scrollTo?.({ left: Math.max(0, left), behavior: 'smooth' })
+    el.scrollTo?.({ left: Math.max(0, left), behavior: scrollBehavior() })
   }, [week])
 
   return (
@@ -54,8 +58,8 @@ export function WeekStrip({ program, week, currentWeek, completion, onSelect }: 
       <div className={cx('tr-weeks__scroll', overflows && 'is-overflow')} ref={scroller}>
         <div className="tr-weeks__blocks" aria-hidden="true">
           {groups.map((g) => (
-            <span key={g.from} className="tr-weeks__block" style={{ width: (g.to - g.from + 1) * (CHIP + GAP) - GAP }}>
-              {g.label}
+            <span key={g.from} className="tr-weeks__block" lang={textLang(blockLabel(g.label))} style={{ width: (g.to - g.from + 1) * (CHIP + GAP) - GAP }}>
+              {blockLabel(g.label)}
             </span>
           ))}
         </div>

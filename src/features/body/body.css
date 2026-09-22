@@ -5,8 +5,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  /* room for the floating quick-log dock above the tab bar */
-  padding-bottom: 84px;
+  /* No bottom padding of its own: the dock registers with the floating-bar stack, and the shell's content column
+     keeps --float-stack of extra room at the bottom (src/app/AppShell.css), rest timer included. */
 }
 .body-layout {
   display: flex;
@@ -21,9 +21,6 @@
   min-width: 0;
 }
 @media (min-width: 1024px) {
-  .body-page {
-    padding-bottom: 0;
-  }
   .body-layout--wide {
     display: grid;
     grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
@@ -422,7 +419,8 @@ button.body-history__row:focus-visible {
   z-index: var(--z-float);
   left: calc(var(--sidebar-w) + var(--safe-left));
   right: var(--safe-right);
-  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 8px);
+  /* --dock-offset comes from the floating-bar stack (src/ui/floating.ts); the rest timer stacks above the dock. */
+  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 8px + var(--dock-offset, 0px));
   width: min(calc(100% - var(--sidebar-w) - 20px), calc(var(--content-max) - 12px));
   margin-inline: auto;
   display: flex;
@@ -489,6 +487,23 @@ button.body-history__row:focus-visible {
 .body-dock__save:active {
   transform: scale(0.96);
 }
+.body-dock__save:disabled {
+  background: var(--surface-3);
+  color: var(--faint);
+  box-shadow: none;
+  transform: none;
+  cursor: not-allowed;
+}
+.body-dock__fix .body-dock__title {
+  color: var(--accent-strong);
+}
+.body-dock__bad .body-dock__title {
+  color: var(--danger);
+}
+.body-dock__fix .body-dock__title,
+.body-dock__bad .body-dock__title {
+  white-space: nowrap;
+}
 .body-dock__done {
   width: 36px;
   height: 36px;
@@ -520,8 +535,35 @@ button.body-history__row:focus-visible {
 }
 .body-entry__stepper {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   padding: 4px 0 2px;
+}
+/* A typed weight out of range stays on screen (never clamped) and turns red until fixed. */
+.body-entry__stepper--invalid .ui-stepper__input,
+.body-dock--invalid .ui-stepper__input {
+  color: var(--danger);
+}
+.body-entry__check {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.body-entry__check:empty {
+  display: none;
+}
+.body-entry__error {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 700 13px/18px var(--font-body);
+  color: var(--danger);
+}
+.body-entry__error svg {
+  flex: none;
 }
 .body-entry__more {
   border-top: 1px solid var(--line);

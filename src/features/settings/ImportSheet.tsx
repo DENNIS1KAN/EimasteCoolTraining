@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
-import { useT } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { COMMON } from '../../i18n/common'
 import { put, update, useStore } from '../../data/store'
 import type { Member, Program } from '../../data/types'
+import { issueText } from '../../lib/import/issues'
 import type { LogbookImportResult } from '../../lib/import/logbook'
 import { fmtDate, fmtNum } from '../../lib/format'
 import { Banner, Button, celebrate, EmptyState, Icon, Sheet, StatTile, Switch, toast } from '../../ui'
@@ -28,6 +29,7 @@ const MAX_WARNINGS = 80
 export function ImportSheet({ preview, me, program, onClose, onChooseAnother }: Props) {
   const t = useT(SETTINGS)
   const c = useT(COMMON)
+  const lang = useLang()
   const existing = useStore((s) => s.logs)
   const [overwrite, setOverwrite] = useState(false)
   const [setStart, setSetStart] = useState(true)
@@ -84,13 +86,17 @@ export function ImportSheet({ preview, me, program, onClose, onChooseAnother }: 
             {summary.firstDate && summary.lastDate ? (
               <p className="set-import__span">
                 <Icon name="calendar" size={16} />
-                {t('importSpan', { from: fmtDate(summary.firstDate, 'medium'), to: fmtDate(summary.lastDate, 'medium'), week: summary.lastWeek })}
+                {summary.firstDate === summary.lastDate
+                  ? t('importSpanOne', { date: fmtDate(summary.firstDate, 'medium'), week: summary.lastWeek })
+                  : t('importSpan', { from: fmtDate(summary.firstDate, 'medium'), to: fmtDate(summary.lastDate, 'medium'), week: summary.lastWeek })}
               </p>
             ) : null}
             {summary.existing > 0 ? (
               <div className="set-import__opt">
                 <Banner tone={overwrite ? 'warn' : 'info'} icon={overwrite ? 'alert' : 'info'}>
-                  {overwrite ? t('importExistingOverwrite', { n: summary.existing }) : t('importExisting', { n: summary.existing })}
+                  {summary.existing === 1
+                    ? t(overwrite ? 'importExistingOverwriteOne' : 'importExistingOne')
+                    : t(overwrite ? 'importExistingOverwrite' : 'importExisting', { n: summary.existing })}
                 </Banner>
                 <Switch checked={overwrite} onChange={setOverwrite} label={t('overwrite')} description={t('overwriteBody')} />
               </div>
@@ -114,7 +120,7 @@ export function ImportSheet({ preview, me, program, onClose, onChooseAnother }: 
             </summary>
             <ul>
               {warnings.slice(0, MAX_WARNINGS).map((w, i) => (
-                <li key={i}>{w}</li>
+                <li key={i}>{issueText(w, lang)}</li>
               ))}
               {warnings.length > MAX_WARNINGS ? <li className="muted">+{warnings.length - MAX_WARNINGS}</li> : null}
             </ul>

@@ -1,7 +1,8 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { NumberField, Stepper, canonicalDecimal, decimalsOf, matchesAccept, parseDecimal, sanitizeDecimalDraft } from './fields'
+import { setLang } from '../i18n'
+import { NumberField, Stepper, canonicalDecimal, decimalsOf, displayDecimal, matchesAccept, parseDecimal, sanitizeDecimalDraft } from './fields'
 
 afterEach(cleanup)
 
@@ -44,6 +45,13 @@ describe('decimal helpers', () => {
     expect(canonicalDecimal(',')).toBe('')
     expect(canonicalDecimal('-')).toBe('')
     expect(canonicalDecimal(',5')).toBe('0.5')
+  })
+
+  it('displayDecimal uses the Greek comma on screen', () => {
+    expect(displayDecimal('67.5', 'el')).toBe('67,5')
+    expect(displayDecimal('67.5', 'en')).toBe('67.5')
+    expect(displayDecimal(3.5, 'el')).toBe('3,5')
+    expect(displayDecimal(null, 'el')).toBe('')
   })
 
   it('decimalsOf reads the step precision', () => {
@@ -103,14 +111,39 @@ describe('NumberField', () => {
     expect(onValue).not.toHaveBeenCalled()
   })
 
-  it('clamps to min/max on blur', () => {
+  it('never clamps and commits an out-of-range entry on blur: it stays as typed and says what is allowed', () => {
     const onValue = vi.fn()
-    render(<ControlledNumber onValue={onValue} min={0} max={300} />)
+    render(<ControlledNumber onValue={onValue} min={100} max={250} decimals={0} initial="176" />)
     const input = screen.getByLabelText('Weight') as HTMLInputElement
-    fireEvent.change(input, { target: { value: '350,5' } })
+    fireEvent.change(input, { target: { value: '1' } })
     fireEvent.blur(input)
-    expect(onValue).toHaveBeenLastCalledWith('300')
-    expect(input.value).toBe('300')
+    expect(onValue).toHaveBeenLastCalledWith('1')
+    expect(onValue).not.toHaveBeenCalledWith('100')
+    expect(input.value).toBe('1')
+    expect(input.getAttribute('aria-invalid')).toBe('true')
+    expect(screen.getByText(/100/)).toBeTruthy()
+    // Typing again hides the error until the next blur; a valid value commits normally.
+    fireEvent.change(input, { target: { value: '181' } })
+    expect(input.getAttribute('aria-invalid')).toBeNull()
+    fireEvent.blur(input)
+    expect(onValue).toHaveBeenLastCalledWith('181')
+    expect(input.getAttribute('aria-invalid')).toBeNull()
+  })
+
+  it('shows a prefilled decimal with the Greek comma and still reports a dot', () => {
+    setLang('el')
+    try {
+      const onValue = vi.fn()
+      render(<ControlledNumber onValue={onValue} initial="3.5" />)
+      const input = screen.getByLabelText('Weight') as HTMLInputElement
+      expect(input.value).toBe('3,5')
+      fireEvent.change(input, { target: { value: '3,8' } })
+      expect(onValue).toHaveBeenLastCalledWith('3.8')
+      fireEvent.blur(input)
+      expect(input.value).toBe('3,8')
+    } finally {
+      setLang('en')
+    }
   })
 
   it('uses a numeric keyboard and refuses a separator when decimals is 0', () => {

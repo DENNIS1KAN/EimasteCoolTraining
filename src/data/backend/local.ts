@@ -3,10 +3,10 @@ import type { ChangeEvent, FileRef, LoginProfile, Member, MemberColor, Snapshot,
 import { TABLES } from '../types'
 import { todayISO } from '../../lib/dates'
 import { uuid } from '../../lib/ids'
-import { DEFAULT_PROGRAM_ID } from '../programs'
 import type { Backend } from './types'
 import { BackendError } from './types'
 import { idbDelete, idbGet, idbPut } from './idb'
+import { defaultMemberProfile } from './supabase-map'
 
 const DB_KEY = 'ect-demo-db-v1'
 const ME_KEY = 'ect-demo-me'
@@ -61,7 +61,10 @@ export class LocalBackend implements Backend {
     }
   }
 
-  /** Wipe demo data and start again (from Settings). */
+  /**
+   * Wipe demo data and start again (from Settings). Without demo data the squad looks like a fresh setup:
+   * the same people, with the profile a new member gets (no goals, start date, notes or remembered machines).
+   */
   reset(withDemoData = true): void {
     try {
       localStorage.removeItem(DB_KEY)
@@ -71,10 +74,10 @@ export class LocalBackend implements Backend {
     this.db = this.seed()
     if (!withDemoData) {
       for (const t of TABLES) if (t !== 'members') (this.db as unknown as Record<string, object>)[t] = {}
+      const now = Date.now()
       for (const m of Object.values(this.db.members)) {
-        m.programStart = null
-        m.coachNote = ''
-        m.coachNoteAt = null
+        const { name: _name, color: _color, competes: _competes, ...fresh } = defaultMemberProfile(m.role, m.slug)
+        Object.assign(m, fresh, { updatedAt: now })
       }
       this.write()
     }
@@ -192,20 +195,12 @@ export class LocalBackend implements Backend {
     if (Object.values(this.db.members).some((m) => m.slug === input.slug)) throw new BackendError('conflict', 'That handle is taken')
     const id = uuid()
     const m: Member = {
+      ...defaultMemberProfile(input.role, input.slug),
       id,
       slug: input.slug,
       name: input.name,
       role: input.role,
       color: input.color as MemberColor,
-      competes: input.role === 'athlete',
-      goal: '',
-      goalWeightKg: null,
-      heightCm: null,
-      programId: DEFAULT_PROGRAM_ID,
-      programStart: null,
-      coachNote: '',
-      coachNoteAt: null,
-      settings: { unit: 'kg', machines: {}, weightVisibility: 'change' },
       // Shows as "invite pending" in the coach console, like a real new member (demo sign-in still works).
       joined: false,
       updatedAt: Date.now(),

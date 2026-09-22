@@ -64,6 +64,18 @@ export function lastWeeks(today: ISODate, weeks = 6): ISODate[] {
   return Array.from({ length: weeks }, (_, i) => addDays(cur, (i - weeks + 1) * 7))
 }
 
+/**
+ * The weeks the volume chart shows: the last `weeks` calendar weeks, but not before the week of `from` (the race
+ * start), so a young program doesn't open with a row of empty weeks.
+ */
+export function volumeWeeks(today: ISODate, from: ISODate | null, weeks = 6): ISODate[] {
+  const all = lastWeeks(today, weeks)
+  if (!from) return all
+  const first = startOfWeek(from)
+  const kept = all.filter((w) => w >= first)
+  return kept.length ? kept : all.slice(-1)
+}
+
 /** Training volume (kg) of finished workouts per calendar week, aligned with `weekStarts`. */
 export function weeklyVolume(logs: WorkoutLog[], programs: ProgramMap, weekStarts: ISODate[]): number[] {
   const idx = new Map(weekStarts.map((w, i) => [w, i]))
@@ -122,13 +134,16 @@ export function liftDuelPoints(logs: WorkoutLog[], programs: ProgramMap, exercis
 
 /* ------------------------------------------------------------------ weight change */
 
-/** Trend weight change since the program start (or the first weigh-in) as a ratio, one point per weigh-in. */
+/**
+ * Trend weight change since the program start (or the first weigh-in) as a ratio, one point per weigh-in.
+ * The trend restarts at the start weigh-in (earlier weigh-ins are left out), so every line begins at exactly 0,
+ * the same numbers as Body's squad race (body/logic changeSeries).
+ */
 export function weightChangeSeries(entries: WeightEntry[], since: ISODate | null): XY[] {
   const stats = weightStats(entries, since)
   if (!stats) return []
-  return weightSeries(entries)
-    .filter((p) => p.date >= stats.startDate)
-    .map((p) => ({ x: dayMs(p.date), y: (p.trendKg - stats.startKg) / stats.startKg }))
+  const base = stats.startKg
+  return weightSeries(entries.filter((e) => e.date >= stats.startDate)).map((p) => ({ x: dayMs(p.date), y: (p.trendKg - base) / base }))
 }
 
 /* ------------------------------------------------------------------ summary line */

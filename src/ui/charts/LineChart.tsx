@@ -10,7 +10,9 @@ import {
   clamp,
   crisp,
   curvePath,
+  formatResolution,
   linearScale,
+  MAX_AXIS_TICKS,
   medianGap,
   nearestIndex,
   niceDomain,
@@ -49,7 +51,10 @@ export interface LineSeries {
   dots?: 'none' | 'end' | 'all'
   /** false draws the points only, as light hollow rings (e.g. raw weigh-ins under a trend line). */
   line?: boolean
-  /** 'step' holds each value until the next point (cumulative counts, running bests). */
+  /**
+   * Default 'monotone' (smooth, never overshoots a reading). 'step' holds each value until the next point
+   * (cumulative counts, running bests); 'linear' draws straight segments.
+   */
   curve?: Curve
 }
 
@@ -164,7 +169,7 @@ function layoutLine(p: LineChartProps, W: number): Layout | null {
   const H = p.height ?? 220
   const series: Prepared[] = p.series.map((s) => {
     const points = sortPts(s.points)
-    return { ...s, points, curve: s.curve ?? 'linear', tol: medianGap(points.map((q) => q.x)) / 2 }
+    return { ...s, points, curve: s.curve ?? 'monotone', tol: medianGap(points.map((q) => q.x)) / 2 }
   })
   const xs = unionX(series)
   if (!xs.length) return null
@@ -183,18 +188,20 @@ function layoutLine(p: LineChartProps, W: number): Layout | null {
   const ys = series.flatMap((s) => s.points.map((q) => q.y))
   const refYs = (p.refLines ?? []).map((r) => r.y).filter(Number.isFinite)
   const integer = [...ys, ...refYs].every(Number.isInteger)
+  // At most 4 labelled gridlines (spec), on steps the y labels can print exactly (no "+0.3" on a 0.25 grid).
   const count = yTickCount(plotH)
+  const tickOpts = { maxIntervals: count, resolution: formatResolution(p.formatY, Math.min(...ys, ...refYs), Math.max(...ys, ...refYs)) }
   let yDom: Domain
   let yTicks: number[]
   if (p.yDomain) {
     yDom = p.yDomain
-    yTicks = niceTicks(yDom[0], yDom[1], count, integer)
+    yTicks = niceTicks(yDom[0], yDom[1], count, integer, tickOpts)
   } else {
     // Goal lines get a little air so they never sit on the plot edge, where they'd read as the axis.
     const span = Math.max(...ys, ...refYs) - Math.min(...ys, ...refYs) || 1
     const refRoom = refYs.flatMap((v) => [v - span * 0.06, v + span * 0.06])
     const ext = paddedExtent([...ys, ...refRoom], p.yPadding ?? 0, !!p.zeroBaseline) ?? [0, 1]
-    const nd = niceDomain(ext[0], ext[1], count, integer)
+    const nd = niceDomain(ext[0], ext[1], count, integer, tickOpts)
     yDom = nd.domain
     yTicks = nd.ticks
   }
@@ -209,10 +216,14 @@ function layoutLine(p: LineChartProps, W: number): Layout | null {
 
   const labelW = (t: number) => textWidth(p.formatX(t), FONT)
   let ticks: number[]
-  if (time) ticks = timeTicks([x0, x1], plotW, labelW)
+  if (time) ticks = timeTicks([x0, x1], plotW, labelW, 12, MAX_AXIS_TICKS)
   else {
     const maxW = Math.max(labelW(x0), labelW(x1))
-    ticks = niceTicks(x0, x1, Math.max(2, Math.floor(plotW / (maxW + 24))), xs.every(Number.isInteger))
+    const n = clamp(Math.floor(plotW / (maxW + 24)), 2, MAX_AXIS_TICKS - 1)
+    ticks = niceTicks(x0, x1, n, xs.every(Number.isInteger), {
+      maxIntervals: MAX_AXIS_TICKS - 1,
+      resolution: formatResolution(p.formatX, x0, x1),
+    })
   }
   const xLabels = placeLabels(
     ticks.map((t) => ({ x: x(t), w: labelW(t), text: p.formatX(t) })),

@@ -12,6 +12,7 @@ import {
   raceSeries,
   raceStart,
   summaryClauses,
+  volumeWeeks,
   weeklyVolume,
   weightChangeSeries,
 } from './compare'
@@ -90,12 +91,30 @@ describe('lift duel', () => {
   })
 })
 
+describe('volume weeks', () => {
+  it('shows the last 6 weeks, but none before the week the race started', () => {
+    expect(volumeWeeks('2026-03-25', null)).toEqual(lastWeeks('2026-03-25', 6))
+    expect(volumeWeeks('2026-04-08', '2026-03-25')).toEqual(['2026-03-23', '2026-03-30', '2026-04-06'])
+    expect(volumeWeeks('2026-06-10', '2026-03-25')).toEqual(lastWeeks('2026-06-10', 6))
+    expect(volumeWeeks('2026-03-25', '2026-03-25')).toEqual(['2026-03-23'])
+  })
+})
+
 describe('weight change series', () => {
   it('is relative to the starting weigh-in', () => {
     const pts = weightChangeSeries([mkWeight(S, '2026-03-23', 80), mkWeight(S, '2026-03-30', 78)], '2026-03-23')
     expect(pts[0].y).toBe(0)
     expect(pts[1].y).toBeLessThan(0)
     expect(weightChangeSeries([], null)).toEqual([])
+  })
+  it('starts at exactly 0 even with weigh-ins before the program start', () => {
+    const pre = [mkWeight(S, '2026-03-16', 84), mkWeight(S, '2026-03-19', 83)]
+    const pts = weightChangeSeries([...pre, mkWeight(S, '2026-03-23', 80), mkWeight(S, '2026-03-26', 79.5)], '2026-03-23')
+    expect(pts.map((p) => p.x)).toEqual([ms('2026-03-23'), ms('2026-03-26')])
+    expect(pts[0].y).toBe(0)
+    // The trend restarts at 80 kg (not dragged up by the heavier pre-start weigh-ins).
+    expect(pts[1].y).toBeLessThan(0)
+    expect(pts[1].y).toBeGreaterThan(-0.5 / 80)
   })
 })
 

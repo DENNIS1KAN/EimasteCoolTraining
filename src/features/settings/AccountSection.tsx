@@ -6,7 +6,7 @@ import type { Member } from '../../data/types'
 import { Button, ConfirmSheet, Icon, Sheet, toast } from '../../ui'
 import { authErrorKey, type AuthErrorKey } from '../auth/errors'
 import { AUTH } from '../auth/messages'
-import { checkPassword } from '../auth/password'
+import { checkPassword, PASSWORD_VARS } from '../auth/password'
 import { PasswordField } from '../auth/PasswordField'
 import { FormError, PasswordRules } from '../auth/PasswordRules'
 import { SETTINGS } from './messages'
@@ -104,7 +104,7 @@ function PasswordSheet({ open, onClose, slug }: { open: boolean; onClose: () => 
           describedBy="set-pw-rules"
         />
         <PasswordRules id="set-pw-rules" check={check} />
-        {error ? <FormError>{a(error)}</FormError> : null}
+        {error ? <FormError>{a(error, PASSWORD_VARS)}</FormError> : null}
         <button type="submit" hidden tabIndex={-1} />
       </form>
     </Sheet>
@@ -160,7 +160,8 @@ export function AccountSection({ me }: { me: Member }) {
         }
         confirmLabel={c('signOut')}
         danger
-        onConfirm={() => signOut()}
+        // Back to the start screen, so whoever signs in next lands on Home, not on these settings.
+        onConfirm={() => signOut().finally(() => void (window.location.hash = '#/login'))}
       />
     </Section>
   )

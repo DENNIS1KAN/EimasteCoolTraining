@@ -1,6 +1,6 @@
 import type { CheckinRating, MealPlan, NutritionCheckin } from '../../../data/types'
 import { addDays, dateRange, startOfWeek, type ISODate } from '../../../lib/dates'
-import { adherence, checkinPlan, checkinScore, type Adherence } from '../../../lib/stats'
+import { checkinPlan, checkinScore } from '../../../lib/stats'
 
 /** One calendar day of the nutrition heatmap. */
 export interface FuelDay {
@@ -59,26 +59,12 @@ export function fuelDays(
   })
 }
 
-/** A day is closed once it has a rating or every planned meal is ticked. */
-export function dayClosed(c: NutritionCheckin | undefined, plan: MealPlan | null): boolean {
-  if (!c) return false
-  if (c.rating) return true
-  return !!plan && plan.meals.length > 0 && plan.meals.every((m) => c.meals.includes(m.id))
-}
-
 /**
- * Adherence over the last `days` days. Today only counts once it is closed, so a morning with two meals
- * ticked does not drag the number down. A plan that starts today reports today alone.
+ * dayClosed and recentAdherence live in lib/stats, so the Fuel page, the coach's Nutrition tab, the squad glance and
+ * compare all show the same number. Pass the plans map to recentAdherence: days logged under an earlier plan are
+ * scored against that plan and keep counting after the coach issues a new one.
  */
-export function recentAdherence(checkins: NutritionCheckin[], plan: MealPlan | null, today: ISODate, days: number): Adherence | null {
-  if (!plan) return null
-  const mine = checkins.filter((c) => c.memberId === plan.memberId)
-  const todayRow = mine.find((c) => c.date === today)
-  const end = dayClosed(todayRow, plan) ? today : addDays(today, -1)
-  const a = adherence(mine, plan, addDays(end, -(days - 1)), end)
-  if (a && a.days > 0) return a
-  return adherence(mine, plan, today, today)
-}
+export { dayClosed, recentAdherence } from '../../../lib/stats'
 
 /** The member's most recent check-in date, or null. */
 export function lastCheckinDate(checkins: NutritionCheckin[], memberId: string): ISODate | null {

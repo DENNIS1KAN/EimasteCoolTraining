@@ -32,12 +32,38 @@ function useMarkSeen(meId: string | null) {
   }, [unseen])
 }
 
+/**
+ * Whether a horizontal scroller has more content past its right edge (for the fade cue). A callback ref, since
+ * the row mounts only once the feed has items; re-checked on scroll and when the row or a chip resizes.
+ */
+function useMoreToRight(): [(el: HTMLElement | null) => void, boolean] {
+  const [el, setEl] = useState<HTMLElement | null>(null)
+  const [more, setMore] = useState(false)
+  useEffect(() => {
+    if (!el) return
+    const check = () => setMore(el.scrollWidth - el.clientWidth - el.scrollLeft > 1)
+    check()
+    el.addEventListener('scroll', check, { passive: true })
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(check)
+    if (ro) {
+      ro.observe(el)
+      for (const c of Array.from(el.children)) ro.observe(c)
+    }
+    return () => {
+      el.removeEventListener('scroll', check)
+      ro?.disconnect()
+    }
+  }, [el])
+  return [setEl, more]
+}
+
 export function FeedTab() {
   const t = useT(SQ)
   const me = useMe()
   const data = useSquadDataWithCheers()
   const [filter, setFilter] = useState<FeedFilter>('all')
   const [limit, setLimit] = useState(PAGE)
+  const [filtersRef, moreFilters] = useMoreToRight()
   useMarkSeen(me?.id ?? null)
 
   const all = useMemo(() => buildFeed(data), [data])
@@ -64,7 +90,7 @@ export function FeedTab() {
 
   return (
     <div className="stack sq-feed">
-      <div className="sq-filters" role="group" aria-label={t('feedFilter')}>
+      <div ref={filtersRef} className={`sq-filters${moreFilters ? ' has-more' : ''}`} role="group" aria-label={t('feedFilter')}>
         {FILTERS.map((f) => (
           <Chip
             key={f.value}
@@ -81,7 +107,7 @@ export function FeedTab() {
       {days.length === 0 ? <EmptyState compact icon="filter" title={t('feedFilterEmpty')} /> : null}
       {days.map((d) => (
         <section key={d.date} className="sq-feed__day" aria-label={fmtDayLabel(d.date)}>
-          <h3 className="eyebrow sq-feed__date">{fmtDayLabel(d.date)}</h3>
+          <h2 className="eyebrow sq-feed__date">{fmtDayLabel(d.date)}</h2>
           <Card padding="none" className="sq-feed__card">
             {d.items.map((it) => (
               <FeedItemView key={it.id} item={it} members={data.members} me={me} unit={unit} />

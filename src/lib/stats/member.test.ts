@@ -174,6 +174,28 @@ describe('points', () => {
   })
 })
 
+describe('points and weight privacy', () => {
+  it('weigh-ins earn points only while the weight is shared with the squad', () => {
+    const d = fixture()
+    const vis = (v: 'exact' | 'change' | 'private') => {
+      d.members[S] = { ...d.members[S], settings: { ...d.members[S].settings, weightVisibility: v } }
+      return points(d, S)
+    }
+    expect(vis('exact').weighIns).toBe(5 * POINTS.weighIn)
+    expect(vis('change').weighIns).toBe(5 * POINTS.weighIn)
+    const priv = vis('private')
+    expect(priv.weighIns).toBe(0)
+    expect(priv.total).toBe(points(fixture(), S).total - 5 * POINTS.weighIn)
+  })
+
+  it("gives every phone the same standings: a private member's points don't depend on the weigh-in rows", () => {
+    const d = fixture()
+    d.members[S] = { ...d.members[S], settings: { ...d.members[S].settings, weightVisibility: 'private' } }
+    const hidden = { ...d, weights: {} } // what a squad mate's phone receives
+    expect(points(hidden, S)).toEqual(points(d, S))
+  })
+})
+
 describe('memberStats', () => {
   it('summarises an athlete mid-program', () => {
     const s = memberStats(fixture(), S, TODAY)
@@ -190,6 +212,7 @@ describe('memberStats', () => {
       lastWorkoutAt: at('2026-03-30', 7, 30),
       nextWorkout: { week: 2, day: 1 },
       adherence14: 0.75,
+      adherence14Days: 2,
     })
     expect(s.program?.id).toBe(MINI.id)
     expect(s.schedule).toMatchObject({ dueBeforeToday: 4, done: 4, behindBy: 0, today: null, consistency: 1 })
@@ -213,6 +236,8 @@ describe('memberStats', () => {
       weight: null,
       goalProgress: null,
       adherence14: null,
+      adherence14Days: 0,
+      mealPlan: null,
       strengthGainPct: null,
       lastWorkoutAt: null,
     })
@@ -228,6 +253,34 @@ describe('memberStats', () => {
     const s = memberStats(d, T, TODAY)
     expect(s.programWeek).toBe(0)
     expect(s.schedule).toMatchObject({ started: false, dueBeforeToday: 0, consistency: null })
+  })
+
+  it('14-day adherence leaves an open today out (same rule as the Fuel page)', () => {
+    const d = fixture()
+    d.checkins[`${S}__${TODAY}`] = { ...d.checkins[`${S}__${TODAY}`], rating: null, meals: ['b'] }
+    const s = memberStats(d, S, TODAY)
+    expect(s.adherence14).toBe(1) // only 03-30 (all meals) counts
+    expect(s.adherence14Days).toBe(1)
+  })
+
+  it('a plan starting today has no adherence yet instead of 0%', () => {
+    const d = fixture()
+    d.mealPlans['plan-s'] = { ...d.mealPlans['plan-s'], startDate: TODAY }
+    delete d.checkins[`${S}__${TODAY}`]
+    const s = memberStats(d, S, TODAY)
+    expect(s.adherence14).toBeNull()
+    expect(s.adherence14Days).toBe(0)
+    expect(s.mealPlan?.id).toBe('plan-s') // "no number yet", not "no plan"
+  })
+
+  it('issuing a new plan keeps the 14-day adherence', () => {
+    const d = fixture()
+    const before = memberStats(d, S, TODAY)
+    d.mealPlans['plan-s'] = { ...d.mealPlans['plan-s'], active: false }
+    d.mealPlans['plan-2'] = mkPlan({ id: 'plan-2', memberId: S, startDate: TODAY, active: true, meals: meals('x', 'y') })
+    const after = memberStats(d, S, TODAY)
+    expect(after.adherence14).toBe(before.adherence14)
+    expect(after.adherence14Days).toBe(2)
   })
 
   it('nutrition adherence is null before the meal plan starts', () => {

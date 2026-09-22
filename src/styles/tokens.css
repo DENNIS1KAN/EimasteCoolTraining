@@ -15,6 +15,9 @@
   --seg-on: #ffffff; /* selected segment */
   --card-border: rgba(16, 24, 40, 0.045);
   --tabbar: rgba(255, 255, 255, 0.93); /* tab bar / sidebar, with backdrop blur */
+  --tabbar-solid: #ffffff; /* opaque twin of --tabbar: the notch ring around the raised Train button */
+  /* Installed iPhone app: band behind the (always white) status-bar clock, so it stays readable in light mode. */
+  --statusbar: #0b1020;
   --scrim: rgba(11, 16, 32, 0.42); /* sheet backdrop */
   --knob: #ffffff; /* switch knob (off) */
 
@@ -25,8 +28,8 @@
   /* ---------------------------------------------------------------- ink */
   --ink: #0b1020; /* primary text, numerals */
   --ink-2: #4a5467; /* secondary text */
-  --muted: #737d91; /* labels, eyebrows, axis (>= 3.9:1 on surface) */
-  --faint: #8a93a3; /* placeholders, last time's numbers (~3:1) */
+  --muted: #626b7f; /* labels, eyebrows, axis: >= 4.5:1 on surface, surface-2 and bg (WCAG AA small text) */
+  --faint: #7a8394; /* placeholders, last time's numbers: >= 3:1 on surface-2 (large numerals) */
 
   /* ---------------------------------------------------------------- accent: volt (one accent only) */
   --accent: #d4ff3f; /* fills only: primary button, current week, active tab pill, done checks, PR badge */
@@ -144,14 +147,16 @@
     --seg-on: #262d3d;
     --card-border: rgba(140, 160, 205, 0.075);
     --tabbar: rgba(9, 12, 19, 0.93);
+    --tabbar-solid: #090c13;
+    --statusbar: rgba(7, 9, 15, 0.9);
     --scrim: rgba(2, 3, 8, 0.66);
     --knob: #c3cad6;
     --line: #1a1f2b;
     --line-strong: #283042;
     --ink: #f3f6fb;
     --ink-2: #a2acbe;
-    --muted: #6c768a;
-    --faint: #5e6779;
+    --muted: #7f899d;
+    --faint: #646d80;
     --accent: #d4ff3f;
     --on-accent: #0a0e02;
     --accent-strong: #d4ff3f;
@@ -193,14 +198,16 @@
   --seg-on: #262d3d;
   --card-border: rgba(140, 160, 205, 0.075);
   --tabbar: rgba(9, 12, 19, 0.93);
+  --tabbar-solid: #090c13;
+  --statusbar: rgba(7, 9, 15, 0.9);
   --scrim: rgba(2, 3, 8, 0.66);
   --knob: #c3cad6;
   --line: #1a1f2b;
   --line-strong: #283042;
   --ink: #f3f6fb;
   --ink-2: #a2acbe;
-  --muted: #6c768a;
-  --faint: #5e6779;
+  --muted: #7f899d;
+  --faint: #646d80;
   --accent: #d4ff3f;
   --on-accent: #0a0e02;
   --accent-strong: #d4ff3f;
@@ -247,8 +254,8 @@
   --line-strong: rgba(160, 180, 220, 0.18);
   --ink: #f3f6fb;
   --ink-2: #a7b0c2;
-  --muted: #727c90;
-  --faint: #5e6779;
+  --muted: #7f899d;
+  --faint: #646d80;
   --on-accent: #0a0e02;
   --accent-strong: #d4ff3f;
   --accent-ink: #d4ff3f;

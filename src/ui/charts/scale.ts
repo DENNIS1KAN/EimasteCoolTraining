@@ -5,7 +5,8 @@
 import { addDays, diffDays, fromISODate, isoFromMs, startOfWeek, toISODate, type ISODate } from '../../lib/dates'
 
 export type Domain = [number, number]
-export type Curve = 'linear' | 'step'
+/** linear: straight segments; monotone: monotone-cubic smoothing (no overshoot, the default for lines); step: step-after. */
+export type Curve = 'linear' | 'monotone' | 'step'
 export interface Pt {
   x: number
   y: number
@@ -57,28 +58,79 @@ const roundTo = (v: number, decimals: number): number => {
 }
 
 /**
- * A "nice" step (1, 2, 2.5 or 5 x 10^n) that splits `span` into about `count` intervals, rounding the raw step
- * to the geometrically nearest candidate. `integer` forbids fractional steps (counts: workouts, reps, PRs).
+ * The finest power of ten a label formatter still tells apart around [lo, hi]: 0.1 for fmtNum(n, 1), 1 for
+ * fmtNum(n, 0), 1000 for `${fmtNum(n / 1000, 0)} t`. Tick steps must be whole multiples of it, or the labels
+ * misstate their gridlines (a 2.5 step printed with no decimals reads "0, 3, 5, 8").
  */
-export function niceStep(span: number, count: number, integer = false): number {
-  if (!(span > 0) || !Number.isFinite(span)) return 1
-  const raw = span / Math.max(1, count)
-  const mag = 10 ** Math.floor(Math.log10(raw))
-  const norm = raw / mag
-  const steps = integer && mag < 10 ? [1, 2, 5, 10] : [1, 2, 2.5, 5, 10]
-  let m = steps[0]
-  for (let i = 1; i < steps.length; i++) if (norm >= Math.sqrt(steps[i - 1] * steps[i])) m = steps[i]
-  const step = Number((m * mag).toPrecision(6))
-  return integer ? Math.max(1, Math.round(step)) : step
+export function formatResolution(fmt: (n: number) => string, lo: number, hi: number): number {
+  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return 0
+  const mid = (lo + hi) / 2
+  const top = Math.ceil(Math.log10(Math.max(Math.abs(lo), Math.abs(hi), 1e-6))) + 1
+  let res = 0
+  for (let k = top; k >= -6; k--) {
+    const r = 10 ** k
+    // A multiple of 10r, so base and base + r both sit exactly on the formatter's grid when it resolves r.
+    const base = Number((Math.round(mid / (10 * r)) * 10 * r).toPrecision(12))
+    const next = Number((base + r).toPrecision(12))
+    if (fmt(base) === fmt(next)) break
+    res = r
+  }
+  return res
 }
 
-/** The next larger nice step (2 -> 2.5 -> 5 -> 10 -> 20 ...). */
-function nextStep(step: number, integer: boolean): number {
-  const mag = 10 ** Math.floor(Math.log10(step) + 1e-9)
-  const norm = Number((step / mag).toPrecision(6))
-  const steps = integer && mag < 10 ? [1, 2, 5, 10] : [1, 2, 2.5, 5, 10]
-  const m = steps.find((s) => s > norm + 1e-9) ?? 10
-  return Number((m * mag).toPrecision(6))
+/** Is `step` a whole multiple of the label resolution `res` (0 = no constraint)? */
+const fitsResolution = (step: number, res: number): boolean => {
+  if (!(res > 0)) return true
+  const q = step / res
+  return q >= 1 - 1e-9 && Math.abs(q - Math.round(q)) < 1e-6
+}
+
+/**
+ * A "nice" step (1, 2, 2.5 or 5 x 10^n) that splits `span` into about `count` intervals, rounding the raw step
+ * to the geometrically nearest candidate. `integer` forbids fractional steps (counts: workouts, reps, PRs);
+ * `res` (see formatResolution) forbids steps the labels can't print exactly.
+ */
+export function niceStep(span: number, count: number, integer = false, res = 0): number {
+  const minRes = Math.max(integer ? 1 : 0, res)
+  if (!(span > 0) || !Number.isFinite(span)) return minRes || 1
+  const raw = span / Math.max(1, count)
+  const k0 = Math.floor(Math.log10(raw))
+  // The printable candidate geometrically nearest to the raw step (ties go to the larger step).
+  let best = 0
+  let bestDist = Infinity
+  for (let k = k0 - 1; k <= k0 + 1; k++) {
+    for (const m of [1, 2, 2.5, 5]) {
+      const c = Number((m * 10 ** k).toPrecision(6))
+      if (!fitsResolution(c, minRes)) continue
+      const dist = Math.abs(Math.log(c / raw))
+      if (dist < bestDist - 1e-9 || (Math.abs(dist - bestDist) <= 1e-9 && c > best)) {
+        best = c
+        bestDist = dist
+      }
+    }
+  }
+  return best > 0 ? best : minRes > 0 ? minRes : 1
+}
+
+/** The next larger nice step (2 -> 2.5 -> 5 -> 10 -> 20 ...) that the labels can print exactly. */
+function nextStep(step: number, integer: boolean, res = 0): number {
+  const minRes = Math.max(integer ? 1 : 0, res)
+  let s = step
+  for (let guard = 0; guard < 40; guard++) {
+    const mag = 10 ** Math.floor(Math.log10(s) + 1e-9)
+    const norm = Number((s / mag).toPrecision(6))
+    const m = [1, 2, 2.5, 5, 10].find((c) => c > norm + 1e-9) ?? 10
+    s = Number((m * mag).toPrecision(6))
+    if (fitsResolution(s, minRes)) return s
+  }
+  return s
+}
+
+export interface TickOptions {
+  /** Hard cap on the number of intervals (ticks - 1). Default: count + 1 (at least 2). */
+  maxIntervals?: number
+  /** Label resolution (formatResolution): steps are whole multiples of it. */
+  resolution?: number
 }
 
 /** Tick values that are multiples of `step` inside [min, max] (inclusive, float-safe). */
@@ -94,13 +146,20 @@ export function ticksForStep(min: number, max: number, step: number): number[] {
 }
 
 /** About `count` nice ticks inside [min, max]. */
-export function niceTicks(min: number, max: number, count: number, integer = false): number[] {
+export function niceTicks(min: number, max: number, count: number, integer = false, opts: TickOptions = {}): number[] {
   if (min === max) return [min]
   const lo = Math.min(min, max)
   const hi = Math.max(min, max)
-  let step = niceStep(hi - lo, count, integer)
-  while ((hi - lo) / step > Math.max(2, count + 1) + 1e-9) step = nextStep(step, integer)
-  return ticksForStep(lo, hi, step)
+  const res = opts.resolution ?? 0
+  const maxIv = Math.max(1, opts.maxIntervals ?? Math.max(2, count + 1))
+  let step = niceStep(hi - lo, count, integer, res)
+  while ((hi - lo) / step > Math.max(2, count + 1) + 1e-9) step = nextStep(step, integer, res)
+  let ticks = ticksForStep(lo, hi, step)
+  for (let guard = 0; guard < 40 && ticks.length > maxIv + 1; guard++) {
+    step = nextStep(step, integer, res)
+    ticks = ticksForStep(lo, hi, step)
+  }
+  return ticks
 }
 
 export interface NiceDomain {
@@ -109,34 +168,70 @@ export interface NiceDomain {
   ticks: number[]
 }
 
-/** Extend [min, max] outward to tick boundaries so the top and bottom gridlines carry labels. */
-export function niceDomain(min: number, max: number, count: number, integer = false): NiceDomain {
+/** Snapping to tick boundaries is dropped when the data would fill less than this share of the plot. */
+const MIN_COVERAGE = 0.7
+
+/**
+ * Extend [min, max] outward to tick boundaries so the top and bottom gridlines carry labels.
+ * opts.maxIntervals caps the gridlines (default count + 1); opts.resolution keeps steps printable.
+ * When a hard cap forces a step so coarse that the data would sit in a thin band (e.g. 78.5–86.5 kg on a
+ * 75–90 axis), the domain stays close to the data instead (4% air) and the ticks fall inside it, like the
+ * Night Session weight chart (79 / 81 / 83 inside the plot).
+ */
+export function niceDomain(min: number, max: number, count: number, integer = false, opts: TickOptions = {}): NiceDomain {
   let lo = Math.min(min, max)
   let hi = Math.max(min, max)
+  const res = opts.resolution ?? 0
+  const maxIv = Math.max(1, opts.maxIntervals ?? Math.max(2, count + 1))
   if (lo === hi) {
-    const d = lo === 0 ? 1 : Math.abs(lo) * 0.05
+    const d = lo === 0 ? 1 : Math.max(Math.abs(lo) * 0.05, res)
     lo -= d
     hi += d
   }
-  let step = niceStep(hi - lo, count, integer)
+  let step = niceStep(hi - lo, count, integer, res)
   let nlo = lo
   let nhi = hi
-  // Extending to tick boundaries can add intervals; step up until there are at most count + 1.
-  for (let i = 0; i < 8; i++) {
+  // Extending to tick boundaries can add intervals; step up until there are at most maxIntervals.
+  for (let i = 0; i < 12; i++) {
     nlo = Math.floor(lo / step + 1e-9) * step
     nhi = Math.ceil(hi / step - 1e-9) * step
-    if (Math.round((nhi - nlo) / step) <= Math.max(2, count + 1)) break
-    step = nextStep(step, integer)
+    if (Math.round((nhi - nlo) / step) <= maxIv) break
+    step = nextStep(step, integer, res)
   }
-  lo = nlo
-  hi = nhi
+  const coverage = (hi - lo) / (nhi - nlo)
+  if (coverage < MIN_COVERAGE) {
+    const inside = ticksInside(lo, hi, maxIv, integer, res)
+    // Only when that still gives 3+ labels (or the snapped axis would be mostly empty).
+    if (inside && (inside.ticks.length >= 3 || coverage < 0.45)) return inside
+  }
   const dec = decimalsOf(step)
-  const domain: Domain = [roundTo(lo, dec), roundTo(hi, dec)]
+  const domain: Domain = [roundTo(nlo, dec), roundTo(nhi, dec)]
   return { domain, step, ticks: ticksForStep(domain[0], domain[1], step) }
 }
 
-/** How many y ticks a plot of this height can hold comfortably (a label every ~44px). */
-export const yTickCount = (plotHeight: number): number => clamp(Math.round(plotHeight / 44), 2, 8)
+/** Domain = the data plus a little air (never crossing zero); the densest printable ticks (at most maxIv+1) inside. */
+function ticksInside(lo: number, hi: number, maxIv: number, integer: boolean, res: number): NiceDomain | null {
+  const pad = (hi - lo) * 0.04
+  const dlo = lo >= 0 && lo - pad < 0 ? 0 : lo - pad
+  const dhi = hi <= 0 && hi + pad > 0 ? 0 : hi + pad
+  let step = niceStep(dhi - dlo, 2 * (maxIv + 1), integer, res)
+  let ticks = ticksForStep(dlo, dhi, step)
+  for (let guard = 0; guard < 40 && ticks.length > maxIv + 1; guard++) {
+    step = nextStep(step, integer, res)
+    ticks = ticksForStep(dlo, dhi, step)
+  }
+  if (ticks.length < 2 || ticks.length > maxIv + 1) return null
+  return { domain: [dlo, dhi], step, ticks }
+}
+
+/**
+ * How many y intervals a plot of this height gets: 3 (four labelled gridlines, the Night Session maximum) from
+ * ~120px up, 2 below. Pass it as both `count` and `maxIntervals` to niceDomain.
+ */
+export const yTickCount = (plotHeight: number): number => (plotHeight >= 120 ? 3 : 2)
+
+/** The chart spec's cap on axis labels ("3–4 ticks max"). */
+export const MAX_AXIS_TICKS = 4
 
 /**
  * The y extent of the data (plus extra values such as goal lines), padded by `padding` x span on each side,
@@ -207,9 +302,10 @@ function ticksForInterval(min: number, max: number, iv: TimeInterval): number[] 
 
 /**
  * Date ticks for a time axis: the densest calendar-aligned interval (days, Mondays, 1st of the month...)
- * whose labels don't overlap at this pixel width. `labelWidth` estimates a label's rendered width.
+ * whose labels don't overlap at this pixel width and that yields at most `maxTicks` labels.
+ * `labelWidth` estimates a label's rendered width.
  */
-export function timeTicks(domain: Domain, pixelWidth: number, labelWidth: (t: number) => number, gap = 12): number[] {
+export function timeTicks(domain: Domain, pixelWidth: number, labelWidth: (t: number) => number, gap = 12, maxTicks = Infinity): number[] {
   const [min, max] = domain
   if (!(max > min) || pixelWidth <= 0) return [dayNoon(min)]
   const px = (t: number) => ((t - min) / (max - min)) * pixelWidth
@@ -218,6 +314,7 @@ export function timeTicks(domain: Domain, pixelWidth: number, labelWidth: (t: nu
     const ticks = ticksForInterval(min, max, iv).filter((t) => t >= min && t <= max)
     if (!ticks.length) continue
     fallback = ticks
+    if (ticks.length > maxTicks) continue
     const fits = ticks.every((t, i) => i === 0 || px(t) - px(ticks[i - 1]) >= (labelWidth(t) + labelWidth(ticks[i - 1])) / 2 + gap)
     if (fits) return ticks
   }
@@ -343,7 +440,49 @@ export function stepPath(pts: [number, number][]): string {
   return d
 }
 
-export const curvePath = (pts: [number, number][], curve: Curve): string => (curve === 'step' ? stepPath(pts) : linePath(pts))
+/**
+ * Monotone-cubic path (Fritsch–Carlson tangents, as d3.curveMonotoneX): smooth, passes through every point and
+ * never overshoots them, so a smoothed line never shows a value that wasn't there. x must be ascending.
+ */
+export function monotonePath(pts: [number, number][]): string {
+  const n = pts.length
+  if (n < 3) return linePath(pts)
+  const sign = (v: number) => (v < 0 ? -1 : v > 0 ? 1 : 0)
+  const h: number[] = []
+  const s: number[] = []
+  for (let i = 0; i < n - 1; i++) {
+    h[i] = pts[i + 1][0] - pts[i][0]
+    s[i] = h[i] > 0 ? (pts[i + 1][1] - pts[i][1]) / h[i] : 0
+  }
+  const t: number[] = new Array(n).fill(0)
+  for (let i = 1; i < n - 1; i++) {
+    const hh = h[i - 1] + h[i]
+    if (!(h[i - 1] > 0) || !(h[i] > 0) || !(hh > 0)) continue
+    const p = (s[i - 1] * h[i] + s[i] * h[i - 1]) / hh
+    t[i] = (sign(s[i - 1]) + sign(s[i])) * Math.min(Math.abs(s[i - 1]), Math.abs(s[i]), 0.5 * Math.abs(p)) || 0
+  }
+  // End tangents: one-sided, consistent with the neighbouring interior tangent.
+  t[0] = h[0] > 0 ? (3 * s[0] - t[1]) / 2 : 0
+  t[n - 1] = h[n - 2] > 0 ? (3 * s[n - 2] - t[n - 2]) / 2 : 0
+  // Keep the end segments monotone too.
+  if (sign(t[0]) !== sign(s[0])) t[0] = 0
+  if (sign(t[n - 1]) !== sign(s[n - 2])) t[n - 1] = 0
+  let d = `M${r2(pts[0][0])},${r2(pts[0][1])}`
+  for (let i = 0; i < n - 1; i++) {
+    const [x0, y0] = pts[i]
+    const [x1, y1] = pts[i + 1]
+    if (!(h[i] > 0)) {
+      d += `L${r2(x1)},${r2(y1)}`
+      continue
+    }
+    const dx = h[i] / 3
+    d += `C${r2(x0 + dx)},${r2(y0 + dx * t[i])},${r2(x1 - dx)},${r2(y1 - dx * t[i + 1])},${r2(x1)},${r2(y1)}`
+  }
+  return d
+}
+
+export const curvePath = (pts: [number, number][], curve: Curve): string =>
+  curve === 'step' ? stepPath(pts) : curve === 'monotone' ? monotonePath(pts) : linePath(pts)
 
 /** Closed area between the curve and the horizontal baseline `y0`. */
 export function areaPath(pts: [number, number][], y0: number, curve: Curve = 'linear'): string {

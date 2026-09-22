@@ -118,13 +118,15 @@
   margin-top: 1.5px;
   color: var(--muted);
 }
+/* Buttons share the row by content (never ellipsized) and wrap onto two rows when both labels don't fit. */
 .fu-cn__actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 .fu-cn__actions .ui-btn {
-  min-width: 0;
+  flex: 1 1 auto;
+  min-width: max-content;
 }
 .fu-cn__hist {
   display: flex;

@@ -109,10 +109,20 @@ export const nextRating = (cur: CheckinRating | null, picked: CheckinRating): Ch
 export const isBlankCheckin = (c: NutritionCheckin): boolean => !c.meals.length && c.rating == null && !c.waterL && !c.note.trim()
 
 /**
- * The plan that applies on a date: the one the day's check-in was logged against, else the newest plan
- * already started by then, else the current plan (so a day before any plan still shows something to follow).
+ * The plan that applies on a date. Today follows the current plan as soon as it has started, even when today's
+ * check-in was logged against the plan it replaced: a plan the coach issues mid-day takes over at once (its card,
+ * meals and targets agree). Other days show the plan their check-in was logged against (history stays as it was
+ * lived), else the newest plan already started by then, else the current plan (so a day before any plan still
+ * shows something to follow).
  */
-export function planOnDate(plans: MealPlan[], current: MealPlan | null, date: string, checkin?: NutritionCheckin | null): MealPlan | null {
+export function planOnDate(
+  plans: MealPlan[],
+  current: MealPlan | null,
+  date: string,
+  checkin?: NutritionCheckin | null,
+  today?: string,
+): MealPlan | null {
+  if (date === today && current && current.startDate <= date) return current
   if (checkin?.planId) {
     const own = plans.find((p) => p.id === checkin.planId)
     if (own) return own
@@ -120,4 +130,41 @@ export function planOnDate(plans: MealPlan[], current: MealPlan | null, date: st
   if (current && current.startDate <= date) return current
   const started = plans.filter((p) => p.startDate <= date).sort((a, b) => (a.startDate < b.startDate ? 1 : a.startDate > b.startDate ? -1 : 0))
   return started[0] ?? current
+}
+
+const mealKey = (s: string) => s.trim().toLocaleLowerCase()
+
+/**
+ * Ticks logged against `from` carried over to `to`: kept when the meal id exists in `to` (a plan edited in place),
+ * otherwise matched by meal name, then by a unique time (a copied plan gets fresh meal ids). The rest are dropped.
+ */
+export function carryTicks(ticked: readonly string[], from: MealPlan | null, to: MealPlan): string[] {
+  const ids = new Set(to.meals.map((m) => m.id))
+  const out = new Set<string>()
+  for (const id of ticked) {
+    if (ids.has(id)) {
+      out.add(id)
+      continue
+    }
+    const old = from?.meals.find((m) => m.id === id)
+    if (!old) continue
+    const byName = old.name.trim() ? to.meals.find((m) => mealKey(m.name) === mealKey(old.name)) : undefined
+    const sameTime = old.time.trim() ? to.meals.filter((m) => m.time.trim() === old.time.trim()) : []
+    const match = byName ?? (sameTime.length === 1 ? sameTime[0] : undefined)
+    if (match) out.add(match.id)
+  }
+  return to.meals.filter((m) => out.has(m.id)).map((m) => m.id)
+}
+
+/** The day's ticks in terms of `plan` (the plan shown for the day), carrying them over from the check-in's own plan. */
+export function ticksFor(checkin: NutritionCheckin | null | undefined, plan: MealPlan | null, plans: MealPlan[]): string[] {
+  if (!checkin) return []
+  if (!plan || !checkin.planId || checkin.planId === plan.id) return checkin.meals
+  return carryTicks(checkin.meals, plans.find((p) => p.id === checkin.planId) ?? null, plan)
+}
+
+/** Moves a check-in onto the plan shown for its day (on the first change after a new plan took over). */
+export function adoptPlan(c: NutritionCheckin, plan: MealPlan | null, plans: MealPlan[]): NutritionCheckin {
+  if (!plan || !c.planId || c.planId === plan.id) return c
+  return { ...c, planId: plan.id, meals: ticksFor(c, plan, plans) }
 }

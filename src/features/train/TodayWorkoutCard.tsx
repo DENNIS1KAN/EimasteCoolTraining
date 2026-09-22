@@ -9,12 +9,13 @@ import { bestE1rmByExercise, sessionSummary, type WorkoutRef } from '../../lib/s
 import { ButtonLink, Button, Card, Icon, ProgressBar, Sheet, WeekDots, cx, memberColorVar, type IconName, type WeekDotItem } from '../../ui'
 import { StartProgramForm } from './StartProgram'
 import { useMemberLogs, useNow } from './hooks'
-import { fmtTime } from './logic/format'
+import { fmtTime, textLang, upperText } from './logic/format'
 import { dayProgress } from './logic/log'
 import { doneKeys, estimateMinutes, focusOf, weekDayStates } from './logic/program'
 import { logPRs } from './logic/prs'
 import { heroWeek, todayState, type TodayState } from './logic/today'
 import { TODAY } from './messages'
+import { useProgramName } from './programText'
 import './train.css'
 
 type TT = (k: keyof typeof TODAY.en, vars?: Vars) => string
@@ -32,6 +33,7 @@ export function TodayWorkoutCard(): JSX.Element {
 
 function Hero({ me, program }: { me: Member; program: Program | null }) {
   const t = useT(TODAY)
+  const programName = useProgramName(program ?? { name: '' })
   const logs = useMemberLogs(me.id)
   const programs = useStore((s) => s.programs)
   const now = useNow(30_000)
@@ -63,7 +65,7 @@ function Hero({ me, program }: { me: Member; program: Program | null }) {
   const done = doneKeys(mine, program.id)
   const states = weekDayStates(program, me.programStart, week, done, today)
   const dots: WeekDotItem[] = (program.weeks[week - 1]?.days ?? []).map((d, i) => ({
-    label: dayShortName(d).charAt(0).toUpperCase(),
+    label: upperText(dayShortName(d).charAt(0)),
     title: dayShortName(d),
     state: states[i],
   }))
@@ -94,7 +96,7 @@ function Hero({ me, program }: { me: Member; program: Program | null }) {
         live: true,
         children: (
           <>
-            <Mid en title={dayShortName(d)} meta={[{ icon: 'check', text: t('setsDone', { done: p.setsDone, total: p.setsTotal }) }, ...meta(state.ref).slice(0, 1)]} />
+            <Mid program title={dayShortName(d)} meta={[{ icon: 'check', text: t('setsDone', { done: p.setsDone, total: p.setsTotal }) }, ...meta(state.ref).slice(0, 1)]} />
             <ProgressBar value={p.setsTotal ? p.setsDone / p.setsTotal : 0} color="var(--accent)" height={4} label={t('setsDone', { done: p.setsDone, total: p.setsTotal })} className="tr-hero__bar" />
             <ButtonLink to={`/train/${state.ref.week}/${state.ref.day}`} block icon="play">
               {t('continue')}
@@ -132,7 +134,7 @@ function Hero({ me, program }: { me: Member; program: Program | null }) {
       return (
         <>
           {shell({
-            eyebrow: program.name,
+            eyebrow: programName,
             children: (
               <>
                 <Mid title={t('ready')} meta={[]} />
@@ -148,7 +150,7 @@ function Hero({ me, program }: { me: Member; program: Program | null }) {
               </>
             ),
           })}
-          <Sheet open={startOpen} onClose={() => setStartOpen(false)} title={t('startSheetTitle')} subtitle={program.name}>
+          <Sheet open={startOpen} onClose={() => setStartOpen(false)} title={t('startSheetTitle')} subtitle={programName}>
             <StartProgramForm me={me} program={program} onSaved={() => setStartOpen(false)} />
           </Sheet>
         </>
@@ -158,7 +160,7 @@ function Hero({ me, program }: { me: Member; program: Program | null }) {
         eyebrow: state.inDays === 1 ? t('startsTomorrow') : t('startsIn', { n: state.inDays }),
         children: (
           <>
-            <Mid en title={dayShortName(dayOf(state.next)!)} meta={meta(state.next)} />
+            <Mid program title={dayShortName(dayOf(state.next)!)} meta={meta(state.next)} />
             <p className="tr-hero__line">{t('startsOn', { date: fmtDate(state.start, 'long') })}</p>
             <ButtonLink to={`/train/${state.next.week}/${state.next.day}`} block variant="secondary" icon="eye">
               {t('preview')}
@@ -193,7 +195,7 @@ function Hero({ me, program }: { me: Member; program: Program | null }) {
         live: true,
         children: (
           <>
-            <Mid en title={dayShortName(d)} meta={meta(state.ref)} />
+            <Mid program title={dayShortName(d)} meta={meta(state.ref)} />
             {state.behindBy > 0 ? (
               <p className="tr-hero__line tr-hero__line--warn">
                 <Icon name="alert" size={16} />
@@ -231,7 +233,7 @@ function DoneToday(p: {
     children: (
       <>
         <Mid
-          en
+          program
           title={d ? dayShortName(d) : ''}
           icon="check"
           meta={[
@@ -273,10 +275,11 @@ function HeroShell(p: {
   )
 }
 
-function Mid({ title, meta, icon, en }: { title: string; meta: { icon: IconName; text: string }[]; icon?: IconName; en?: boolean }) {
+/** `program`: the title is a program day name (English or Greek, whatever the UI language), tagged for uppercase and speech. */
+function Mid({ title, meta, icon, program }: { title: string; meta: { icon: IconName; text: string }[]; icon?: IconName; program?: boolean }) {
   return (
     <div className="tr-hero__mid">
-      <h2 className="tr-hero__title" lang={en ? 'en' : undefined}>
+      <h2 className="tr-hero__title" lang={program ? textLang(title) : undefined}>
         {icon ? (
           <span className="tr-hero__badge" aria-hidden="true">
             <Icon name={icon} size={26} strokeWidth={2.6} />

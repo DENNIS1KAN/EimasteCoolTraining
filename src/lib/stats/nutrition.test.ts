@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DST_SPRING, meals, mkCheckin, mkPlan } from '../testing/fixtures'
-import { adherence, checkinPlan, checkinScore, currentPlan, onPlanStreak } from './nutrition'
+import { adherence, checkinPlan, checkinScore, currentPlan, dayClosed, firstPlanStart, onPlanStreak, recentAdherence } from './nutrition'
 
 const plan = mkPlan({ id: 'p1', memberId: 'stelios', startDate: '2026-03-25', active: true, meals: meals('b', 'l', 's', 'd') })
 const C = (date: string, p: Parameters<typeof mkCheckin>[2] = {}) => mkCheckin('stelios', date, p)
@@ -127,5 +127,109 @@ describe('onPlanStreak', () => {
 
   it('is 0 without a plan', () => {
     expect(onPlanStreak(good, null, DST_SPRING)).toBe(0)
+  })
+})
+
+/** A plan change: v1 (meals a1, a2) from 03-20, then v2 (new meal ids b1, b2) from 03-27. */
+function planChange() {
+  const v1 = mkPlan({ id: 'v1', memberId: 'stelios', startDate: '2026-03-20', meals: meals('a1', 'a2') })
+  const v2 = mkPlan({ id: 'v2', memberId: 'stelios', startDate: '2026-03-27', active: true, meals: meals('b1', 'b2') })
+  const theirs = mkPlan({ id: 'theirs', memberId: 'thanos', startDate: '2026-01-01', meals: meals('t') })
+  const plans = { v1, v2, theirs }
+  const cs = [
+    C('2026-03-24', { meals: ['a1', 'a2'], planId: 'v1' }),
+    C('2026-03-25', { meals: ['a1', 'a2'], planId: 'v1' }),
+    C('2026-03-26', { meals: ['a1'], planId: 'v1' }),
+  ]
+  return { v1, v2, plans, cs }
+}
+
+describe('firstPlanStart', () => {
+  it("is the earliest start among the member's plans, else the plan's own start", () => {
+    const { v2, plans } = planChange()
+    expect(firstPlanStart(v2, plans)).toBe('2026-03-20')
+    expect(firstPlanStart(v2)).toBe('2026-03-27')
+    expect(firstPlanStart(v2, { v2 })).toBe('2026-03-27')
+  })
+})
+
+describe('adherence across a plan change', () => {
+  it('keeps days logged under the earlier plan, scored against that plan', () => {
+    const { v2, plans, cs } = planChange()
+    const a = adherence(cs, v2, '2026-03-24', '2026-03-27', plans)!
+    expect(a.byDay.map((d) => d.score)).toEqual([1, 1, 0.5, 0])
+    expect(a).toMatchObject({ days: 4, logged: 3, ratio: 2.5 / 4 })
+  })
+
+  it('does not restart when the new plan starts today', () => {
+    const { v2, plans, cs } = planChange()
+    expect(adherence(cs, v2, '2026-03-14', '2026-03-26', plans)!.days).toBe(7)
+    // without the plans map only days since the current plan count (the old behaviour)
+    expect(adherence(cs, v2, '2026-03-14', '2026-03-26')!.days).toBe(0)
+  })
+})
+
+describe('dayClosed', () => {
+  it('is closed with a rating, or once every planned meal is ticked', () => {
+    expect(dayClosed(undefined, plan)).toBe(false)
+    expect(dayClosed(C('2026-03-25', { meals: ['b', 'l'] }), plan)).toBe(false)
+    expect(dayClosed(C('2026-03-25', { meals: ['b', 'l', 's', 'd'] }), plan)).toBe(true)
+    expect(dayClosed(C('2026-03-25', { meals: ['b'], rating: 'off' }), plan)).toBe(true)
+    expect(dayClosed(C('2026-03-25', { meals: [] }), { ...plan, meals: [] })).toBe(false)
+  })
+})
+
+describe('recentAdherence', () => {
+  const week = ['2026-03-25', '2026-03-26', '2026-03-27', '2026-03-28'].map((d) => C(d, { rating: 'on' }))
+
+  it('leaves an open today out of the window', () => {
+    const a = recentAdherence([...week, C(DST_SPRING, { meals: ['b'] })], plan, DST_SPRING, 14)!
+    expect(a.byDay.map((d) => d.date)).toEqual(['2026-03-25', '2026-03-26', '2026-03-27', '2026-03-28'])
+    expect(a.ratio).toBe(1)
+  })
+
+  it('counts today once it is closed', () => {
+    const a = recentAdherence([...week, C(DST_SPRING, { rating: 'mostly' })], plan, DST_SPRING, 14)!
+    expect(a.days).toBe(5)
+    expect(a.ratio).toBeCloseTo(4.5 / 5, 10)
+  })
+
+  it('has no counted day while the first plan has no complete day yet', () => {
+    expect(recentAdherence([], plan, '2026-03-25', 14)).toMatchObject({ days: 0 })
+    expect(recentAdherence([C('2026-03-25', { meals: ['b'] })], plan, '2026-03-25', 14)).toMatchObject({ days: 0 })
+    expect(recentAdherence([C('2026-03-25', { rating: 'on' })], plan, '2026-03-25', 14)).toMatchObject({ days: 1, ratio: 1 })
+    expect(recentAdherence([], null, '2026-03-25', 14)).toBeNull()
+  })
+
+  it('a new plan issued today keeps the history instead of dropping to 0%', () => {
+    const { v2, plans, cs } = planChange()
+    const today = '2026-03-27' // v2 starts today, nothing logged yet
+    const a = recentAdherence(cs, v2, today, 14, plans)!
+    expect(a.byDay.map((d) => d.date)).toEqual(['2026-03-20', '2026-03-21', '2026-03-22', '2026-03-23', '2026-03-24', '2026-03-25', '2026-03-26'])
+    expect(a.ratio).toBeCloseTo(2.5 / 7, 10)
+  })
+
+  it("judges today's closure against the plan it was logged with", () => {
+    const { v2, plans, cs } = planChange()
+    // logged under v1 in the morning, then the coach issued v2: all v1 meals ticked closes the day
+    const a = recentAdherence([...cs, C('2026-03-27', { meals: ['a1', 'a2'], planId: 'v1' })], v2, '2026-03-27', 14, plans)!
+    expect(a.byDay.at(-1)).toEqual({ date: '2026-03-27', score: 1, logged: true })
+  })
+})
+
+describe('onPlanStreak across a plan change', () => {
+  it('keeps counting days logged under the earlier plan', () => {
+    const { v2, plans, cs } = planChange()
+    const good = [...cs.slice(0, 2), C('2026-03-26', { meals: ['a1', 'a2'], planId: 'v1' })]
+    expect(onPlanStreak(good, v2, '2026-03-27', plans)).toBe(3)
+    expect(onPlanStreak([...good, C('2026-03-27', { meals: ['b1', 'b2'], planId: 'v2' })], v2, '2026-03-27', plans)).toBe(4)
+    // without the plans map the streak stops at the current plan's start
+    expect(onPlanStreak(good, v2, '2026-03-27')).toBe(0)
+  })
+
+  it("never reaches back before the member's first plan", () => {
+    const { v2, plans } = planChange()
+    const early = ['2026-03-18', '2026-03-19', '2026-03-20', '2026-03-21'].map((d) => C(d, { rating: 'on' }))
+    expect(onPlanStreak(early, v2, '2026-03-21', plans)).toBe(2)
   })
 })

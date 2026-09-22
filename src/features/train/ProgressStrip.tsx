@@ -8,7 +8,7 @@ interface Props {
   onJump: (exercise: number) => void
 }
 
-/** "EXERCISE 2 OF 7 ▬▬▭▭ 4 / 18 SETS": one segment per exercise; tap a segment to jump to it. */
+/** "EXERCISE 2 OF 7 ▬▬▭▭ 4 / 18 SETS" (+N for extra sets): one segment per exercise; tap a segment to jump to it. */
 export function ProgressStrip({ progress, onJump }: Props) {
   const t = useT(M)
   const n = progress.exercises.length
@@ -29,7 +29,11 @@ export function ProgressStrip({ progress, onJump }: Props) {
           />
         ))}
       </span>
-      <span className="tr-prog__r num">{t('setsProgress', { done: progress.setsDone, total: progress.setsTotal })}</span>
+      <span className="tr-prog__r num">
+        {progress.setsExtra
+          ? t('setsProgressExtra', { done: progress.setsDone, total: progress.setsTotal, extra: progress.setsExtra })
+          : t('setsProgress', { done: progress.setsDone, total: progress.setsTotal })}
+      </span>
     </div>
   )
 }

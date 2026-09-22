@@ -2,7 +2,7 @@ import type { Cheer, MealPlan, Member, NutritionCheckin, Program, WeightEntry, W
 import type { ISODate } from '../dates'
 import { addDays, isoFromMs, startOfWeek } from '../dates'
 import { totalWorkouts } from '../../data/programs'
-import { adherence, checkinPlan, checkinScore, currentPlan } from './nutrition'
+import { checkinPlan, checkinScore, currentPlan, recentAdherence } from './nutrition'
 import { goalProgress, weightStats, type WeightStats } from './body'
 import { logTime, personalRecords, sessionSummary, strengthGain, type PR, type ProgramMap } from './lifts'
 import { programWeekOn, scheduleStatus, upcomingWorkout, type ScheduleStatus, type WorkoutRef } from './schedule'
@@ -27,6 +27,14 @@ export const checkinsOf = (d: SquadData, memberId: string): NutritionCheckin[] =
   Object.values(d.checkins).filter((c) => c.memberId === memberId)
 export const programOf = (d: SquadData, m: Member | null | undefined): Program | null =>
   (m?.programId && d.programs[m.programId]) || null
+
+/**
+ * Whether the squad can read the member's weigh-ins (weight visibility other than 'private'). Weigh-ins earn
+ * league points and weight badges only then: the database hides a private member's weigh-ins from squad
+ * mates, so counting them would give different standings on different phones (the setting itself is on
+ * every phone).
+ */
+export const sharesWeight = (m: Pick<Member, 'settings'> | null | undefined): boolean => m?.settings?.weightVisibility !== 'private'
 
 /** Members sorted: athletes first (by name), then coach(es). */
 export function sortedMembers(d: SquadData): Member[] {
@@ -81,8 +89,15 @@ export interface MemberStats {
   strengthGainPct: number | null
   weight: WeightStats | null
   goalProgress: number | null
-  /** Nutrition adherence over the last 14 days (null without a meal plan). */
+  /** The meal plan in force (active, else the latest); null without one. */
+  mealPlan: MealPlan | null
+  /**
+   * Nutrition adherence over the last 14 days, today included once it is closed (see recentAdherence).
+   * null without a meal plan or before the first complete day on a plan.
+   */
   adherence14: number | null
+  /** Days counted in adherence14 (0..14), e.g. to wait a few days before judging a new plan. */
+  adherence14Days: number
   lastWorkoutAt: number | null
   nextWorkout: WorkoutRef | null
   points: Points
@@ -101,7 +116,7 @@ export function memberStats(d: SquadData, memberId: string, today: ISODate): Mem
   const weights = weightsOf(d, memberId)
   const w = weightStats(weights, m?.programStart ?? null, today)
   const plan = currentPlan(plansOf(d, memberId), memberId)
-  const adh = adherence(checkinsOf(d, memberId), plan, addDays(today, -13), today)
+  const adh = recentAdherence(checkinsOf(d, memberId), plan, today, 14, d.mealPlans)
   const perWeekTarget = program ? program.schedule.filter((s) => s != null).length || program.weeks[0]?.days.length || 5 : 5
   return {
     memberId,
@@ -119,7 +134,9 @@ export function memberStats(d: SquadData, memberId: string, today: ISODate): Mem
     strengthGainPct: strengthGain(logs, programs)?.pct ?? null,
     weight: w,
     goalProgress: w ? goalProgress(w.startKg, w.trendKg, m?.goalWeightKg ?? null) : null,
+    mealPlan: plan,
     adherence14: adh && adh.days ? adh.ratio : null,
+    adherence14Days: adh?.days ?? 0,
     lastWorkoutAt: doneLogs.length ? Math.max(...doneLogs.map(logTime)) : null,
     nextWorkout: program ? upcomingWorkout(program, m?.programStart ?? null, programLogs, today) : null,
     points: points(d, memberId, weekStart, addDays(weekStart, 6)),
@@ -142,7 +159,8 @@ export interface Points {
 /**
  * League points earned within [from, to] (inclusive; omit for all time):
  * workout 10, PR 5, perfect program week 15 (all its workouts done, counted in the week the last one was finished),
- * weigh-in 1 per day, nutrition day on plan (score >= 0.8) 2.
+ * weigh-in 1 per day (only while the weight is shared with the squad, see sharesWeight), nutrition day on
+ * plan (score >= 0.8) 2.
  */
 export function points(d: SquadData, memberId: string, from?: ISODate, to?: ISODate): Points {
   const inRange = (date: ISODate) => (!from || date >= from) && (!to || date <= to)
@@ -164,7 +182,7 @@ export function points(d: SquadData, memberId: string, from?: ISODate, to?: ISOD
       if (inRange(isoFromMs(last))) perfect++
     }
   }
-  const weighIns = new Set(weightsOf(d, memberId).map((w) => w.date).filter(inRange)).size
+  const weighIns = sharesWeight(d.members[memberId]) ? new Set(weightsOf(d, memberId).map((w) => w.date).filter(inRange)).size : 0
   const plan = currentPlan(plansOf(d, memberId), memberId)
   const onPlan = checkinsOf(d, memberId).filter((c) => inRange(c.date) && checkinScore(c, checkinPlan(c, d.mealPlans, plan)) >= 0.8).length
   const p = {

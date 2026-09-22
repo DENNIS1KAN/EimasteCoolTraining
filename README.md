@@ -24,19 +24,22 @@ Friendly competition pushes each person to pull the others forward.
 ## How it works
 
 - **Frontend:** React 19 + TypeScript + Vite, hash routing, and a hand-made design system called "Night Session" (`src/ui`, tokens in `src/styles/tokens.css`). Charts are dependency-free SVG (`src/ui/charts`).
-- **Data:** one small store (`src/data/store.ts`) holds the whole squad's data in memory. Writes are optimistic and go through a persisted outbox with retries, so logging a workout offline is safe. If two devices edit the same row, the most recent edit wins.
+- **Data:** one small store (`src/data/store.ts`) holds the whole squad's data in memory. Writes are optimistic and go through an outbox saved on the device with retries, so logging a workout offline is safe: it survives the app being closed and even the session expiring (it is sent after signing in again). If two devices edit the same row, the most recent edit wins, and an older copy arriving late never overwrites it. Profiles, which the coach and the athlete both edit, are merged field by field.
 - **Backends:** `src/data/backend`
   - `LocalBackend` is the demo mode. It keeps everything in the browser and is seeded by `src/data/demo/seed.ts`.
   - `SupabaseBackend` is the shared mode: Postgres with row-level security, Auth, Storage for meal-plan files, and Realtime for live updates.
-    Logins are password-only: each person signs in as `<name>-<invite>@<authEmailDomain>` behind the scenes, and nobody receives e-mail.
+    Logins are password-only: each person signs in as `<name>-<invite>@<authEmailDomain>` behind the scenes (by default the site's own address, e.g. `dennis1kan.github.io`), and nobody receives e-mail.
 - **Stats:** `src/lib/stats` holds pure, unit-tested functions for the schedule, PRs and e1RM, volume, weight trend, adherence, league points, head-to-head, feed and badges.
 - **Security model** (`supabase/schema.sql`):
   - Only signed-in squad members can read squad data, and each member can write only their own rows.
   - The coach manages everyone.
   - Fields that belong to the coach (role, coach note, "competes") are protected by a trigger.
-  - Weight privacy is enforced in the database.
+  - Weight privacy: *Private* is enforced by the database, so nobody but you and the coach can read your weigh-ins.
+    *Change only* (the default) is a display choice: squad screens show your progress (kg lost or gained, and %), never your weigh-ins, but the exact numbers still reach squad mates' devices.
   - Meal-plan files are visible only to their owner and the coach.
-  - Invite codes are single-use and rotate.
+  - Invite codes are 12 characters, single-use and rotate; each login gets at most 5 wrong codes per hour.
+  - An update older than the stored row is ignored, so a phone replaying an old queue cannot undo newer edits.
+  - The app refuses to start if `config.js` holds the secret (service_role) key.
   - The rules are tested against a local Postgres by `npm run test:db`.
 
 ## Development

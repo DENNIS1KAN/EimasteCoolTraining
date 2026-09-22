@@ -22,11 +22,13 @@ export function GlanceRow({ row, isMe }: { row: AthleteGlance; isMe: boolean }) 
   const edit = `/coach/member/${m.slug}`
 
   const next = stats.nextWorkout && stats.program?.weeks[stats.nextWorkout.week - 1]?.days[stats.nextWorkout.day]
+  // "Week 3/12 · Next: Lower": each part stays on one line, the line only breaks at the dot
   const meta = [
     stats.programWeek > 0 && stats.program ? `${tc('weekN', { n: stats.programWeek })}/${stats.program.weeks.length}` : null,
     next ? `${tc('next')}: ${dayShortName(next)}` : null,
   ]
-    .filter(Boolean)
+    .filter((x): x is string => !!x)
+    .map((x) => x.replace(/ /g, '\u00a0'))
     .join(' · ')
 
   let status

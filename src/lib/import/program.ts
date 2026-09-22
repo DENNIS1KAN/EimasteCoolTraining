@@ -12,6 +12,7 @@ import type { Program, ProgramExercise, ProgramWeek } from '../../data/types'
 import { BTS_PROGRAM } from '../../data/programs'
 import { uuid } from '../ids'
 import { headerIndex, isBlankRow, normalizeHeader, parseCSV, toCSV, type Delimiter } from './csv'
+import { issue, type ImportIssue } from './issues'
 
 export const PROGRAM_CSV_COLUMNS = [
   'week',
@@ -72,29 +73,34 @@ const REQUIRED_KEYS = ['t', 'w', 's', 'r', 'e', 'l', 'rest'] as const
 const OPTIONAL_KEYS = ['s1', 's2', 'note', 'v', 'v1', 'v2'] as const
 const MAX_DAYS_PER_WEEK = 7
 const MAX_ERRORS = 20
+/** Working sets per exercise above which the number is treated as a typo. */
+const MAX_WORKING_SETS = 20
+
+/** Name given to a program whose file has none; the import sheet offers the file name instead. */
+export const DEFAULT_IMPORT_NAME = 'Imported program'
 
 export interface ParseProgramOptions {
-  /** Program name; defaults to the name in a JSON file, else "Imported program". */
+  /** Program name; defaults to the name in a JSON file, else DEFAULT_IMPORT_NAME. */
   name?: string
   /** Program id; defaults to a new id. Ids inside the file are ignored, so an import never overwrites a program. */
   id?: string
 }
 
-export type ParseProgramResult = { program: Program; warnings: string[] } | { errors: string[] }
+/** Problems are ImportIssues: show them with issueText(). */
+export type ParseProgramResult = { program: Program; warnings: ImportIssue[] } | { errors: ImportIssue[] }
 
 interface Draft {
   weeks: ProgramWeek[]
   name?: string
   description?: string
   schedule?: unknown
-  warnings: string[]
+  warnings: ImportIssue[]
 }
 
-type Fail = { errors: string[] }
-const fail = (errors: string[]): Fail => ({
-  errors: errors.length > MAX_ERRORS ? [...errors.slice(0, MAX_ERRORS), `…and ${errors.length - MAX_ERRORS} more problems.`] : errors,
+type Fail = { errors: ImportIssue[] }
+const fail = (errors: ImportIssue[]): Fail => ({
+  errors: errors.length > MAX_ERRORS ? [...errors.slice(0, MAX_ERRORS), issue('moreProblems', { n: errors.length - MAX_ERRORS })] : errors,
 })
-const weekList = (ns: number[]): string => `Week${ns.length > 1 ? 's' : ''} ${ns.join(', ')}`
 const isObject = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x)
 const str = (x: unknown): string => (typeof x === 'string' ? x.trim() : typeof x === 'number' && Number.isFinite(x) ? String(x) : '')
 
@@ -152,46 +158,66 @@ export function normalizeExercise(raw: Record<string, unknown>): ProgramExercise
 
 const isIntroWeek = (w: Pick<ProgramWeek, 'days'>): boolean => w.days.every((d) => d.ex.every((e) => e.t === 'N/A'))
 
+const WHOLE = /^(\d+)(?:[.,]0+)?$/
+/** "2", "1-2", "2–3" */
+const COUNT_OR_RANGE = /^\d+(?:\s*[-–—]\s*\d+)?$/
+/** Rep targets without a number that still make sense to a lifter. */
+const REP_WORDS = /^(amrap|max|failure|to failure|μέγιστο|μέγιστες|αποτυχία|μέχρι αποτυχία)$/i
+
+/**
+ * Prescription fields the logger computes with: working sets must be a whole number (the logger shows that
+ * many set rows), warm-up sets a number or range, reps something with a number ("8-10", "12/leg", "30 s")
+ * or a word like AMRAP. Empty fields are fine (1 working set, no target).
+ */
+export function exerciseProblems(e: Pick<ProgramExercise, 'w' | 's' | 'r'>): ImportIssue[] {
+  const out: ImportIssue[] = []
+  const sets = Number(e.s.match(WHOLE)?.[1] ?? 0)
+  if (e.s && !(sets >= 1 && sets <= MAX_WORKING_SETS)) out.push(issue('badWorkingSets', { value: e.s, max: MAX_WORKING_SETS }))
+  if (e.w && !COUNT_OR_RANGE.test(e.w) && !WHOLE.test(e.w)) out.push(issue('badWarmupSets', { value: e.w }))
+  if (e.r && !/\d/.test(e.r) && !REP_WORDS.test(e.r.trim())) out.push(issue('badReps', { value: e.r }))
+  return out
+}
+
 /** Validate and normalise one week from JSON; problems are appended to `errors`. */
-function normalizeWeek(raw: unknown, weekNo: number, errors: string[], warnings: string[]): ProgramWeek | null {
-  const where = `Week ${weekNo}`
+function normalizeWeek(raw: unknown, week: number, errors: ImportIssue[], warnings: ImportIssue[]): ProgramWeek | null {
   if (!isObject(raw)) {
-    errors.push(`${where} is not an object with "days".`)
+    errors.push(issue('weekNotObject', { week }))
     return null
   }
   if (!Array.isArray(raw.days) || raw.days.length === 0) {
-    errors.push(`${where} has no days.`)
+    errors.push(issue('weekNoDays', { week }))
     return null
   }
-  if (raw.days.length > MAX_DAYS_PER_WEEK) errors.push(`${where} has ${raw.days.length} days; a week can have at most ${MAX_DAYS_PER_WEEK}.`)
+  if (raw.days.length > MAX_DAYS_PER_WEEK) errors.push(issue('weekTooManyDays', { week, n: raw.days.length, max: MAX_DAYS_PER_WEEK }))
   const days = raw.days.map((d: unknown, di: number) => {
     const dayObj = isObject(d) ? d : {}
     let name = str(dayObj.name)
     if (!name) {
       name = `Day ${di + 1}`
-      warnings.push(`${where}, day ${di + 1} has no name; called it "${name}".`)
+      warnings.push(issue('dayNoName', { week, day: di + 1, name }))
     }
-    const dayWhere = `${where}, day ${di + 1} (${name})`
     if (!Array.isArray(dayObj.ex) || dayObj.ex.length === 0) {
-      errors.push(`${dayWhere} has no exercises.`)
+      errors.push(issue('dayNoExercises', { week, day: di + 1, name }))
       return { name, ex: [] }
     }
     const ex = dayObj.ex.map((e: unknown, ei: number) => {
       const exercise = normalizeExercise(isObject(e) ? e : {})
-      if (!exercise.n) errors.push(`${dayWhere}, exercise ${ei + 1} has no name.`)
+      const at = { week, day: di + 1, name, ex: ei + 1 }
+      if (!exercise.n) errors.push(issue('exerciseNoName', { ...at }))
+      for (const p of exerciseProblems(exercise)) errors.push({ ...p, at })
       return exercise
     })
     return { name, ex }
   })
-  const week = { block: str(raw.block), intro: false, days }
-  week.intro = typeof raw.intro === 'boolean' ? raw.intro : isIntroWeek(week)
-  return week
+  const out = { block: str(raw.block), intro: false, days }
+  out.intro = typeof raw.intro === 'boolean' ? raw.intro : isIntroWeek(out)
+  return out
 }
 
 function weeksFromJSON(list: unknown[], meta: Record<string, unknown>): Draft | Fail {
-  if (list.length === 0) return fail(['The program has no weeks.'])
-  const errors: string[] = []
-  const warnings: string[] = []
+  if (list.length === 0) return fail([issue('noWeeks')])
+  const errors: ImportIssue[] = []
+  const warnings: ImportIssue[] = []
   const weeks = list.map((w, i) => normalizeWeek(w, i + 1, errors, warnings))
   if (errors.length) return fail(errors)
   return {
@@ -208,9 +234,9 @@ function weeksFromKeyed(data: Record<string, unknown>): Draft | Fail {
   const nums = Object.keys(data).map(Number)
   const max = Math.max(...nums)
   const missing = Array.from({ length: max }, (_, i) => i + 1).filter((n) => !nums.includes(n))
-  if (nums.some((n) => n < 1)) return fail(['Week numbers must start at 1.'])
-  if (new Set(nums).size !== nums.length) return fail(['A week number appears twice (e.g. "1" and "01").'])
-  if (missing.length) return fail([`${weekList(missing)} ${missing.length > 1 ? 'are' : 'is'} missing: weeks must run from 1 to ${max} without gaps.`])
+  if (nums.some((n) => n < 1)) return fail([issue('weeksStartAt1')])
+  if (new Set(nums).size !== nums.length) return fail([issue('weekTwice')])
+  if (missing.length) return fail([issue(missing.length > 1 ? 'weeksMissing' : 'weekMissing', { weeks: missing.join(', '), max })])
   const byNum = new Map(Object.entries(data).map(([k, v]) => [Number(k), v]))
   return weeksFromJSON(Array.from({ length: max }, (_, i) => byNum.get(i + 1)), {})
 }
@@ -220,14 +246,14 @@ function fromJSON(src: string): Draft | Fail {
   try {
     data = JSON.parse(src)
   } catch (e) {
-    return fail([`The file is not valid JSON (${(e as Error).message}).`])
+    return fail([issue('notJson', { detail: (e as Error).message })])
   }
   if (Array.isArray(data)) return weeksFromJSON(data, {})
-  if (!isObject(data)) return fail(['Expected a JSON object with the program weeks.'])
+  if (!isObject(data)) return fail([issue('expectedJsonObject')])
   if (Array.isArray(data.weeks)) return weeksFromJSON(data.weeks, data)
   const keys = Object.keys(data)
   if (keys.length > 0 && keys.every((k) => /^\d+$/.test(k))) return weeksFromKeyed(data)
-  return fail(['Unrecognised JSON: expected { "weeks": [...] }, a program object, or weeks keyed "1", "2", ….'])
+  return fail([issue('unrecognisedJson')])
 }
 
 /* ------------------------------------------------------------------ CSV */
@@ -245,7 +271,7 @@ function fromCSV(src: string): Draft | Fail {
   const rows = parseCSV(src)
   const first = (rows[0] ?? []).map(normalizeHeader)
   if (first.includes('set') && first.includes('program_exercise'))
-    return fail(['This looks like a workout log export, not a program. Import it as workout history instead.'])
+    return fail([issue('workoutLogNotProgram')])
   const found = rows
     .slice(0, HEADER_SEARCH_ROWS)
     .findIndex((r) => REQUIRED_COLUMNS.every((c) => headerIndex(r, PROGRAM_CSV_COLUMNS, ALIASES)[c] != null))
@@ -253,12 +279,10 @@ function fromCSV(src: string): Draft | Fail {
   const col = headerIndex(rows[headerRow] ?? [], PROGRAM_CSV_COLUMNS, ALIASES)
   const missing = REQUIRED_COLUMNS.filter((c) => col[c] == null)
   if (missing.length) {
-    return fail([
-      `Missing column${missing.length > 1 ? 's' : ''} ${missing.join(', ')} in the header row. Expected: ${PROGRAM_CSV_COLUMNS.join(',')}.`,
-    ])
+    return fail([issue(missing.length > 1 ? 'missingColumns' : 'missingColumn', { cols: missing.join(', '), expected: PROGRAM_CSV_COLUMNS.join(',') })])
   }
-  const errors: string[] = []
-  const warnings: string[] = []
+  const errors: ImportIssue[] = []
+  const warnings: ImportIssue[] = []
   const weeks = new Map<number, { block: string; days: CsvDay[] }>()
   const reappeared = new Set<string>()
   let prevDay: CsvDay | null = null
@@ -275,47 +299,46 @@ function fromCSV(src: string): Draft | Fail {
     const weekNo = wm ? Number(wm[1]) : 0
     const dayName = get('day')
     const exName = get('exercise')
-    const rowErrors = [
-      weekNo >= 1 ? '' : weekRaw ? `week "${weekRaw}" is not a whole number of 1 or more` : 'the week is empty',
-      dayName ? '' : 'the day is empty',
-      exName ? '' : 'the exercise name is empty',
-    ].filter(Boolean)
-    if (rowErrors.length) {
-      errors.push(`Row ${rowNo}: ${rowErrors.join('; ')}.`)
-      continue
-    }
+    const rowErrors: ImportIssue[] = []
+    if (weekNo < 1) rowErrors.push(weekRaw ? issue('weekNotNumber', { week: weekRaw }, rowNo) : issue('weekEmpty', undefined, rowNo))
+    if (!dayName) rowErrors.push(issue('dayEmpty', undefined, rowNo))
+    if (!exName) rowErrors.push(issue('exerciseEmpty', undefined, rowNo))
     const raw: Record<string, unknown> = {}
     for (const c of PROGRAM_CSV_COLUMNS) {
       const key = FIELD_OF[c]
       if (key) raw[key] = get(c)
     }
+    const exercise = normalizeExercise(raw)
+    for (const p of exerciseProblems(exercise)) rowErrors.push({ ...p, row: rowNo })
+    if (rowErrors.length) {
+      errors.push(...rowErrors)
+      continue
+    }
     const week = weeks.get(weekNo) ?? { block: '', days: [] }
     weeks.set(weekNo, week)
     const block = get('block')
     if (block && !week.block) week.block = block
-    else if (block && block !== week.block) warnings.push(`Row ${rowNo}: block "${block}" differs from "${week.block}" earlier in week ${weekNo}; kept "${week.block}".`)
+    else if (block && block !== week.block) warnings.push(issue('blockDiffers', { block, kept: week.block, week: weekNo }, rowNo))
     let day = week.days.find((d) => d.name === dayName)
     if (!day) {
       day = { name: dayName, ex: [] }
       week.days.push(day)
     } else if (day !== prevDay && !reappeared.has(`${weekNo}:${dayName}`)) {
       reappeared.add(`${weekNo}:${dayName}`)
-      warnings.push(
-        `Row ${rowNo}: day "${dayName}" of week ${weekNo} appears again after other rows; its exercises were added to the first "${dayName}". Keep each day's rows together and give days of the same week different names.`,
-      )
+      warnings.push(issue('dayReappears', { day: dayName, week: weekNo }, rowNo))
     }
     prevDay = day
-    day.ex.push(normalizeExercise(raw))
+    day.ex.push(exercise)
   }
   if (errors.length) return fail(errors)
-  if (weeks.size === 0) return fail(['The file has a header row but no exercise rows.'])
+  if (weeks.size === 0) return fail([issue('noExerciseRows')])
   const max = Math.max(...weeks.keys())
   const gaps = Array.from({ length: max }, (_, i) => i + 1).filter((n) => !weeks.has(n))
-  if (gaps.length) return fail([`No rows for ${weekList(gaps).toLowerCase()}: weeks must run from 1 to ${max} without gaps.`])
+  if (gaps.length) return fail([issue(gaps.length > 1 ? 'noRowsForWeeks' : 'noRowsForWeek', { weeks: gaps.join(', '), max })])
   const out: ProgramWeek[] = []
   for (let n = 1; n <= max; n++) {
     const w = weeks.get(n)!
-    if (w.days.length > MAX_DAYS_PER_WEEK) errors.push(`Week ${n} has ${w.days.length} days; a week can have at most ${MAX_DAYS_PER_WEEK}.`)
+    if (w.days.length > MAX_DAYS_PER_WEEK) errors.push(issue('weekTooManyDays', { week: n, n: w.days.length, max: MAX_DAYS_PER_WEEK }))
     const days = w.days.map((d) => ({ name: d.name, ex: d.ex }))
     out.push({ block: w.block, intro: isIntroWeek({ days }), days })
   }
@@ -328,7 +351,7 @@ function fromCSV(src: string): Draft | Fail {
 /** Parse a program from JSON or CSV text. Returns the program (plus non-fatal warnings) or specific errors. */
 export function parseProgram(text: string, opts: ParseProgramOptions = {}): ParseProgramResult {
   const src = text.replace(/^﻿/, '').trim()
-  if (!src) return fail(['The file is empty.'])
+  if (!src) return fail([issue('fileEmpty')])
   const draft = src[0] === '{' || src[0] === '[' ? fromJSON(src) : fromCSV(src)
   if ('errors' in draft) return draft
   const warnings = [...draft.warnings]
@@ -336,12 +359,12 @@ export function parseProgram(text: string, opts: ParseProgramOptions = {}): Pars
   let schedule = defaultSchedule(days)
   if (draft.schedule !== undefined) {
     if (isValidSchedule(draft.schedule, days)) schedule = [...draft.schedule]
-    else warnings.push('The schedule in the file is not valid (7 slots of distinct day numbers or null); using the default.')
+    else warnings.push(issue('badSchedule'))
   }
   return {
     program: {
       id: opts.id?.trim() || `prog-${uuid()}`,
-      name: opts.name?.trim() || draft.name || 'Imported program',
+      name: opts.name?.trim() || draft.name || DEFAULT_IMPORT_NAME,
       description: draft.description ?? '',
       weeks: draft.weeks,
       schedule,

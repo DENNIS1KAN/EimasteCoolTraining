@@ -1,23 +1,23 @@
 import { memo, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
-import type { ExerciseLog, ProgramExercise, Unit } from '../../data/types'
+import type { ExerciseLog, ProgramExercise, SetLog, Unit } from '../../data/types'
 import { exerciseName, exerciseVideo, workingSets } from '../../data/programs'
 import { useT, type Vars } from '../../i18n'
 import { fmtNum } from '../../lib/format'
-import { isPRSet } from '../../lib/stats'
-import { parseNum } from '../../lib/units'
+import { e1rm, isPRSet, setKg, setReps } from '../../lib/stats'
+import { kgToUnit, parseNum } from '../../lib/units'
 import { Card, Chip, Icon, cx } from '../../ui'
 import { ProgressRing } from '../../ui/charts'
 import { ExerciseExtras, type ExtrasActions } from './ExerciseExtras'
 import { SetList } from './SetList'
 import { SetRow, type SetActions } from './SetRow'
-import { fmtRange, fmtRestShort, fmtRpe, fmtTypedWeight, setSeparator, swapCount } from './logic/format'
+import { fmtRange, fmtRestShort, fmtRpe, fmtTypedWeight, setSeparator, swapCount, textLang } from './logic/format'
 import { exerciseFrom, type Machines } from './logic/log'
-import { placeholderFor, type PrevPerformance } from './logic/previous'
+import { placeholdersFor, type PrevPerformance } from './logic/previous'
 import { parseRepRange, suggestNext, type Suggestion } from './logic/progression'
 import { lastSetTechnique, type Technique } from './logic/techniques'
 import { M } from './messages'
-import { useTechniqueText } from './techniqueText'
+import { useTechniqueLabel, useTechniqueText } from './techniqueText'
 
 export interface ExerciseActions extends SetActions, ExtrasActions {
   addSet: (exercise: number) => void
@@ -57,6 +57,7 @@ function OpenExercise(p: Props & { x: ExerciseLog }) {
   const name = exerciseName(e, x.v)
   const tech = lastSetTechnique(e, intro)
   const techText = useTechniqueText(tech)
+  const techLabel = useTechniqueLabel(tech)
   const prescribed = workingSets(e)
   const done = x.sets.filter((s) => s.ok).length
   const suggestion = useMemo(() => (prev ? suggestNext(prev.sets, e.r, unit) : null), [prev, e.r, unit])
@@ -66,14 +67,27 @@ function OpenExercise(p: Props & { x: ExerciseLog }) {
   const firstW = parseNum(x.sets[0]?.w)
   const workingWeight = firstW && firstW > 0 ? firstW : (suggestion?.weight ?? prev?.sets.find((s) => s.weight)?.weight ?? null)
   const swaps = swapCount(e)
+  const placeholders = useMemo(() => placeholdersFor(prev, x.sets), [prev, x.sets])
+  /** Under a ticked set: "e1RM 76.7 kg · +3.4 vs best" (the best before this workout), in the member's unit. */
+  const e1Caption = (s: SetLog): string | null => {
+    const kg = setKg(s, unit)
+    const reps = setReps(s)
+    if (!s.ok || !kg || !reps) return null
+    const est = e1rm(kg, reps)
+    const v = `${fmtNum(kgToUnit(est, unit), 1)} ${unit}`
+    if (!prior) return t('e1rmOnly', { v })
+    const diff = Math.round(kgToUnit(est - prior, unit) * 10) / 10
+    const d = fmtNum(Math.abs(diff), 1)
+    return t(diff > 0 ? 'e1rmAbove' : diff < 0 ? 'e1rmBelow' : 'e1rmTie', { v, d })
+  }
 
   return (
-    <Card as="article" className="tr-ex" id={`ex-${index}`} aria-labelledby={`ex-${index}-name`}>
+    <Card as="article" className="tr-ex" id={`ex-${index}`} aria-labelledby={`ex-${index}-name`} tabIndex={-1}>
       <div className="tr-ex__head">
         <div className="tr-ex__title">
           <p className="tr-ex__n">{t('exerciseN', { n: index + 1, total })}</p>
           <h2 className="tr-ex__name" id={`ex-${index}-name`}>
-            <Link to={`/lift/${p.slug}/${encodeURIComponent(name)}`} title={t('history', { name })} lang="en">
+            <Link to={`/lift/${p.slug}/${encodeURIComponent(name)}`} title={t('history', { name })} lang={textLang(name)}>
               {name}
             </Link>
           </h2>
@@ -94,7 +108,7 @@ function OpenExercise(p: Props & { x: ExerciseLog }) {
           {x.v ? <Chip icon="swap">{t('swapped')}</Chip> : null}
           {tech ? (
             <Chip icon="flame" selected={showTech} onClick={() => setShowTech((v) => !v)}>
-              {t('lastSet', { t: tech.label })}
+              {t('lastSet', { t: techLabel ?? tech.label })}
             </Chip>
           ) : null}
         </div>
@@ -116,11 +130,12 @@ function OpenExercise(p: Props & { x: ExerciseLog }) {
             exercise={index}
             index={j}
             set={s}
-            placeholder={placeholderFor(prev, j, x.sets[j - 1])}
+            placeholder={placeholders[j]}
             unit={unit}
             extra={j >= prescribed}
             tag={j === prescribed - 1 ? tagText : null}
             pr={s.ok && isPRSet(s, unit, prior)}
+            caption={e1Caption(s)}
             actions={actions}
           />
         ))}
@@ -312,6 +327,7 @@ function CollapsedExercise(p: Props & { x: ExerciseLog }) {
   const { e, index, total, x } = p
   const name = exerciseName(e, x.v)
   const tech = lastSetTechnique(e, p.intro)
+  const techLabel = useTechniqueLabel(tech)
   const rows = x.sets.length
   const doneSets = x.sets.filter((s) => s.ok)
   const done = doneSets.length
@@ -323,7 +339,7 @@ function CollapsedExercise(p: Props & { x: ExerciseLog }) {
       {e.s}
       <i className="mul">×</i>
       {fmtRange(e.r)} · RPE {fmtRpe(e.l) ?? fmtRpe(e.e) ?? '—'}
-      {tech ? ` · ${tech.label}` : ''}
+      {techLabel ? ` · ${techLabel}` : ''}
     </>
   )
   return (
@@ -340,7 +356,7 @@ function CollapsedExercise(p: Props & { x: ExerciseLog }) {
         </ProgressRing>
         <span className="tr-ex2__text">
           <span className="tr-ex2__n">{t('exerciseN', { n: index + 1, total })}</span>
-          <span className="tr-ex2__t" lang="en">
+          <span className="tr-ex2__t" lang={textLang(name)}>
             {name}
           </span>
           <span className={cx('tr-ex2__s', doneSets.length && 'num')}>{sub}</span>

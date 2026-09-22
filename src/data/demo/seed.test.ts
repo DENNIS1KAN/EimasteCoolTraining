@@ -3,7 +3,6 @@ import type { Snapshot } from '../types'
 import { addDays, diffDays, isoFromMs, startOfWeek, type ISODate } from '../../lib/dates'
 import { dailyId, logId } from '../../lib/ids'
 import {
-  adherence,
   buildFeed,
   currentPlan,
   earnedBadges,
@@ -11,6 +10,7 @@ import {
   memberStats,
   personalRecords,
   programWeekOn,
+  recentAdherence,
   unseenCheers,
   workoutOn,
   type SquadData,
@@ -178,7 +178,7 @@ describe.each(TODAYS)('createDemoSnapshot(%s)', (today) => {
   })
 
   it('has nutrition adherence in the intended ranges', () => {
-    const adh = (id: string) => adherence(Object.values(d.checkins), currentPlan(Object.values(d.mealPlans), id), addDays(today, -13), today)!.ratio
+    const adh = (id: string) => recentAdherence(Object.values(d.checkins), currentPlan(Object.values(d.mealPlans), id), today, 14, d.mealPlans)!.ratio
     expect(adh(S)).toBeGreaterThanOrEqual(0.78)
     expect(adh(S)).toBeLessThanOrEqual(0.92)
     expect(adh(T)).toBeGreaterThanOrEqual(0.55)

@@ -2,14 +2,14 @@ import type { ReactNode } from 'react'
 import { useT } from '../../i18n'
 import { Icon } from '../../ui'
 import { AUTH } from './messages'
-import type { PasswordCheck } from './password'
+import { PASSWORD_VARS, type PasswordCheck } from './password'
 import './fields.css'
 
-/** Live checklist under a new-password form: "At least 6 characters", "Both match". */
+/** Live checklist under a new-password form: "At least 8 characters", "Both match". */
 export function PasswordRules({ id, check }: { id: string; check: PasswordCheck }) {
   const t = useT(AUTH)
   const rows: [boolean, string][] = [
-    [check.longEnough, t('ruleLength')],
+    [check.longEnough, t('ruleLength', PASSWORD_VARS)],
     [check.matches, t('ruleMatch')],
   ]
   return (

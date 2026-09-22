@@ -297,7 +297,9 @@
 /* ==================================================================== coach: squad today */
 .home-sq__strip {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Equal thirds when they fit; a long one-word label ("ΠΡΟΠΟΝΗΘΗΚΑΝ") keeps its width and the last column,
+     whose label may wrap, gives way. */
+  grid-template-columns: minmax(max-content, 1fr) minmax(max-content, 1fr) minmax(min-content, 1fr);
   margin: 0 0 4px;
   padding: 10px 0;
   border-radius: var(--r-md);

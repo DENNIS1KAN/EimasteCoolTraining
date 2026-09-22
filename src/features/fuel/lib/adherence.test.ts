@@ -96,10 +96,17 @@ describe('recentAdherence', () => {
     expect(a.byDay.map((d) => d.date)).toEqual(['2026-09-09', '2026-09-10'])
     expect(a.ratio).toBe(1)
   })
-  it('reports today alone for a plan that starts today', () => {
+  it('has no number yet for a plan that starts today (until today is closed)', () => {
     const a = recentAdherence([ci('2026-09-01', ['a'])], p, '2026-09-01', 14)!
-    expect(a.days).toBe(1)
-    expect(a.ratio).toBe(0.5)
+    expect(a.days).toBe(0)
+  })
+  it('keeps counting days logged under the previous plan after a new one starts', () => {
+    const v2 = plan('v2', '2026-09-01', ['a', 'b'], false)
+    const v3 = plan('v3', '2026-09-10', ['x', 'y'])
+    const cs = [ci('2026-09-08', ['a', 'b'], null, 'v2'), ci('2026-09-09', ['a', 'b'], null, 'v2')]
+    const a = recentAdherence(cs, v3, '2026-09-10', 2, { v2, v3 })!
+    expect(a.byDay.map((d) => d.date)).toEqual(['2026-09-08', '2026-09-09'])
+    expect(a.ratio).toBe(1)
   })
   it('is null without a plan', () => {
     expect(recentAdherence([], null, '2026-09-01', 14)).toBeNull()

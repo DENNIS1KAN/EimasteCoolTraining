@@ -144,8 +144,13 @@ begin
   perform ect_test.eq((select count(*) from public.members)::text, '3', 'seed: 3 members after two runs');
   perform ect_test.eq((select count(*) from public.member_invites)::text, '3', 'seed: every member has one invite');
   perform ect_test.eq(
-    (select count(*) from public.member_invites where code ~ '^[ABCDEFGHJKLMNPQRSTUVWXYZ2-9]{6}$')::text, '3',
-    'invite codes: 6 chars, uppercase, no 0/O/1/I');
+    (select count(*) from public.member_invites where code ~ '^[ABCDEFGHJKLMNPQRSTUVWXYZ2-9]{12}$')::text, '3',
+    'invite codes: 12 chars, uppercase, no 0/O/1/I');
+  perform ect_test.eq((select count(distinct c)::text from (select public.gen_invite_code() c from generate_series(1, 2000)) g), '2000',
+    'invite codes: no repeats in 2000');
+  perform ect_test.eq((select count(distinct substr(c, k, 1))::text
+                         from (select public.gen_invite_code() c from generate_series(1, 400)) g, generate_series(1, 12) k), '32',
+    'invite codes: every symbol is used');
   perform ect_test.eq((select string_agg(slug || ':' || role || ':' || (data->>'color') || ':' || (data->>'competes'), ',' order by slug)
                          from public.members),
     'dennis:coach:aqua:false,stelios:athlete:blue:true,thanos:athlete:orange:true', 'seed: roles, colors, competes');
@@ -174,6 +179,14 @@ begin
     'grants: anon may not call the other RPCs');
   perform ect_test.eq(has_function_privilege('authenticated', 'public.gen_invite_code()', 'execute')::text, 'false',
     'grants: internal helpers are not callable');
+  perform ect_test.eq((has_function_privilege('authenticated', 'public.patch_member(uuid,jsonb,bigint)', 'execute')
+                       and not has_function_privilege('anon', 'public.patch_member(uuid,jsonb,bigint)', 'execute'))::text, 'true',
+    'grants: patch_member is for signed-in users only');
+  perform ect_test.eq((has_table_privilege('authenticated', 'public.invite_attempts', 'select,insert,update,delete')
+                       or has_table_privilege('anon', 'public.invite_attempts', 'select,insert,update,delete'))::text, 'false',
+    'grants: invite attempts are not reachable through the API');
+  perform ect_test.eq((select count(*) from pg_trigger where tgname = 'stale_write_guard')::text, '7',
+    'stale-write guard on the 7 data tables');
 end $$;
 
 -- ============================================================================================ anon
@@ -209,8 +222,14 @@ begin
   perform ect_test.eq(ect_test.count('select * from public.member_invites')::text, '0', 'outsider sees no invites');
   perform ect_test.fails(ect_test.upsert_sql('workout_logs', ect_test.owned('x__bts-12__w1d0', ect_test.m('stelios'))),
     'row-level security', 'outsider cannot write logs');
-  perform ect_test.fails($q$select public.claim_invite('dennis', 'ZZZZZZ')$q$, 'invalid_invite', 'join: wrong code is refused');
-  perform ect_test.fails($q$select public.claim_invite('nobody', 'ZZZZZZ')$q$, 'invalid_invite', 'join: unknown member is refused');
+  perform ect_test.eq(public.claim_invite('dennis', 'ZZZZZZ')::text, null, 'join: wrong code is refused');
+  perform ect_test.eq(public.claim_invite('nobody', 'ZZZZZZ')::text, null, 'join: unknown member is refused');
+  perform ect_test.eq(public.claim_invite('dennis', '')::text, null, 'join: empty code is refused');
+  perform ect_test.eq(public.claim_invite('thanos', 'ZZZZZZZZZZZZ')::text, null, 'join: 4th wrong code');
+  perform ect_test.eq(public.claim_invite('stelios', 'ZZZZZZZZZZZZ')::text, null, 'join: 5th wrong code');
+  perform ect_test.fails(format('select public.claim_invite(%L, %L)', 'thanos', ect_test.invite('thanos')), 'too_many_attempts',
+    'join: after 5 wrong codes in an hour even the right code is refused');
+  perform ect_test.eq(((ect_test.member_raw('thanos')).user_id is null)::text, 'true', 'join: a throttled claim links nothing');
   perform ect_test.fails($q$select public.create_member('evil', 'Evil', 'coach', 'red')$q$, 'forbidden',
     'outsider cannot create members');
 end $$;
@@ -273,7 +292,7 @@ begin
     $q$update public.members set role = 'coach', slug = 'boss', user_id = %L, login_email = 'x@y',
          data = data || '{"name":"Stelios K","goal":"Bench 100","heightCm":181,"coachNote":"hacked","coachNoteAt":5,"competes":false,
                            "settings":{"unit":"lb","machines":{"Leg Press":"Hammer"},"weightVisibility":"exact"}}'::jsonb,
-         updated_at = 2000
+         updated_at = 9000000002000
        where id = %L$q$, '00000000-0000-4000-8000-0000000000e1', me))::text, '1', 'athlete updates own profile row');
   m := ect_test.member_raw('stelios');
   perform ect_test.eq(m.role || '/' || m.slug, 'athlete/stelios', 'athlete cannot change own role or slug');
@@ -283,7 +302,7 @@ begin
     '/null/true', 'athlete cannot change coachNote, coachNoteAt or competes');
   perform ect_test.eq((m.data->>'name') || '/' || (m.data->>'goal') || '/' || (m.data->>'heightCm') || '/'
                       || (m.data->'settings'->>'unit') || '/' || (m.data->'settings'->'machines'->>'Leg Press') || '/' || m.updated_at,
-    'Stelios K/Bench 100/181/lb/Hammer/2000', 'athlete changes name, goal, settings');
+    'Stelios K/Bench 100/181/lb/Hammer/9000000002000', 'athlete changes name, goal, settings');
 
   perform ect_test.eq(ect_test.affected(format(
     $q$update public.members set data = data || '{"name":"Hacked"}'::jsonb where id = %L$q$, thanos))::text, '0',
@@ -473,7 +492,7 @@ begin
                       || (m.data->'settings')::text,
     'athlete/Eleni/green/true/bts-12/null/{"unit": "kg", "machines": {}, "weightVisibility": "change"}',
     'new member gets default profile data');
-  perform ect_test.eq((ect_test.invite('eleni') ~ '^[A-Z2-9]{6}$')::text, 'true', 'new member gets an invite');
+  perform ect_test.eq((ect_test.invite('eleni') ~ '^[A-Z2-9]{12}$')::text, 'true', 'new member gets an invite');
   perform ect_test.fails($q$select public.create_member('eleni', 'Eleni', 'athlete', 'green')$q$, 'slug_taken', 'member handles are unique');
   perform ect_test.fails($q$select public.create_member('E', 'E', 'athlete', 'green')$q$, 'invalid_slug', 'member handles are validated');
   perform ect_test.fails($q$select public.create_member('ok-slug', 'X', 'admin', 'green')$q$, 'invalid_role', 'roles are validated');
@@ -516,6 +535,59 @@ begin
   perform ect_test.eq(me::text, ect_test.m('thanos')::text, 'the new login re-joins with the new code');
   perform ect_test.eq(ect_test.count('select * from public.weights where member_id = ' || quote_literal(me))::text, '1',
     'the re-joined member keeps their history');
+end $$;
+reset role;
+
+-- ============================================================================================ sync
+
+-- Profiles are merged field by field: the coach and the athlete editing at the same time keep both edits.
+call ect_test.act('dennis');
+set role authenticated;
+do $$
+declare
+  stelios uuid := ect_test.m('stelios');
+  m public.members;
+  v_at bigint := (ect_test.member_raw('stelios')).updated_at;
+begin
+  m := public.patch_member(stelios, '{"programStart":"2026-09-23","goal":"Lose 5 kg"}'::jsonb, v_at + 10);
+  perform ect_test.eq((m.data->>'programStart') || '/' || (m.data->>'goal') || '/' || (m.updated_at = v_at + 10),
+    '2026-09-23/Lose 5 kg/true', 'patch_member: coach sets a start date and a goal, gets the stored profile back');
+end $$;
+reset role;
+
+call ect_test.act('stelios');
+set role authenticated;
+do $$
+declare
+  me uuid := ect_test.m('stelios');
+  thanos uuid := ect_test.m('thanos');
+  m public.members;
+  v_at bigint := (ect_test.member_raw('stelios')).updated_at;
+begin
+  -- a queued edit from before the coach's change, stamped earlier
+  m := public.patch_member(me, '{"settings":{"machines":{"Leg Press":"Technogym"}}}'::jsonb, v_at - 5);
+  perform ect_test.eq((m.data->>'programStart') || '/' || (m.data->>'goal') || '/' || (m.data->'settings'->'machines'->>'Leg Press')
+                      || '/' || (m.data->'settings'->>'unit') || '/' || (m.data->'settings'->>'weightVisibility')
+                      || '/' || (m.updated_at = v_at + 1),
+    '2026-09-23/Lose 5 kg/Technogym/lb/exact/true', 'patch_member: an older athlete edit keeps the coach''s fields and other settings');
+  m := public.patch_member(me, '{"coachNote":"I am great","competes":false,"name":"Stelios"}'::jsonb, v_at + 100);
+  perform ect_test.eq((m.data->>'coachNote') || '/' || (m.data->>'competes') || '/' || (m.data->>'name'), 'Great week/false/Stelios',
+    'patch_member: coach-owned fields stay protected');
+  perform ect_test.eq((select count(*) from public.patch_member(thanos, '{"name":"Hacked"}'::jsonb, v_at + 200))::text, '0',
+    'patch_member: nobody else''s profile');
+  perform ect_test.eq((ect_test.member_raw('thanos')).data->>'name', 'Thanos', 'patch_member: the other profile is untouched');
+
+  -- whole-row tables: last writer wins on updated_at
+  perform ect_test.upsert('workout_logs',
+    ect_test.owned(me || '__sync', me, null, '{"note":"new"}') || '{"updated_at":5000}'::jsonb);
+  perform ect_test.upsert('workout_logs',
+    ect_test.owned(me || '__sync', me, null, '{"note":"stale"}') || '{"updated_at":4000}'::jsonb);
+  perform ect_test.eq((select (data->>'note') || '/' || updated_at from public.workout_logs where id = me || '__sync'), 'new/5000',
+    'last writer wins: an older write does not replace a newer row');
+  perform ect_test.upsert('workout_logs',
+    ect_test.owned(me || '__sync', me, null, '{"note":"newer"}') || '{"updated_at":6000}'::jsonb);
+  perform ect_test.eq((select (data->>'note') || '/' || updated_at from public.workout_logs where id = me || '__sync'), 'newer/6000',
+    'last writer wins: a newer write replaces it');
 end $$;
 reset role;
 

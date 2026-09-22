@@ -70,8 +70,8 @@ export function SquadTodayCard({ data, today, meId }: { data: SquadData; today: 
 function Row({ row, today, t }: { row: SquadTodayRow; today: ISODate; t: T }) {
   const m = row.member
   const food = foodText(row, today, t)
-  const weigh =
-    row.daysSinceWeighIn == null ? t('weighNever') : row.daysSinceWeighIn === 0 ? t('weighToday') : t('weighDays', { n: row.daysSinceWeighIn })
+  const days = row.daysSinceWeighIn
+  const weigh = days == null ? t('weighNever') : days === 0 ? t('weighToday') : days === 1 ? t('weighYesterday') : t('weighDays', { n: days })
   return (
     <li className={cx('home-sq__row', row.push && 'is-push')}>
       <Link to={`/member/${encodeURIComponent(m.slug)}`} className="home-sq__who">

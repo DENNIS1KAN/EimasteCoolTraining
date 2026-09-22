@@ -17,6 +17,8 @@ export interface CheckinCardProps {
   waterL: number | null
   waterTargetL: number | null
   note: string
+  /** The viewer is the coach logging their own day: the note is for themselves, not "for your coach". */
+  coachSelf?: boolean
   readOnly?: boolean
   onRate: (r: CheckinRating) => void
   onWater: (litres: number) => void
@@ -55,7 +57,7 @@ export function CheckinCard(p: CheckinCardProps) {
       <WaterGlasses valueL={p.waterL} targetL={p.waterTargetL} readOnly={p.readOnly} onChange={p.onWater} />
       <TextField
         label={t('note')}
-        placeholder={t('notePh')}
+        placeholder={p.coachSelf ? t('notePhSelf') : t('notePh')}
         value={p.note}
         maxLength={280}
         disabled={p.readOnly}

@@ -11,10 +11,36 @@
   min-width: 0;
 }
 
+/* desktop: the logger is one focused column (cards of different heights never leave holes) */
+@media (min-width: 1024px) {
+  .tr-logger {
+    width: 100%;
+    max-width: 760px;
+    margin-inline: auto;
+  }
+}
+
 /* ------------------------------------------------------------------ header: live session chip */
 .tr-head .ui-page-header__actions {
   align-self: center;
   gap: 8px;
+}
+/* The eyebrow stays on one line; with the live clock on a phone it switches to "BTS · WK 3/12". */
+.tr-head .ui-page-header__eyebrow {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tr-head__eb--short {
+  display: none;
+}
+@media (max-width: 419px) {
+  .tr-head.is-live .tr-head__eb {
+    display: none;
+  }
+  .tr-head.is-live .tr-head__eb--short {
+    display: inline;
+  }
 }
 .tr-live {
   display: inline-flex;
@@ -230,10 +256,8 @@
   gap: 10px;
   align-items: start;
 }
-@media (min-width: 1024px) {
-  .tr-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.tr-finish-cta {
+  margin-top: 4px;
 }
 
 /* ------------------------------------------------------------------ open exercise card */
@@ -242,6 +266,14 @@
   border-radius: calc(var(--r-xl) + 2px);
   scroll-margin-top: calc(var(--safe-top) + 44px);
   min-width: 0;
+}
+/* focused programmatically when the logger moves on to this exercise */
+.tr-ex:focus {
+  outline: none;
+}
+.tr-ex:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 .tr-ex__head {
   display: flex;
@@ -407,6 +439,19 @@
 }
 .tr-set.is-extra .tr-set__n b {
   color: var(--ink-2);
+}
+/* e1RM caption under a ticked set, below the weight and reps */
+.tr-set__e1 {
+  grid-column: 2 / -1;
+  margin: -5px 0 0;
+  padding-left: 2px;
+  font: 700 11px/14px var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .tr-fld {
   position: relative;
@@ -805,7 +850,7 @@
 }
 @media (min-width: 1024px) {
   .tr-bottom.has-rest {
-    height: 24px;
+    height: 96px;
   }
 }
 
@@ -814,7 +859,8 @@
   position: fixed;
   left: 10px;
   right: 10px;
-  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 8px);
+  /* --float-off: height of the floating bars below this one (useFloatingBar), e.g. the Body quick-log dock */
+  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 8px + var(--float-off, 0px));
   z-index: var(--z-float);
   max-width: 560px;
   margin: 0 auto;
@@ -838,7 +884,7 @@
   .tr-rest {
     left: auto;
     right: 24px;
-    bottom: calc(24px + var(--safe-bottom));
+    bottom: calc(24px + var(--safe-bottom) + var(--float-off, 0px));
     width: 440px;
     margin: 0;
   }
@@ -1460,11 +1506,15 @@
   font: 700 12px/16px var(--font-body);
   color: var(--warn);
 }
-.lf-avatar {
-  display: inline-grid;
-  border-radius: 50%;
-}
-.lf-avatar:focus-visible {
-  outline: 2px solid var(--accent-strong);
-  outline-offset: 2px;
+/* desktop: read-only exercises flow in two balanced columns (1–4 left, 5–7 right), no ragged holes */
+@media (min-width: 1024px) {
+  .mw-page .tr-list {
+    display: block;
+    columns: 2;
+    column-gap: 10px;
+  }
+  .mw-page .tr-list > * {
+    break-inside: avoid;
+    margin-bottom: 10px;
+  }
 }

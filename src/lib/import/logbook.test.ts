@@ -5,7 +5,14 @@ import type { Program, WorkoutLog } from '../../data/types'
 import { fromISODate } from '../dates'
 import { logDate, performedExercises, personalRecords } from '../stats/lifts'
 import { parseCSV } from './csv'
-import { LOGBOOK_CSV_COLUMNS, exportLogbookCSV, importLogbookCSV, parseFinishDate, parseYesNo } from './logbook'
+import { issueText } from './issues'
+import { LOGBOOK_CSV_COLUMNS, exportLogbookCSV, importLogbookCSV as importWithIssues, parseFinishDate, parseYesNo, type LogbookImportOptions } from './logbook'
+
+/** The importer with its warnings as English sentences. */
+function importLogbookCSV(text: string, o: LogbookImportOptions) {
+  const r = importWithIssues(text, o)
+  return { ...r, warnings: r.warnings.map((w) => issueText(w, 'en')) }
+}
 
 const BTS = BTS_PROGRAM
 const NOW = at('2026-09-22', 12)
@@ -263,25 +270,53 @@ describe('importLogbookCSV', () => {
   it('reports missing columns and empty files', () => {
     expect(importLogbookCSV('', opts)).toEqual({ logs: [], warnings: ['The file is empty.'] })
     expect(importLogbookCSV('\r\n\r\n', opts)).toEqual({ logs: [], warnings: ['The file is empty.'] })
-    expect(importLogbookCSV('week,workout,set\n1,Upper,1', opts).warnings).toEqual([`Missing columns weight, reps, order. Expected: ${HEADER}.`])
+    expect(importLogbookCSV('week,workout,set\n1,Upper,1', opts).warnings).toEqual([`Missing columns weight, reps, order in the header row. Expected: ${HEADER}.`])
   })
 
   it('skips blank lines without shifting row numbers', () => {
     const r = importLogbookCSV(`${HEADER}\r\n\r\n,,,,,,,,,,,,,\r\n1,,Chest,1,,,1,60,kg,5,yes,,no,\r\n`, opts)
     expect(r.warnings[0]).toMatch(/^Row 4:/)
   })
+
+  it('returns structured warnings that read in Greek too', () => {
+    const r = importWithIssues(csv('99,,Upper,1,,,1,60,kg,5,yes,,no,', '1,,Upper,1,,Nonexistent Lift,1,60,kg,5,yes,,no,'), opts)
+    expect(r.warnings[0]).toEqual({ key: 'badWeek', vars: { week: '99', program: BTS.name, max: 12 }, row: 2 })
+    expect(r.warnings.map((w) => issueText(w, 'el'))).toEqual([
+      `Γραμμή 2: η εβδομάδα «99» δεν υπάρχει στο ${BTS.name} (1-12)· παραλείφθηκε.`,
+      'Γραμμή 3: το «Nonexistent Lift» δεν υπάρχει σε αυτή την προπόνηση· μπήκε στη θέση 1 (45° Incline Barbell Press).',
+    ])
+    expect(issueText(importWithIssues('', opts).warnings[0], 'el')).toBe('Το αρχείο είναι κενό.')
+  })
 })
 
 describe('exportLogbookCSV', () => {
-  it('writes the original app format exactly (round trip of an export)', () => {
-    expect(exportLogbookCSV(sampleLogs(), [BTS])).toBe(SAMPLE)
+  it('writes the original app format, with weights as dot decimals (round trip of an export)', () => {
+    expect(exportLogbookCSV(sampleLogs(), [BTS])).toBe(SAMPLE.replace('"32,5"', '32.5'))
   })
 
-  it('import(export(logs)) gives the same logs', () => {
+  it('import(export(logs)) gives the same logs, weights typed with a comma normalised', () => {
     const logs = sampleLogs()
     const again = importLogbookCSV(exportLogbookCSV(logs, { [BTS.id]: BTS }), opts)
     expect(again.warnings).toEqual([])
-    expect(again.logs).toEqual(logs)
+    const dot = (l: WorkoutLog): WorkoutLog => ({
+      ...l,
+      ex: Object.fromEntries(Object.entries(l.ex).map(([k, x]) => [k, { ...x, sets: x.sets.map((s) => ({ ...s, w: s.w.replace(',', '.') })) }])),
+    })
+    expect(again.logs).toEqual(logs.map(dot))
+  })
+
+  it('writes weights and reps as plain numbers so a spreadsheet can sum them, keeping anything else as typed', () => {
+    const log = mkLog({ week: 1, day: 0, ex: { 0: { sets: [['72,5', '10'], ['62.50', ' 8 '], ['bar', '8-10'], ['', '', false]] } } })
+    const rows = parseCSV(exportLogbookCSV([log], [MINI]))
+    const col = (c: string) => rows[0].indexOf(c)
+    expect(rows.slice(1).map((r) => [r[col('weight')], r[col('reps')]])).toEqual([
+      ['72.5', '10'],
+      ['62.5', '8'],
+      ['bar', '8-10'],
+      ['', ''],
+    ])
+    const semi = parseCSV(exportLogbookCSV([log], [MINI], { delimiter: ';' }))
+    expect(semi.slice(1).map((r) => r[col('weight')])).toEqual(['72,5', '62,5', 'bar', ''])
   })
 
   it('round-trips app logs, normalising what the format cannot hold (times become local noon, feel/notes dropped)', () => {

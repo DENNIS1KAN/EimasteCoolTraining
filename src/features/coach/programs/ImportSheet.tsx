@@ -1,11 +1,12 @@
 import { useDeferredValue, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Banner, Button, Chip, FileDrop, Segmented, Sheet, TextArea, TextField, toast } from '../../../ui'
-import { useT } from '../../../i18n'
+import { useLang, useT } from '../../../i18n'
 import { COMMON } from '../../../i18n/common'
 import { put, useMe, useStore } from '../../../data/store'
 import { dayShortName } from '../../../data/programs'
-import { parseProgram } from '../../../lib/import/program'
+import { issueText } from '../../../lib/import/issues'
+import { DEFAULT_IMPORT_NAME, parseProgram } from '../../../lib/import/program'
 import { fmtNum } from '../../../lib/format'
 import { readFileText } from '../lib/download'
 import { programIdFromName, programSummary } from '../lib/programs'
@@ -36,6 +37,7 @@ export function ImportSheet({ open, onClose }: ImportSheetProps) {
 function ImportSheetForm({ open, onClose, afterClose }: ImportSheetProps & { afterClose: () => void }) {
   const t = useT(M)
   const tc = useT(COMMON)
+  const lang = useLang()
   const me = useMe()
   const navigate = useNavigate()
   const programs = useStore((s) => s.programs)
@@ -54,7 +56,9 @@ function ImportSheetForm({ open, onClose, afterClose }: ImportSheetProps & { aft
   const warnings = result && 'warnings' in result ? result.warnings : []
   const summary = program ? programSummary(program) : null
 
-  const defaultName = program ? (program.name === 'Imported program' && mode === 'file' && file ? nameFromFile(file.name) || program.name : program.name) : ''
+  // A file without a program name: offer the file name, else a name in the viewer's language.
+  const fileName = mode === 'file' && file ? nameFromFile(file.name) : ''
+  const defaultName = !program ? '' : program.name !== DEFAULT_IMPORT_NAME ? program.name : fileName || t('untitledProgram')
   const name = nameDraft ?? defaultName
   const nameError = triedSave && !name.trim() ? t('programNameRequired') : null
 
@@ -86,18 +90,18 @@ function ImportSheetForm({ open, onClose, afterClose }: ImportSheetProps & { aft
   const week1 = program?.weeks[0]
 
   const footer = (
-    <div className="import-actions">
+    <>
       <Button variant="ghost" onClick={onClose} block>
         {tc('cancel')}
       </Button>
       <Button variant="primary" icon="check" onClick={save} disabled={!program} block>
         {t('saveProgram')}
       </Button>
-    </div>
+    </>
   )
 
   return (
-    <Sheet open={open} onClose={onClose} afterClose={afterClose} title={t('importTitle')} subtitle={t('importBody')} size="full" footer={footer}>
+    <Sheet open={open} onClose={onClose} afterClose={afterClose} title={t('importTitle')} subtitle={t('importBody')} footer={footer}>
       <div className="import-form stack-lg">
         <Segmented<Mode>
           options={[
@@ -142,7 +146,7 @@ function ImportSheetForm({ open, onClose, afterClose }: ImportSheetProps & { aft
           <Banner tone="danger" title={t('problems')} role="alert">
             <ul className={errors.length === 1 ? 'import-list import-list--single' : 'import-list'}>
               {errors.map((e, i) => (
-                <li key={i}>{e}</li>
+                <li key={i}>{issueText(e, lang)}</li>
               ))}
             </ul>
           </Banner>
@@ -187,7 +191,7 @@ function ImportSheetForm({ open, onClose, afterClose }: ImportSheetProps & { aft
               <Banner tone="warn" title={t('headsUp')}>
                 <ul className={warnings.length === 1 ? 'import-list import-list--single' : 'import-list'}>
                   {warnings.map((w, i) => (
-                    <li key={i}>{w}</li>
+                    <li key={i}>{issueText(w, lang)}</li>
                   ))}
                 </ul>
               </Banner>

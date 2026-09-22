@@ -2,10 +2,10 @@ import { Link } from 'react-router'
 import type { Member, Program, Unit, WorkoutLog } from '../../../data/types'
 import { dayShortName } from '../../../data/programs'
 import { useT } from '../../../i18n'
-import { fmtDayLabel, fmtDuration, fmtVolume } from '../../../lib/format'
+import { fmtDayLabel, fmtVolume } from '../../../lib/format'
 import { logDate, sessionSummary, type PR } from '../../../lib/stats'
 import { ButtonLink, Card, CardHeader, EmptyState, Icon, PRBadge } from '../../../ui'
-import { memberWorkoutHref } from '../format'
+import { fmtSessionDuration, memberWorkoutHref } from '../format'
 import { SQ } from '../messages'
 
 export interface RecentWorkoutsProps {
@@ -30,12 +30,12 @@ export function RecentWorkouts({ member, logs, programs, prs, unit, isMe }: Rece
             const day = p?.weeks[l.week - 1]?.days[l.day]
             const s = sessionSummary(l, p)
             const n = prs.filter((x) => x.logId === l.id).length
-            const meta = [t('weekShort', { n: l.week }), t('setsN', { n: s.setsDone }), s.volumeKg > 0 ? fmtVolume(s.volumeKg, unit) : null, s.durationMs ? fmtDuration(s.durationMs) : null]
+            const meta = [t('weekShort', { n: l.week }), t('setsN', { n: s.setsDone }), s.volumeKg > 0 ? fmtVolume(s.volumeKg, unit) : null, s.durationMs ? fmtSessionDuration(s.durationMs) : null]
               .filter(Boolean)
               .join(' · ')
             return (
               <li key={l.id}>
-                <Link to={memberWorkoutHref(member, l.week, l.day)} className="sq-recent__row">
+                <Link to={memberWorkoutHref(member, l.week, l.day, l.programId)} className="sq-recent__row">
                   <span className="sq-recent__day num">{day ? dayShortName(day) : '—'}</span>
                   <span className="sq-recent__main">
                     <span className="sq-recent__date">{fmtDayLabel(logDate(l))}</span>

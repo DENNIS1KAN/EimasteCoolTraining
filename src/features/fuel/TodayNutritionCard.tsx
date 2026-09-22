@@ -5,7 +5,7 @@ import { fmtNum } from '../../lib/format'
 import { Card, Icon } from '../../ui'
 import { ProgressRing } from '../../ui/charts'
 import { useFuelData, useNow } from './hooks'
-import { daySummary, minutesOf, nextMealId, planOnDate } from './lib/day'
+import { daySummary, minutesOf, nextMealId, planOnDate, ticksFor } from './lib/day'
 import { FM } from './messages'
 import './fuel-mini.css'
 
@@ -16,8 +16,8 @@ export function TodayNutritionCard(props: { memberId: string }) {
   const today = todayISO(now)
   const data = useFuelData(props.memberId)
   const checkin = data.byDate.get(today) ?? null
-  const plan = planOnDate(data.plans, data.current, today, checkin)
-  const ticked = useMemo(() => checkin?.meals ?? [], [checkin])
+  const plan = planOnDate(data.plans, data.current, today, checkin, today)
+  const ticked = useMemo(() => ticksFor(checkin, plan, data.plans), [checkin, plan, data.plans])
   const s = useMemo(() => daySummary(plan, ticked), [plan, ticked])
   const nextId = plan ? nextMealId(plan.meals, ticked, minutesOf(now)) : null
   const next = plan?.meals.find((m) => m.id === nextId) ?? null

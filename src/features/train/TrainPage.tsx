@@ -4,7 +4,8 @@ import type { Member, Program } from '../../data/types'
 import { useMe, useStore } from '../../data/store'
 import { COMMON } from '../../i18n/common'
 import { useT } from '../../i18n'
-import { nextWorkout } from '../../lib/stats'
+import { todayISO } from '../../lib/dates'
+import { upcomingWorkout } from '../../lib/stats'
 import { ButtonLink, Card, EmptyState, PageHeader } from '../../ui'
 import { Logger } from './Logger'
 import { useMemberLogs } from './hooks'
@@ -14,7 +15,8 @@ import { M } from './messages'
 import './train.css'
 
 /**
- * /train opens the session in progress, else the next workout (the first one not done), and pins it in the URL
+ * /train opens the session in progress, else the next workout (calendar-aligned: this week's first one not done,
+ * so a missed week doesn't send you back in time), and pins it in the URL
  * so finishing it doesn't jump ahead; /train/:week/:day opens a specific one (week 1-based, day 0-based like
  * WorkoutLog).
  */
@@ -36,7 +38,7 @@ function TrainRoute({ me, program }: { me: Member; program: Program }) {
     const mine = logs.filter((l) => l.programId === program.id)
     const live = liveLog(mine, Date.now())
     if (live) return { week: live.week, day: live.day }
-    const n = nextWorkout(program, mine)
+    const n = upcomingWorkout(program, me.programStart, mine, todayISO())
     if (n) return n
     const last = program.weeks.length
     return { week: last, day: program.weeks[last - 1].days.length - 1 }

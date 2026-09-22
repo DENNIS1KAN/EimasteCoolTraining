@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from '../../data/store'
 import type { Unit, WeightEntry } from '../../data/types'
 import { COMMON } from '../../i18n/common'
@@ -7,9 +7,10 @@ import { todayISO } from '../../lib/dates'
 import { fmtDayLabel, fmtNum } from '../../lib/format'
 import { dailyId } from '../../lib/ids'
 import { parseNum } from '../../lib/units'
-import { Banner, Button, ConfirmSheet, DateField, Icon, NumberField, Sheet, Stepper, TextField, toast } from '../../ui'
+import { Banner, Button, Chip, ConfirmSheet, DateField, Icon, NumberField, Sheet, Stepper, TextField, cx, toast } from '../../ui'
 import { deleteWeighIn, saveWeighIn } from './actions'
-import { fromDisplay, round1, toDisplay, WEIGHT_LIMITS } from './logic'
+import { useJumpConfirm } from './JumpConfirm'
+import { fromDisplay, nearestEntry, round1, STEPPER_BOUNDS, suggestWeight, toDisplay, validWeight, WEIGHT_LIMITS } from './logic'
 import { M } from './messages'
 import { wText } from './format'
 
@@ -66,12 +67,35 @@ export function WeightEntrySheet(props: WeightEntrySheetProps) {
   const weights = useStore((s) => s.weights)
   const existing = weights[dailyId(props.memberId, draft.date)] ?? null
   const conflict = existing && existing.id !== entry?.id ? existing : null
+  const mine = useMemo(() => Object.values(weights).filter((w) => w.memberId === props.memberId && w.kg > 0), [weights, props.memberId])
   const lim = WEIGHT_LIMITS[props.unit]
   const today = todayISO()
   const set = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }))
+  const jump = useJumpConfirm(props.unit)
+
+  // The Stepper keeps what was typed (see STEPPER_BOUNDS): out-of-range values are flagged here, never clamped and saved.
+  const refEntry = nearestEntry(mine, draft.date, entry?.id)
+  const valid = validWeight(draft.value, props.unit)
+  const suggest = valid ? null : suggestWeight(draft.value, props.unit, refEntry ? toDisplay(refEntry.kg, props.unit) : null)
+
+  // A first weigh-in starts from a guess (goal weight or a default): put the cursor in the number so it gets typed.
+  const stepperRef = useRef<HTMLDivElement>(null)
+  const firstEver = open && !entry && mine.length === 0
+  useEffect(() => {
+    if (!firstEver) return
+    const id = requestAnimationFrame(() => stepperRef.current?.querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true }))
+    return () => cancelAnimationFrame(id)
+  }, [firstEver])
 
   const save = () => {
+    if (!valid) return
     const kg = fromDisplay(draft.value, props.unit)
+    // Re-saving an edited weigh-in without touching the number (a note, the date) never asks again.
+    if (entry && kg === entry.kg) persist(kg)
+    else jump.guard(kg, draft.date, refEntry, () => persist(kg))
+  }
+
+  const persist = (kg: number) => {
     const undo = saveWeighIn(
       {
         memberId: props.memberId,
@@ -112,7 +136,7 @@ export function WeightEntrySheet(props: WeightEntrySheetProps) {
                 {tc('delete')}
               </Button>
             )}
-            <Button variant="primary" block icon="check" onClick={save}>
+            <Button variant="primary" block icon="check" onClick={save} disabled={!valid}>
               {entry ? tc('save') : t('saveWeight')}
             </Button>
           </div>
@@ -125,18 +149,33 @@ export function WeightEntrySheet(props: WeightEntrySheetProps) {
             save()
           }}
         >
-          <div className="body-entry__stepper">
+          <div ref={stepperRef} className={cx('body-entry__stepper', !valid && 'body-entry__stepper--invalid')}>
             <Stepper
               value={draft.value}
               onChange={(v) => set({ value: v })}
               step={0.1}
-              min={lim.min}
-              max={lim.max}
+              min={STEPPER_BOUNDS.min}
+              max={STEPPER_BOUNDS.max}
               format={(n) => fmtNum(n, 1, 1)}
               unit={props.unit}
               size="lg"
               label={t('weightLabel')}
             />
+            <div className="body-entry__check" role="status">
+              {valid ? null : (
+                <>
+                  <span className="body-entry__error">
+                    <Icon name="alert" size={16} />
+                    {t('invalidWeight', { min: `${lim.min} ${props.unit}`, max: `${lim.max} ${props.unit}` })}
+                  </span>
+                  {suggest != null && (
+                    <Chip tone="accent" onClick={() => set({ value: suggest })}>
+                      {t('didYouMean', { value: `${fmtNum(suggest, 1, 1)} ${props.unit}` })}
+                    </Chip>
+                  )}
+                </>
+              )}
+            </div>
           </div>
           <DateField label={t('date')} value={draft.date} max={today} onChange={(v) => v && set({ date: v })} />
           {conflict && (
@@ -186,6 +225,7 @@ export function WeightEntrySheet(props: WeightEntrySheetProps) {
           onClose={() => setConfirm(false)}
         />
       )}
+      {jump.sheet}
     </>
   )
 }

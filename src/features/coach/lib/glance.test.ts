@@ -23,6 +23,13 @@ describe('athleteGlance', () => {
     expect(g.flags).toEqual(['behind', 'noWeighIn'])
   })
 
+  it("suggests the calendar week's next workout, not a missed one from an earlier week", () => {
+    const m = mkMember({ id: 'a', programStart: START })
+    // Monday of week 2, only week 1 Monday was done: next is week 2 day 1, not week 1 Wednesday
+    const d = squad({ members: [m], logs: [mkLog({ member: 'a', week: 1, day: 0, doneAt: at('2026-01-05') })] })
+    expect(athleteGlance(d, m, '2026-01-12').stats.nextWorkout).toEqual({ week: 2, day: 0 })
+  })
+
   it('is clean when on track', () => {
     const m = mkMember({ id: 'a', programStart: START })
     const d = squad({

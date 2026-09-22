@@ -46,7 +46,7 @@ export function MemberRow({ info, code, loadingCode, isMe }: MemberRowProps) {
             <span className="truncate">{m.name}</span>
             {isMe ? <Tag tone="accent">{t('youTag')}</Tag> : null}
           </p>
-          <p className="member-row__meta truncate">
+          <p className="member-row__meta">
             {m.role === 'coach' ? tc('coach') : tc('athlete')} · {programLine}
           </p>
           <p className="member-row__sub">

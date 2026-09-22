@@ -1,5 +1,11 @@
-/** Supabase's default minimum; the app asks for the same so the server never has to refuse. */
-export const MIN_PASSWORD = 6
+/**
+ * Minimum password length for joining and changing a password. Stricter than Supabase's default of 6: the
+ * login handles are public (the profile picker lists them), so a short password is the only thing to guess.
+ */
+export const MIN_PASSWORD = 8
+
+/** Values for the password messages ("At least {min} characters"). */
+export const PASSWORD_VARS = { min: MIN_PASSWORD } as const
 
 export interface PasswordCheck {
   longEnough: boolean

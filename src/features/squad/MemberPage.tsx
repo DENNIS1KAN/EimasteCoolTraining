@@ -65,7 +65,7 @@ export default function MemberPage() {
         <PageHeader back="/squad" eyebrow={t('coachRole')} title={member.name} />
         <ProfileHeader member={member} stats={s} isMe={isMe} compareWith={null} viewerFirst={false} />
         <Card as="section" aria-labelledby="sq-coaching-h">
-          <CardHeader title={<span id="sq-coaching-h">{t('coachingN', { n: competitors.length })}</span>} subtitle={isMe ? undefined : t('coachProfileBody')} />
+          <CardHeader title={<span id="sq-coaching-h">{competitors.length === 1 ? t('coachingOne') : t('coachingN', { n: competitors.length })}</span>} subtitle={isMe ? undefined : t('coachProfileBody')} />
           <ul className="sq-athletes">
             {competitors.map((m) => (
               <li key={m.id}>

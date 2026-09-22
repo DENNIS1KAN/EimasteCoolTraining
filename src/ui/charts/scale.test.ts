@@ -5,6 +5,7 @@ import {
   barPath,
   calendarGrid,
   deltaShares,
+  formatResolution,
   groupLayout,
   heatLevel,
   labelStride,
@@ -12,6 +13,7 @@ import {
   linePath,
   linearScale,
   medianGap,
+  monotonePath,
   nearestIndex,
   niceDomain,
   niceStep,
@@ -92,6 +94,81 @@ describe('nice ticks', () => {
     expect(paddedExtent([5, 10], 0, true)).toEqual([0, 10])
     expect(paddedExtent([-4, -2], 1, false)).toEqual([-6, 0])
     expect(paddedExtent([], 0.1, false)).toBeNull()
+  })
+})
+
+describe('printable, capped ticks', () => {
+  const oneDec = (n: number) => (Math.round(n * 10) / 10).toString()
+  const noDec = (n: number) => Math.round(n).toString()
+  const signed = (n: number) => (n > 0 ? '+' : '') + oneDec(n)
+  it('measures a formatter resolution', () => {
+    expect(formatResolution(oneDec, 78, 84)).toBe(0.1)
+    expect(formatResolution(noDec, 30, 45)).toBe(1)
+    expect(formatResolution((n) => `${Math.round(n / 1000)} t`, 0, 21100)).toBe(1000)
+    expect(formatResolution(signed, -0.3, 1.1)).toBe(0.1)
+  })
+  it('never picks a step the labels cannot print (the 0.25 kg grid labelled +0.3 / +0.8)', () => {
+    const res = formatResolution(signed, -0.25, 1)
+    const nd = niceDomain(-0.25, 1, 3, false, { maxIntervals: 3, resolution: res })
+    expect(nd.ticks).toEqual([-0.5, 0, 0.5, 1])
+    const labels = nd.ticks.map(signed)
+    expect(new Set(labels).size).toBe(labels.length)
+    // e1RM printed without decimals: no 2.5 steps
+    const e = niceDomain(38.4, 45.3, 3, false, { maxIntervals: 3, resolution: 1 })
+    expect(e.step % 1).toBe(0)
+    // tonnes: steps of whole tonnes
+    expect(niceDomain(0, 21100, 3, false, { maxIntervals: 3, resolution: 1000 }).step % 1000).toBe(0)
+  })
+  it('caps the gridlines at four', () => {
+    for (const [lo, hi] of [
+      [77.6, 83.5],
+      [0, 13],
+      [-0.25, 1],
+      [80.2, 80.9],
+      [0, 21100],
+    ]) {
+      expect(niceDomain(lo, hi, 3, false, { maxIntervals: 3 }).ticks.length).toBeLessThanOrEqual(4)
+      expect(niceTicks(lo, hi, 3, false, { maxIntervals: 3 }).length).toBeLessThanOrEqual(4)
+    }
+  })
+  it('caps time ticks when asked', () => {
+    const ticks = timeTicks([t('2026-09-08'), t('2026-09-22')], 1100, () => 40, 12, 4)
+    expect(ticks.length).toBeLessThanOrEqual(4)
+    expect(ticks.length).toBeGreaterThanOrEqual(2)
+  })
+})
+
+describe('monotonePath', () => {
+  it('passes through every point and never overshoots', () => {
+    const pts: [number, number][] = [
+      [0, 50],
+      [10, 10],
+      [20, 12],
+      [30, 90],
+      [40, 88],
+    ]
+    const d = monotonePath(pts)
+    expect(d.startsWith('M0,50')).toBe(true)
+    for (const [x, y] of pts.slice(1)) expect(d).toContain(`${x},${y}`)
+    // Control points of each segment stay within that segment's y range (no overshoot).
+    const segs = d.split('C').slice(1).map((c) => c.split(/[ ,]/).map(Number))
+    segs.forEach((c, i) => {
+      const [y0, y1] = [pts[i][1], pts[i + 1][1]]
+      const lo = Math.min(y0, y1) - 1e-6
+      const hi = Math.max(y0, y1) + 1e-6
+      expect(c[1]).toBeGreaterThanOrEqual(lo)
+      expect(c[1]).toBeLessThanOrEqual(hi)
+      expect(c[3]).toBeGreaterThanOrEqual(lo)
+      expect(c[3]).toBeLessThanOrEqual(hi)
+    })
+  })
+  it('falls back to straight lines for two points', () => {
+    expect(
+      monotonePath([
+        [0, 0],
+        [10, 10],
+      ]),
+    ).toBe('M0,0L10,10')
   })
 })
 

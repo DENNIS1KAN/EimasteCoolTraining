@@ -7,7 +7,8 @@ import { M } from './messages'
 
 export interface SetActions {
   field: (exercise: number, set: number, field: 'w' | 'r', value: string) => void
-  tick: (exercise: number, set: number, placeholder: Placeholder | null) => TickResult
+  /** `keyboard`: the check was pressed with Enter/Space, so focus follows to the next exercise's first input. */
+  tick: (exercise: number, set: number, placeholder: Placeholder | null, keyboard?: boolean) => TickResult
 }
 
 interface Props {
@@ -20,19 +21,21 @@ interface Props {
   /** Technique micro tag on the last prescribed set ("FAIL"). */
   tag: string | null
   pr: boolean
+  /** Small line under a ticked set ("e1RM 76.7 kg · +3.4 vs best"). */
+  caption?: string | null
   actions: SetActions
 }
 
 const REPS = /^\d{0,3}$/
 
 /** One set: number (+ PR badge or technique tag), weight, reps and the 52 px done check. */
-export const SetRow = memo(function SetRow({ exercise, index, set, placeholder, unit, extra, tag, pr, actions }: Props) {
+export const SetRow = memo(function SetRow({ exercise, index, set, placeholder, unit, extra, tag, pr, caption, actions }: Props) {
   const t = useT(M)
   const repsRef = useRef<HTMLInputElement>(null)
   const n = index + 1
 
-  const tick = () => {
-    const r = actions.tick(exercise, index, placeholder)
+  const tick = (keyboard: boolean) => {
+    const r = actions.tick(exercise, index, placeholder, keyboard)
     if (r === 'need-reps') {
       const el = repsRef.current
       if (el) {
@@ -52,7 +55,8 @@ export const SetRow = memo(function SetRow({ exercise, index, set, placeholder, 
   const onRepsKey = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault()
-      if (!set.ok) tick()
+      // The soft keyboard's "done" key: don't pull the keyboard back up on the next exercise.
+      if (!set.ok) tick(false)
       e.currentTarget.blur()
     }
   }
@@ -96,9 +100,10 @@ export const SetRow = memo(function SetRow({ exercise, index, set, placeholder, 
           }}
         />
       </div>
-      <button type="button" className="tr-chk" aria-pressed={set.ok} aria-label={set.ok ? t('untickAria', { n }) : t('tickAria', { n })} onClick={tick}>
+      <button type="button" className="tr-chk" aria-pressed={set.ok} aria-label={set.ok ? t('untickAria', { n }) : t('tickAria', { n })} onClick={(e) => tick(e.detail === 0)}>
         <Icon name="check" size={22} strokeWidth={2.4} />
       </button>
+      {caption ? <p className="tr-set__e1">{caption}</p> : null}
     </div>
   )
 })

@@ -3,7 +3,7 @@ import type { ISODate } from '../dates'
 import { addDays, fromISODate, isoFromMs, startOfWeek } from '../dates'
 import { weightSeries } from './body'
 import { logTime, personalRecords, sessionSummary } from './lifts'
-import { checkinsOf, logsOf, plansOf, weightsOf, type SquadData } from './member'
+import { checkinsOf, logsOf, plansOf, sharesWeight, weightsOf, type SquadData } from './member'
 import { checkinPlan, checkinScore, currentPlan } from './nutrition'
 
 export type BadgeId =
@@ -128,7 +128,9 @@ export function earnedBadges(d: SquadData, memberId: string): EarnedBadge[] {
   add('ten-tonnes', tenTonnes ? logTime(tenTonnes) : null)
   add('early-bird', done.find((l) => l.doneAt != null && new Date(l.doneAt).getHours() < 8)?.doneAt ?? null)
   add('night-owl', done.find((l) => l.doneAt != null && new Date(l.doneAt).getHours() >= 22)?.doneAt ?? null)
-  const weighDay = firstRunOf(weightsOf(d, memberId).map((w) => w.date), 7)
+  // Weight badges only while the squad can read the weigh-ins, so every phone awards the same badges.
+  const weights = sharesWeight(m) ? weightsOf(d, memberId) : []
+  const weighDay = firstRunOf(weights.map((w) => w.date), 7)
   add('weigh-in-7', weighDay ? endOfDay(weighDay) : null)
   const plan = currentPlan(plansOf(d, memberId), memberId)
   const goodDays = checkinsOf(d, memberId)
@@ -137,7 +139,7 @@ export function earnedBadges(d: SquadData, memberId: string): EarnedBadge[] {
   const planDay = firstRunOf(goodDays, 7)
   add('on-plan-7', planDay ? endOfDay(planDay) : null)
   if (m.goalWeightKg != null) {
-    const series = weightSeries(weightsOf(d, memberId))
+    const series = weightSeries(weights)
     if (series.length >= 2) {
       const start = series[0].kg
       const down = m.goalWeightKg < start

@@ -17,6 +17,8 @@ export interface RestState {
   next: [string, string]
   /** Where the workout lives, so the timer can take you back to it. */
   route: string | null
+  /** Whose workout it is: the timer never shows for anyone else (e.g. after "Switch profile"). */
+  memberId: string | null
   /** When the countdown reached zero (null while counting). */
   zeroAt: number | null
 }
@@ -68,10 +70,13 @@ export function subscribeRest(f: () => void): () => void {
 export const useRest = (): RestState | null => useSyncExternalStore(subscribeRest, getRest, getRest)
 
 /** Start (or restart) the rest countdown. Call from the tap that ticked the set, so audio can unlock. */
-export function startRest(p: { seconds: number; next: [string, string]; route?: string | null }, now = Date.now()): void {
+export function startRest(
+  p: { seconds: number; next: [string, string]; route?: string | null; memberId?: string | null },
+  now = Date.now(),
+): void {
   unlockAudio()
   const total = Math.max(1, Math.round(p.seconds)) * 1000
-  emit({ id: ++seq, startedAt: now, endsAt: now + total, total, next: p.next, route: p.route ?? null, zeroAt: null })
+  emit({ id: ++seq, startedAt: now, endsAt: now + total, total, next: p.next, route: p.route ?? null, memberId: p.memberId ?? null, zeroAt: null })
   schedule(now)
 }
 

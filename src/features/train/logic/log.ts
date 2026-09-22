@@ -7,7 +7,7 @@ import { exerciseName, workingSets } from '../../../data/programs'
 import { logId } from '../../../lib/ids'
 import { parseNum } from '../../../lib/units'
 import { fromISODate, isoFromMs, type ISODate } from '../../../lib/dates'
-import { setReps } from '../../../lib/stats'
+import { isCountedSet, setReps } from '../../../lib/stats'
 
 export type Machines = Record<string, string>
 
@@ -198,8 +198,12 @@ export interface ExerciseProgress {
 
 export interface DayProgress {
   exercises: ExerciseProgress[]
+  /** Ticked sets counted against the prescription (at most the prescribed sets of each exercise). */
   setsDone: number
+  /** Prescribed sets of the day (the one denominator used everywhere: logger, Home, finish sheet, done card). */
   setsTotal: number
+  /** Ticked sets beyond the prescription, shown apart as "+N". */
+  setsExtra: number
   /** First exercise that isn't complete, -1 when all are. */
   current: number
 }
@@ -213,10 +217,36 @@ export function dayProgress(log: WorkoutLog | null | undefined, day: ProgramDay)
   })
   return {
     exercises,
-    setsDone: exercises.reduce((a, x) => a + x.done, 0),
-    setsTotal: exercises.reduce((a, x) => a + x.total, 0),
+    setsDone: exercises.reduce((a, x) => a + Math.min(x.done, x.prescribed), 0),
+    setsTotal: exercises.reduce((a, x) => a + x.prescribed, 0),
+    setsExtra: exercises.reduce((a, x) => a + Math.max(0, x.done - x.prescribed), 0),
     current: exercises.findIndex((x) => !x.complete),
   }
+}
+
+export interface SetTally {
+  /** Counted sets, at most the prescribed ones per exercise. */
+  done: number
+  prescribed: number
+  /** Counted sets beyond the prescription. */
+  extra: number
+}
+
+/**
+ * Sets done against the prescription for a whole workout, counting the way the stats do (ticked sets, plus
+ * sets with reps once the workout is done). Extra sets are counted apart, so "sets done" never reads 15 / 14.
+ */
+export function setTally(log: WorkoutLog | null | undefined, day: ProgramDay | undefined): SetTally {
+  const t: SetTally = { done: 0, prescribed: 0, extra: 0 }
+  if (!day) return t
+  day.ex.forEach((e, i) => {
+    const prescribed = workingSets(e)
+    const n = (log?.ex[String(i)]?.sets ?? []).filter((s) => isCountedSet(s, !!log?.done)).length
+    t.prescribed += prescribed
+    t.done += Math.min(n, prescribed)
+    t.extra += Math.max(0, n - prescribed)
+  })
+  return t
 }
 
 export type NextUp =

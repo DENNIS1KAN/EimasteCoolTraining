@@ -25,7 +25,7 @@ export function LogWeightSheet({ open, onClose }: { open: boolean; onClose: () =
       memberId={me.id}
       unit={unit}
       entry={todayEntry}
-      startValue={stepperStart(model.latest?.kg, unit)}
+      startValue={stepperStart(model.latest?.kg, unit, me.goalWeightKg)}
       onSaved={(_kg, date) => celebrateStreak(model.entries, me.id, date, model.today, (n) => t('streak', { n }))}
     />
   )

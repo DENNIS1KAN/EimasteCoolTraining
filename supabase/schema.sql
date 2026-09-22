@@ -12,6 +12,9 @@
 --   rows; the coach may manage everyone. Visitors who are not signed in can only call login_profiles().
 -- - Logins: members.user_id links a squad member to a Supabase Auth user. It is set by claim_invite()
 --   (the friend opens their invite link and picks a password) and cleared by reset_invite(..., true).
+-- - Sync: rows carry the writer's updated_at (ms). An update older than the stored row is ignored, so a phone
+--   that comes back online with a stale copy cannot undo newer edits. Member profiles, which both the coach and
+--   the athlete edit, are merged field by field through patch_member().
 -- =====================================================================================================
 
 -- ----------------------------------------------------------------------------------------- tables
@@ -31,6 +34,13 @@ create table if not exists public.member_invites (
   member_id uuid primary key references public.members on delete cascade,
   code text not null
 );
+
+-- Wrong invite codes per login, to stop guessing (claim_invite allows 5 per hour). Not readable through the API.
+create table if not exists public.invite_attempts (
+  user_id uuid not null,
+  at timestamptz not null default now()
+);
+create index if not exists invite_attempts_user_at_idx on public.invite_attempts (user_id, at);
 
 create table if not exists public.programs (
   id text primary key,
@@ -100,6 +110,7 @@ create index if not exists programs_created_by_idx on public.programs (created_b
 
 alter table public.members enable row level security;
 alter table public.member_invites enable row level security;
+alter table public.invite_attempts enable row level security;
 alter table public.programs enable row level security;
 alter table public.workout_logs enable row level security;
 alter table public.weights enable row level security;
@@ -114,11 +125,14 @@ language sql volatile set search_path = public as $$
   select (extract(epoch from clock_timestamp()) * 1000)::bigint
 $$;
 
--- 6 characters, uppercase, without the look-alikes 0/O/1/I. 32 symbols, so every byte maps evenly.
+-- 12 characters (60 random bits: far too many to guess), uppercase, without the look-alikes 0/O/1/I.
+-- 32 symbols, so every byte maps evenly. Bytes 6 and 8 of a v4 uuid carry fixed version bits and are skipped.
+-- People never type it: it travels inside the join link.
 create or replace function public.gen_invite_code() returns text
 language sql volatile set search_path = public as $$
-  select string_agg(substr('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', get_byte(s.b, i) % 32 + 1, 1), '' order by i)
-  from (select uuid_send(gen_random_uuid()) as b) s, generate_series(0, 5) as i
+  select string_agg(substr('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', get_byte(s.b, u.i) % 32 + 1, 1), '' order by u.o)
+  from (select uuid_send(gen_random_uuid()) as b) s,
+       unnest(array[0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13]) with ordinality as u(i, o)
 $$;
 
 -- Profile defaults for new members (mirrors the demo seed in the app).
@@ -240,6 +254,30 @@ drop trigger if exists cheers_guard on public.cheers;
 create trigger cheers_guard before update on public.cheers
   for each row execute function public.cheers_guard();
 
+-- Last writer wins: an update carrying an older updated_at than the stored row changes nothing (a phone that
+-- was offline replays its queue after someone else saved a newer version). Keeping the old row, instead of
+-- skipping the update, still sends a live event, so the stale phone picks up the newer version.
+-- Named to run after the *_guard triggers (same-event triggers fire in name order).
+create or replace function public.skip_stale_write() returns trigger
+language plpgsql set search_path = public as $$
+begin
+  if new.updated_at < old.updated_at then
+    return old;
+  end if;
+  return new;
+end
+$$;
+
+do $$
+declare
+  t text;
+begin
+  foreach t in array array['members', 'programs', 'workout_logs', 'weights', 'meal_plans', 'checkins', 'cheers'] loop
+    execute format('drop trigger if exists stale_write_guard on public.%I', t);
+    execute format('create trigger stale_write_guard before update on public.%I for each row execute function public.skip_stale_write()', t);
+  end loop;
+end $$;
+
 -- ----------------------------------------------------------------------------------------- RPCs
 
 -- The login screen lists the squad before anyone signs in (names and colors only, never data).
@@ -259,6 +297,8 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 -- A signed-up user claims a squad member with the invite code the coach shared.
+-- A wrong code (or unknown member) returns null instead of raising, so the failed attempt stays recorded;
+-- after 5 of them in an hour the login gets 'too_many_attempts', even with a right code.
 create or replace function public.claim_invite(p_slug text, p_code text) returns uuid
 language plpgsql security definer set search_path = public as $$
 declare
@@ -270,18 +310,24 @@ begin
     raise exception 'not_authenticated' using errcode = '28000';
   end if;
   select * into v_member from public.members where slug = lower(btrim(p_slug)) for update;
-  if not found then
-    raise exception 'invalid_invite';
-  end if;
-  if v_member.user_id = v_uid then
+  if v_member.id is not null and v_member.user_id = v_uid then
     return v_member.id; -- already ours (e.g. a retry after a lost response)
   end if;
   if v_member.user_id is not null then
     raise exception 'already_joined';
   end if;
-  select i.code into v_code from public.member_invites i where i.member_id = v_member.id;
+
+  delete from public.invite_attempts where at < now() - interval '1 day';
+  if (select count(*) from public.invite_attempts a where a.user_id = v_uid and a.at > now() - interval '1 hour') >= 5 then
+    raise exception 'too_many_attempts';
+  end if;
+
+  if v_member.id is not null then
+    select i.code into v_code from public.member_invites i where i.member_id = v_member.id;
+  end if;
   if v_code is null or upper(btrim(coalesce(p_code, ''))) <> upper(btrim(v_code)) then
-    raise exception 'invalid_invite';
+    insert into public.invite_attempts (user_id) values (v_uid);
+    return null; -- invalid invite
   end if;
   if exists (select 1 from public.members m where m.user_id = v_uid) then
     raise exception 'already_linked';
@@ -352,6 +398,31 @@ begin
   )
   returning id into v_id;
   return v_id;
+end
+$$;
+
+-- Save the fields of a member profile that one phone changed, keeping everything else as stored: the coach
+-- setting a start date and the athlete saving a machine at the same moment must not undo each other.
+-- p_patch holds changed profile fields; its "settings" object holds only the changed settings.
+-- Runs as the caller, so the row-level security policies and members_guard apply as for a plain update.
+-- Returns the stored profile (no row: not allowed).
+create or replace function public.patch_member(p_id uuid, p_patch jsonb, p_at bigint) returns setof public.members
+language plpgsql security invoker set search_path = public as $$
+declare
+  v_patch jsonb := case when jsonb_typeof(p_patch) = 'object' then p_patch else '{}'::jsonb end;
+begin
+  return query
+  update public.members m
+     set data = (m.data || (v_patch - array['settings', 'id', 'slug', 'role', 'joined', 'updatedAt']))
+                || case
+                     when jsonb_typeof(v_patch->'settings') = 'object' then jsonb_build_object('settings',
+                       case when jsonb_typeof(m.data->'settings') = 'object' then m.data->'settings' else '{}'::jsonb end
+                       || (v_patch->'settings'))
+                     else '{}'::jsonb
+                   end,
+         updated_at = greatest(m.updated_at + 1, coalesce(p_at, 0))
+   where m.id = p_id
+  returning m.*;
 end
 $$;
 
@@ -433,19 +504,21 @@ create policy cheers_delete on public.cheers for delete to authenticated
 
 -- ----------------------------------------------------------------------------------------- privileges
 
-revoke all on table public.members, public.member_invites, public.programs, public.workout_logs, public.weights,
-  public.meal_plans, public.checkins, public.cheers from public, anon, authenticated;
+revoke all on table public.members, public.member_invites, public.invite_attempts, public.programs, public.workout_logs,
+  public.weights, public.meal_plans, public.checkins, public.cheers from public, anon, authenticated;
 grant select, insert, update, delete on table public.members, public.programs, public.workout_logs, public.weights,
   public.meal_plans, public.checkins, public.cheers to authenticated;
 grant select, update (code) on table public.member_invites to authenticated;
 
 revoke all on function public.now_ms(), public.gen_invite_code(), public.default_member_data(text, text, text),
   public.current_member_id(), public.is_member(), public.is_coach(), public.weights_shared(uuid),
-  public.members_guard(), public.members_create_invite(), public.cheers_guard(), public.login_profiles(),
-  public.claim_invite(text, text), public.reset_invite(uuid, boolean), public.create_member(text, text, text, text)
+  public.members_guard(), public.members_create_invite(), public.cheers_guard(), public.skip_stale_write(),
+  public.login_profiles(), public.claim_invite(text, text), public.reset_invite(uuid, boolean),
+  public.create_member(text, text, text, text), public.patch_member(uuid, jsonb, bigint)
   from public, anon, authenticated;
 grant execute on function public.current_member_id(), public.is_member(), public.is_coach(), public.weights_shared(uuid),
-  public.claim_invite(text, text), public.reset_invite(uuid, boolean), public.create_member(text, text, text, text)
+  public.claim_invite(text, text), public.reset_invite(uuid, boolean), public.create_member(text, text, text, text),
+  public.patch_member(uuid, jsonb, bigint)
   to authenticated;
 grant execute on function public.login_profiles() to anon, authenticated;
 
@@ -515,7 +588,7 @@ on conflict (member_id) do nothing;
 
 -- ----------------------------------------------------------------------------------------- result
 
--- Join links: add each one to your site address, e.g. https://you.github.io/EimasteCoolTraining/#/join/dennis?code=ABC123
+-- Join links: add each one to your site address, e.g. https://you.github.io/EimasteCoolTraining/#/join/dennis?code=ABCDEFGHJKLM
 select coalesce(nullif(m.data->>'name', ''), m.slug) as name,
        m.role,
        m.user_id is not null as joined,

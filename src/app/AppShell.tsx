@@ -1,15 +1,17 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { Link, Outlet, useLocation } from 'react-router'
-import { useMe, useStore, useSync } from '../data/store'
+import { useMe, useStore, useSync, type State } from '../data/store'
 import type { Member } from '../data/types'
 import { defineMessages, useT } from '../i18n'
 import { COMMON } from '../i18n/common'
 import { unseenCheers } from '../lib/stats'
-import { Avatar, Banner, Icon, Toaster, openAccountSheet, type IconName } from '../ui'
+import { liveLog } from '../features/train/logic/today'
+import { Avatar, Banner, Icon, Toaster, cx, openAccountSheet, type IconName } from '../ui'
 import { memberColorVar } from '../ui/member'
 import { AccountSheet } from './AccountSheet'
 import { PageFallback } from './BootScreens'
 import { Brand } from './Brand'
+import { PageErrorBoundary } from './PageErrorBoundary'
 import './AppShell.css'
 
 // The rest timer keeps running (and stays visible) on every screen once a set is ticked.
@@ -26,6 +28,7 @@ const M = defineMessages(
     dismiss: 'Dismiss',
     account: 'Account: {name}',
     home: 'Eimaste Cool Training, home',
+    live: 'workout in progress',
   },
   {
     mainNav: 'Κύρια πλοήγηση',
@@ -37,6 +40,7 @@ const M = defineMessages(
     dismiss: 'Απόκρυψη',
     account: 'Λογαριασμός: {name}',
     home: 'Eimaste Cool Training, αρχική',
+    live: 'προπόνηση σε εξέλιξη',
   },
 )
 
@@ -49,13 +53,15 @@ interface NavItem {
   label: 'home' | 'train' | 'body' | 'fuel' | 'squad' | 'coachConsole' | 'settings'
 }
 
-const TABS: NavItem[] = [
-  { key: 'home', to: '/', icon: 'home', label: 'home' },
-  { key: 'train', to: '/train', icon: 'train', label: 'train' },
-  { key: 'body', to: '/body', icon: 'body', label: 'body' },
-  { key: 'fuel', to: '/fuel', icon: 'fuel', label: 'fuel' },
-  { key: 'squad', to: '/squad', icon: 'squad', label: 'squad' },
-]
+const HOME: NavItem = { key: 'home', to: '/', icon: 'home', label: 'home' }
+const TRAIN: NavItem = { key: 'train', to: '/train', icon: 'train', label: 'train' }
+const BODY: NavItem = { key: 'body', to: '/body', icon: 'body', label: 'body' }
+const FUEL: NavItem = { key: 'fuel', to: '/fuel', icon: 'fuel', label: 'fuel' }
+const SQUAD: NavItem = { key: 'squad', to: '/squad', icon: 'squad', label: 'squad' }
+/** Desktop sidebar order. */
+const TABS: NavItem[] = [HOME, TRAIN, BODY, FUEL, SQUAD]
+/** Phone tab bar: Train is the raised volt button in the middle, one thumb-tap away. */
+const MOBILE_TABS: NavItem[] = [HOME, BODY, TRAIN, FUEL, SQUAD]
 const COACH: NavItem = { key: 'coach', to: '/coach', icon: 'whistle', label: 'coachConsole' }
 const SETTINGS: NavItem = { key: 'settings', to: '/settings', icon: 'settings', label: 'settings' }
 
@@ -101,6 +107,7 @@ export function AppShell() {
   const { pathname } = useLocation()
   const active = navKeyFor(pathname)
   const unseen = useStore((s) => (s.meId ? unseenCheers(s.cheers, s.meId).length : 0))
+  const live = useStore(hasLiveWorkout)
   const pageRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
   const firstPath = useRef(true)
@@ -139,16 +146,29 @@ export function AppShell() {
         <main id="main" ref={mainRef} className="app-content" tabIndex={-1}>
           <ShellBanners />
           <div className="app-page" ref={pageRef}>
-            <Suspense fallback={<PageFallback />}>
-              <Outlet />
-            </Suspense>
+            <PageErrorBoundary resetKey={pathname}>
+              <Suspense fallback={<PageFallback />}>
+                <Outlet />
+              </Suspense>
+            </PageErrorBoundary>
           </div>
         </main>
       </div>
 
+      {/* Installed iPhone app (black-translucent status bar): keeps the white clock readable and hides content
+          scrolling under it. Zero height everywhere else (no top inset). */}
+      <div className="app-statusbar" aria-hidden="true" />
+
       <nav className="app-tabbar" aria-label={t('mainNav')}>
-        {TABS.map((item) => (
-          <NavLink key={item.key} item={item} active={active === item.key} dot={item.key === 'squad' && unseen > 0} variant="tab" />
+        {MOBILE_TABS.map((item) => (
+          <NavLink
+            key={item.key}
+            item={item}
+            active={active === item.key}
+            dot={item.key === 'squad' && unseen > 0}
+            live={item.key === 'train' && live}
+            variant={item.key === 'train' ? 'primary' : 'tab'}
+          />
         ))}
       </nav>
 
@@ -161,7 +181,27 @@ export function AppShell() {
   )
 }
 
-function NavLink({ item, active, dot, variant }: { item: NavItem; active: boolean; dot?: boolean; variant: 'tab' | 'side' }) {
+/** The viewer has an unfinished workout from the last 12 hours (drives the live dot on the Train tab). */
+function hasLiveWorkout(s: State): boolean {
+  const me = s.meId ? s.members[s.meId] : undefined
+  if (!me) return false
+  const mine = Object.values(s.logs).filter((l) => l.memberId === me.id && (!me.programId || l.programId === me.programId))
+  return !!liveLog(mine, Date.now())
+}
+
+function NavLink({
+  item,
+  active,
+  dot,
+  live,
+  variant,
+}: {
+  item: NavItem
+  active: boolean
+  dot?: boolean
+  live?: boolean
+  variant: 'tab' | 'primary' | 'side'
+}) {
   const tc = useT(COMMON)
   const t = useT(M)
   const { pathname, search } = useLocation()
@@ -174,8 +214,26 @@ function NavLink({ item, active, dot, variant }: { item: NavItem; active: boolea
     }
   }
   const badge = dot ? <span className="app-dot" aria-hidden="true" /> : null
-  const srBadge = dot ? <span className="visually-hidden">, {t('newActivity')}</span> : null
+  const srBadge = dot ? (
+    <span className="visually-hidden">, {t('newActivity')}</span>
+  ) : live ? (
+    <span className="visually-hidden">, {t('live')}</span>
+  ) : null
 
+  if (variant === 'primary') {
+    return (
+      <Link to={item.to} className={cx('app-tab', 'app-tab--primary', live && 'is-live')} aria-current={active ? 'page' : undefined} onClick={onClick}>
+        <span className="app-tab__fab">
+          <Icon name={item.icon} size={24} strokeWidth={2} />
+          {live ? <span className="app-tab__live" aria-hidden="true" /> : null}
+        </span>
+        <span className="app-tab__label">
+          {label}
+          {srBadge}
+        </span>
+      </Link>
+    )
+  }
   if (variant === 'tab') {
     return (
       <Link to={item.to} className="app-tab" aria-current={active ? 'page' : undefined} onClick={onClick}>

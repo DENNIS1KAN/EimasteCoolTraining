@@ -1,11 +1,14 @@
-import { lazy, Suspense, type ReactNode } from 'react'
+import { Suspense, type ReactNode } from 'react'
 import { HashRouter, Navigate, Route, Routes } from 'react-router'
-import { useLang } from '../i18n'
 import { useMe, useStatus } from '../data/store'
+import { useLang } from '../i18n'
 import { AppShell } from './AppShell'
+import { lazyPage as lazy } from './appUpdate'
 import { BootScreen, ErrorScreen } from './BootScreens'
+import { PageErrorBoundary } from './PageErrorBoundary'
 
 // Feature pages are code-split; each feature owns its folder under src/features/.
+// lazyPage: a chunk that vanished with a new deploy reloads the app once instead of crashing it.
 const HomePage = lazy(() => import('../features/home/HomePage'))
 const TrainPage = lazy(() => import('../features/train/TrainPage'))
 const LiftHistoryPage = lazy(() => import('../features/train/LiftHistoryPage'))
@@ -48,21 +51,27 @@ function RequireCoach({ children }: { children: ReactNode }) {
  *   /settings
  */
 export function App() {
-  const lang = useLang()
+  // Subscribing here re-renders the whole tree top-down on a language switch, so text formatted outside useT
+  // (dates, numbers) updates too.
+  useLang()
   const status = useStatus()
 
   if (status === 'booting') return <BootScreen />
   if (status === 'error') return <ErrorScreen />
 
+  // The router is NOT keyed by language: a language switch re-renders in place (useT subscribes to it), so open
+  // forms and editors keep what was typed.
   return (
-    <HashRouter key={lang}>
+    <HashRouter>
       <Suspense fallback={<BootScreen quiet />}>
         {status === 'signed-out' ? (
-          <Routes>
-            <Route path="/join/:slug" element={<JoinPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="*" element={<LoginPage />} />
-          </Routes>
+          <PageErrorBoundary>
+            <Routes>
+              <Route path="/join/:slug" element={<JoinPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="*" element={<LoginPage />} />
+            </Routes>
+          </PageErrorBoundary>
         ) : (
           <Routes>
             <Route element={<AppShell />}>

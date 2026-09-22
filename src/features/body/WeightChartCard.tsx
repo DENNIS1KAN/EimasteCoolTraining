@@ -40,7 +40,8 @@ export function WeightChartCard({
     const pts = clipSeries(model.series, from)
     if (pts.length < 1) return null
     const raw = pts.map((p) => ({ x: ms(p.date), y: toDisplay(p.kg, unit) }))
-    const trend = pts.map((p) => ({ x: ms(p.date), y: Math.round(kgToUnit(p.trendKg, unit) * 100) / 100 }))
+    // Unrounded: the formatters round once (to 0.1), exactly like the hero, so the end label and the stats agree.
+    const trend = pts.map((p) => ({ x: ms(p.date), y: kgToUnit(p.trendKg, unit) }))
     const goal = member.goalWeightKg != null ? toDisplay(member.goalWeightKg, unit) : null
     const showGoal =
       goal != null &&

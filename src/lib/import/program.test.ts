@@ -2,19 +2,23 @@ import { describe, expect, it } from 'vitest'
 import { BTS_PROGRAM } from '../../data/programs'
 import type { Program, ProgramWeek } from '../../data/types'
 import { parseCSV, toCSV } from './csv'
+import { issueText } from './issues'
 import { PROGRAM_CSV_COLUMNS, defaultSchedule, normalizeExercise, parseProgram, programTemplateCSV, programToCSV, type ParseProgramResult } from './program'
 import { programWorkouts, scheduledDate, workoutOn } from '../stats/schedule'
 
 const BTS = BTS_PROGRAM
 const HEADER = PROGRAM_CSV_COLUMNS.join(',')
 
+const en = (issues: Parameters<typeof issueText>[0][]): string[] => issues.map((i) => issueText(i, 'en'))
+/** The program, with its warnings as English sentences. */
 function ok(r: ParseProgramResult): { program: Program; warnings: string[] } {
-  if ('errors' in r) throw new Error(`expected a program, got errors:\n${r.errors.join('\n')}`)
-  return r
+  if ('errors' in r) throw new Error(`expected a program, got errors:\n${en(r.errors).join('\n')}`)
+  return { program: r.program, warnings: en(r.warnings) }
 }
+/** The problems as English sentences. */
 function errors(r: ParseProgramResult): string[] {
   if (!('errors' in r)) throw new Error('expected errors, got a program')
-  return r.errors
+  return en(r.errors)
 }
 /** BTS weeks in the original logbook shape: keyed "1".."12", no intro flag. */
 const keyedBTS = () => Object.fromEntries(BTS.weeks.map((w, i) => [String(i + 1), { block: w.block, days: w.days }]))
@@ -240,9 +244,31 @@ describe('parseProgram: CSV', () => {
     expect(errors(parseProgram(text))).toEqual([
       'Row 4: week "x" is not a whole number of 1 or more.',
       'Row 5: the day is empty.',
-      'Row 6: week "0" is not a whole number of 1 or more; the exercise name is empty.',
+      'Row 6: week "0" is not a whole number of 1 or more.',
+      'Row 6: the exercise name is empty.',
       'Row 7: week "-1" is not a whole number of 1 or more.',
     ])
+  })
+
+  it('rejects sets and reps that the logger cannot use, instead of silently logging 1 set', () => {
+    const cols = ['week', 'day', 'exercise', 'warmup_sets', 'working_sets', 'reps']
+    const text = csv(cols, ['1', 'A', 'Squat', '1-2', 'three', '5'], ['1', 'A', 'Bench', 'two', '0', 'ten'], ['1', 'A', 'Row', '2', '3', '8-10'])
+    expect(errors(parseProgram(text))).toEqual([
+      'Row 2: working sets "three" is not a whole number between 1 and 20.',
+      'Row 3: working sets "0" is not a whole number between 1 and 20.',
+      'Row 3: warm-up sets "two" is not a number or a range like 1-2.',
+      'Row 3: reps "ten" is not a number or a range like 8-10.',
+    ])
+    const fine = csv(cols, ['1', 'A', 'Squat', '', '', ''], ['1', 'A', 'Dips', '0', '3.0', 'AMRAP'], ['1', 'A', 'Lunge', '1–2', '2', '12/leg'])
+    expect(ok(parseProgram(fine)).program.weeks[0].days[0].ex.map((e) => e.s)).toEqual(['', '3.0', '2'])
+    const json = JSON.stringify([{ days: [{ name: 'Upper', ex: [{ n: 'Bench', s: 'three' }] }] }])
+    expect(errors(parseProgram(json))).toEqual(['Week 1, day 1 (Upper), exercise 1: working sets "three" is not a whole number between 1 and 20.'])
+  })
+
+  it('reads problems in Greek', () => {
+    const r = parseProgram(csv(['week', 'day', 'exercise', 'working_sets'], ['1', 'A', 'Squat', 'three']))
+    if (!('errors' in r)) throw new Error('expected errors')
+    expect(r.errors.map((i) => issueText(i, 'el'))).toEqual(['Γραμμή 2: τα σετ εργασίας πρέπει να είναι ακέραιος από 1 έως 20, όχι «three».'])
   })
 
   it('reports missing columns, a header without rows and week gaps', () => {

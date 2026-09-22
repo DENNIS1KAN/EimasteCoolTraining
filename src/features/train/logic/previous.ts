@@ -2,7 +2,7 @@
  * "Last time" for the logger: the previous performance of an exercise, shown as grey placeholders in the set
  * inputs and in the "Last time · Week 2: 55 × 10, 55 × 9" row.
  */
-import type { Program, Unit, WorkoutLog } from '../../../data/types'
+import type { Program, ProgramDay, SetLog, Unit, WorkoutLog } from '../../../data/types'
 import { exerciseName } from '../../../data/programs'
 import { isCountedSet, logTime, setReps } from '../../../lib/stats'
 import { kgToUnit, parseNum, unitToKg } from '../../../lib/units'
@@ -100,4 +100,38 @@ export function placeholderFor(prev: PrevPerformance | null, j: number, above: {
   if (p) return { w: p.w, r: p.r }
   const w = above?.w.trim() ?? ''
   return w ? { w, r: '' } : null
+}
+
+/**
+ * Placeholders for all set rows of an exercise. Without a previous performance, a set suggests the weight of the
+ * set above, typed or itself suggested (so 50 typed in set 1 shows as the grey weight of sets 2 and 3).
+ */
+export function placeholdersFor(prev: PrevPerformance | null, sets: SetLog[]): (Placeholder | null)[] {
+  const out: (Placeholder | null)[] = []
+  sets.forEach((_, j) => {
+    const above = j > 0 ? { w: sets[j - 1].w.trim() || out[j - 1]?.w || '' } : undefined
+    out.push(placeholderFor(prev, j, above))
+  })
+  return out
+}
+
+/**
+ * Before a workout is finished: un-ticked sets that have reps but no weight take the grey placeholder weight,
+ * exactly like ticking them would have. Otherwise reps typed under a grey 67.5 would be stored as a bodyweight
+ * set (no volume, no e1RM, and "— × 10" as next time's placeholder). `prevs` is indexed like the day's exercises.
+ */
+export function fillPlaceholderWeights(log: WorkoutLog, day: ProgramDay, prevs: readonly (PrevPerformance | null)[]): WorkoutLog {
+  let ex: WorkoutLog['ex'] | null = null
+  for (const [k, x] of Object.entries(log.ex)) {
+    if (!day.ex[Number(k)]) continue
+    const ph = placeholdersFor(prevs[Number(k)] ?? null, x.sets)
+    let changed = false
+    const sets = x.sets.map((s, j) => {
+      if (s.ok || s.w.trim() || !setReps(s) || !ph[j]?.w) return s
+      changed = true
+      return { ...s, w: ph[j]!.w }
+    })
+    if (changed) (ex ??= { ...log.ex })[k] = { ...x, sets }
+  }
+  return ex ? { ...log, ex } : log
 }

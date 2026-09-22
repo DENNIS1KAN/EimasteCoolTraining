@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Meal, MealPlan } from '../../../data/types'
-import { blankCheckin, daySummary, isBlankCheckin, mealMinutes, nextMealId, nextRating, planOnDate, toggleMeal } from './day'
+import { adoptPlan, blankCheckin, carryTicks, daySummary, isBlankCheckin, mealMinutes, nextMealId, nextRating, planOnDate, ticksFor, toggleMeal } from './day'
 
 const meal = (id: string, time: string, kcal: number | null = null, protein: number | null = null): Meal => ({
   id,
@@ -147,5 +147,38 @@ describe('planOnDate', () => {
   })
   it('ignores a check-in whose plan is gone', () => {
     expect(planOnDate(plans, cur, '2026-09-20', blankCheckin('m1', '2026-09-20', 'deleted'))?.id).toBe('cur')
+  })
+  it('switches today to a plan issued mid-day, but keeps past days on the plan they were logged with', () => {
+    const logged = blankCheckin('m1', '2026-09-20', 'old')
+    expect(planOnDate(plans, cur, '2026-09-20', logged, '2026-09-20')?.id).toBe('cur')
+    expect(planOnDate(plans, cur, '2026-09-20', logged, '2026-09-21')?.id).toBe('old')
+    // a plan that starts tomorrow does not take over today
+    expect(planOnDate(plans, next, '2026-09-20', logged, '2026-09-20')?.id).toBe('old')
+  })
+})
+
+describe('carrying ticks to a new plan', () => {
+  const v2 = plan([meal('b1', '08:00'), meal('s1', '11:00'), meal('l1', '14:30')], { id: 'v2' })
+  v2.meals[0].name = 'Breakfast'
+  v2.meals[1].name = 'Snack'
+  v2.meals[2].name = 'Lunch'
+  const v3 = plan([meal('b2', '08:30'), meal('s2', '11:00'), meal('d2', '21:00')], { id: 'v3' })
+  v3.meals[0].name = 'breakfast '
+  v3.meals[1].name = 'Shake'
+  v3.meals[2].name = 'Dinner'
+  it('matches by name, then by a unique time, and drops the rest', () => {
+    expect(carryTicks(['b1', 's1', 'l1'], v2, v3)).toEqual(['b2', 's2'])
+    expect(carryTicks(['b2'], v2, v3)).toEqual(['b2'])
+    expect(carryTicks(['zz'], null, v3)).toEqual([])
+  })
+  it('shows and stores the day on the plan it is shown with', () => {
+    const c = { ...blankCheckin('m1', '2026-09-20', 'v2'), meals: ['b1', 'l1'] }
+    expect(ticksFor(c, v3, [v2, v3])).toEqual(['b2'])
+    expect(ticksFor(c, v2, [v2, v3])).toEqual(['b1', 'l1'])
+    expect(ticksFor(null, v3, [v2, v3])).toEqual([])
+    const moved = adoptPlan(c, v3, [v2, v3])
+    expect(moved.planId).toBe('v3')
+    expect(moved.meals).toEqual(['b2'])
+    expect(adoptPlan(c, v2, [v2, v3])).toBe(c)
   })
 })

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { mkMember, mkWeight } from '../../lib/testing/fixtures'
 import {
+  bigJumpKg,
   canEditBody,
   changeSeries,
   clipSeries,
@@ -11,9 +12,11 @@ import {
   historyRows,
   latestEntry,
   maintainGauge,
+  nearestEntry,
   phaseOf,
   rangeFrom,
   stepperStart,
+  suggestWeight,
   toDisplay,
   toneOf,
   validWeight,
@@ -140,12 +143,47 @@ describe('units', () => {
     expect(stepperStart(null, 'kg')).toBe(75)
     expect(stepperStart(null, 'lb')).toBe(165)
   })
+  it('starts a first weigh-in at the goal weight when there is one', () => {
+    expect(stepperStart(null, 'kg', 79)).toBe(79)
+    expect(stepperStart(null, 'lb', 79)).toBe(174.2)
+    expect(stepperStart(84.2, 'kg', 79)).toBe(84.2)
+  })
   it('validates typed weights per unit', () => {
     expect(validWeight(80, 'kg')).toBe(true)
     expect(validWeight(8, 'kg')).toBe(false)
     expect(validWeight(null, 'kg')).toBe(false)
     expect(validWeight(300, 'lb')).toBe(true)
     expect(validWeight(300, 'kg')).toBe(false)
+  })
+  it('suggests the likely value for a mistyped weight', () => {
+    expect(suggestWeight(725, 'kg')).toBe(72.5)
+    expect(suggestWeight(7250, 'kg')).toBe(72.5)
+    expect(suggestWeight(8.3, 'kg', 84)).toBe(83)
+    expect(suggestWeight(7, 'kg')).toBeNull()
+    expect(suggestWeight(72.5, 'kg')).toBeNull()
+    // a fix far from the last weigh-in is not offered
+    expect(suggestWeight(725, 'kg', 110)).toBeNull()
+    expect(suggestWeight(1805, 'lb')).toBe(180.5)
+  })
+})
+
+describe('nearestEntry / bigJumpKg', () => {
+  const entries = [W('2026-09-10', 84), W('2026-09-20', 83.8), W('2026-09-24', 83.1)]
+  it('finds the closest weigh-in on another day', () => {
+    expect(nearestEntry(entries, '2026-09-21')?.date).toBe('2026-09-20')
+    expect(nearestEntry(entries, '2026-09-22')?.date).toBe('2026-09-20')
+    expect(nearestEntry(entries, '2026-09-24')?.date).toBe('2026-09-20')
+    expect(nearestEntry(entries, '2026-09-25', entries[2].id)?.date).toBe('2026-09-20')
+    expect(nearestEntry([], '2026-09-25')).toBeNull()
+  })
+  it('asks only for a big change, allowing more after a longer gap', () => {
+    const ref = W('2026-09-21', 83.8)
+    expect(bigJumpKg(83.2, '2026-09-22', ref)).toBeNull()
+    expect(bigJumpKg(38.3, '2026-09-22', ref)).toBeCloseTo(-45.5, 6)
+    expect(bigJumpKg(88.5, '2026-09-22', ref)).toBeCloseTo(4.7, 6)
+    // 5 weeks later a 7% change is plausible
+    expect(bigJumpKg(78, '2026-10-26', ref)).toBeNull()
+    expect(bigJumpKg(80, '2026-09-22', null)).toBeNull()
   })
 })
 

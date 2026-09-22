@@ -115,6 +115,18 @@ describe('earnedBadges', () => {
     expect(badgeMap(squad({ members: [member()], weights: gap.map((d) => mkWeight(S, d, 80)) }))['weigh-in-7']).toBeUndefined()
   })
 
+  it("no weight badges while the weight is private (squad mates' phones can't read the weigh-ins)", () => {
+    const days = Array.from({ length: 7 }, (_, i) => addDays('2026-03-24', i))
+    const weights = [mkWeight(S, '2026-03-01', 90), ...days.map((d) => mkWeight(S, d, 84))]
+    const priv = (v: 'private' | 'change') => member({ goalWeightKg: 86, settings: { unit: 'kg', machines: {}, weightVisibility: v } })
+    const shared = badgeMap(squad({ members: [priv('change')], weights }))
+    expect(shared['weigh-in-7']).toBeDefined()
+    expect(shared['goal-reached']).toBeDefined()
+    const hidden = badgeMap(squad({ members: [priv('private')], weights }))
+    expect(hidden['weigh-in-7']).toBeUndefined()
+    expect(hidden['goal-reached']).toBeUndefined()
+  })
+
   it('on-plan-7: seven consecutive on-plan days, scored against the plan each day was logged under', () => {
     const old = mkPlan({ id: 'old', memberId: S, startDate: '2026-03-01', meals: meals('a', 'b') })
     const cur = mkPlan({ id: 'cur', memberId: S, startDate: '2026-04-01', active: true, meals: meals('x', 'y') })

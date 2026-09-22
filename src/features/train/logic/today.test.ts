@@ -37,6 +37,25 @@ describe('todayState', () => {
     expect(s).toEqual({ kind: 'train', ref: { week: 1, day: 0 }, scheduledToday: false, behindBy: 2 })
   })
 
+  it("doesn't send you back to a missed week: this week's workout is next", () => {
+    // Week 1 fully missed; Monday of week 2
+    const s = todayState({ ...base, logs: [], today: '2026-01-12', now: at('2026-01-12', 9) })
+    expect(s).toEqual({ kind: 'train', ref: { week: 2, day: 0 }, scheduledToday: true, behindBy: 0 })
+    // Tuesday of week 2 with Monday done: a rest day, next is Wednesday's
+    const mon = mkLog({ week: 2, day: 0, doneAt: at('2026-01-12', 18) })
+    expect(todayState({ ...base, logs: [mon], today: '2026-01-13', now: at('2026-01-13', 9) })).toEqual({
+      kind: 'rest',
+      next: { week: 2, day: 1 },
+      nextDate: '2026-01-14',
+    })
+  })
+
+  it("after finishing today, next is this week's following workout", () => {
+    const mon = mkLog({ week: 2, day: 0, doneAt: at('2026-01-12', 18), startedAt: at('2026-01-12', 17) })
+    const s = todayState({ ...base, logs: [mon], today: '2026-01-12', now: at('2026-01-12', 19) })
+    expect(s).toMatchObject({ kind: 'done-today', next: { week: 2, day: 1 }, nextDate: '2026-01-14' })
+  })
+
   it('continues a session in progress', () => {
     const live = mkLog({ week: 1, day: 0, done: false, startedAt: at(START, 18), updatedAt: at(START, 18, 30), ex: { 0: { sets: [['50', '8']] } } })
     const s = todayState({ ...base, logs: [live], today: START, now: at(START, 19) })

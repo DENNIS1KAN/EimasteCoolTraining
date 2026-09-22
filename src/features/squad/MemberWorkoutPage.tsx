@@ -5,18 +5,18 @@ import { dayShortName } from '../../data/programs'
 import { useMe, useStore } from '../../data/store'
 import { useT } from '../../i18n'
 import { isoFromMs } from '../../lib/dates'
-import { fmtDate, fmtDuration, fmtVolume } from '../../lib/format'
+import { fmtDate } from '../../lib/format'
 import { logId } from '../../lib/ids'
-import { sessionSummary } from '../../lib/stats'
 import { Avatar, ButtonLink, Card, EmptyState, Icon, PageHeader, Tag } from '../../ui'
-import { FEEL_KEYS } from '../train/DoneCard'
+import { FEEL_KEYS, SessionStats } from '../train/DoneCard'
 import { ReadOnlyExercise } from '../train/WorkoutView'
-import { fmtTime } from '../train/logic/format'
+import { fmtTime, textLang } from '../train/logic/format'
 import { clampRef } from '../train/logic/program'
 import { workoutView } from '../train/logic/view'
 import { LIFT, M } from '../train/messages'
 import { KudosBar } from './KudosBar'
 import '../train/train.css'
+import '../train/lift.css'
 
 /** /member/:slug/workout/:week/:day: a read-only view of a member's (or my) logged workout. */
 export default function MemberWorkoutPage() {
@@ -54,13 +54,14 @@ function MemberWorkout({ me, member, program, week, day }: { me: Member; member:
   const isMe = me.id === member.id
   const prs = view.reduce((a, x) => a + x.sets.filter((s) => s.pr).length, 0)
   const logged = !!log && view.some((x) => !x.skipped)
+  const title = t('dayTitle', { day: dayShortName(pday) })
 
   return (
     <div className="tr-page mw-page">
       <PageHeader
         back
         eyebrow={l('workoutEyebrow', { name: member.name, week })}
-        title={t('dayTitle', { day: dayShortName(pday) })}
+        title={<span lang={textLang(title)}>{title}</span>}
         actions={
           <Link to={`/member/${member.slug}`} className="lf-avatar" aria-label={member.name}>
             <Avatar member={member} size={40} you={isMe} decorative />
@@ -99,7 +100,6 @@ function MemberWorkout({ me, member, program, week, day }: { me: Member; member:
 function Summary({ log, program, unit, prs, member, isMe }: { log: WorkoutLog; program: Program; unit: 'kg' | 'lb'; prs: number; member: Member; isMe: boolean }) {
   const t = useT(M)
   const l = useT(LIFT)
-  const s = sessionSummary(log, program)
   const at = log.doneAt ?? log.startedAt ?? log.updatedAt
   const feelKey = log.feel ? (FEEL_KEYS[Math.round(log.feel) - 1] ?? null) : null
   return (
@@ -118,27 +118,7 @@ function Summary({ log, program, unit, prs, member, isMe }: { log: WorkoutLog; p
           {fmtDate(isoFromMs(at), 'long')} · {fmtTime(at)}
         </span>
       </div>
-      <dl className="tr-done__stats">
-        <div>
-          <dt>{t('duration')}</dt>
-          <dd className="num">{s.durationMs ? fmtDuration(Math.max(60_000, s.durationMs)) : '—'}</dd>
-        </div>
-        <div>
-          <dt>{t('sets')}</dt>
-          <dd className="num">
-            {s.setsDone}
-            <small>/{s.setsPrescribed}</small>
-          </dd>
-        </div>
-        <div>
-          <dt>{t('volume')}</dt>
-          <dd className="num">{fmtVolume(s.volumeKg, unit)}</dd>
-        </div>
-        <div>
-          <dt>{t('newPrs')}</dt>
-          <dd className="num">{prs}</dd>
-        </div>
-      </dl>
+      <SessionStats log={log} program={program} unit={unit} prs={prs} />
       {feelKey || log.note ? (
         <p className="tr-done__note">
           {feelKey ? (

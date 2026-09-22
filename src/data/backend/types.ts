@@ -27,7 +27,13 @@ export interface Backend {
 
   /** Everything the signed-in member may read. Built-in programs are NOT included (the store adds them). */
   loadAll(): Promise<Snapshot>
-  put<T extends TableName>(table: T, row: Tables[T]): Promise<void>
+  /**
+   * Write a row. `changed` lists the fields this device changed since its copy was current (top-level keys, or
+   * "settings.unit" for one nested key); members are merged on the server by these keys, so two devices editing
+   * different fields of one profile never overwrite each other. Undefined = the whole row.
+   * Resolves the row as the server stored it when that is known (the store adopts it), else void.
+   */
+  put<T extends TableName>(table: T, row: Tables[T], changed?: string[]): Promise<Tables[T] | void>
   remove(table: TableName, id: string): Promise<void>
   /** Live changes made by others (and echoes of our own writes, which the store ignores by LWW). */
   subscribe(cb: (e: ChangeEvent) => void): () => void
@@ -56,6 +62,9 @@ export type BackendErrorCode =
   | 'not_found'
   | 'conflict'
   | 'too_large'
+  | 'rate_limited' // too many attempts / requests: wait and try again
+  | 'unavailable' // the server failed or is overloaded (5xx, 408): try again later
+  | 'config' // the deployment is misconfigured (e.g. the secret key or a rejected e-mail domain in config.js)
   | 'unknown'
 
 export class BackendError extends Error {
@@ -67,4 +76,6 @@ export class BackendError extends Error {
   }
 }
 
-export const isRetryable = (e: unknown): boolean => e instanceof BackendError ? e.code === 'network' : true
+/** Failures that may succeed later without anyone changing anything: the outbox keeps such writes and retries. */
+export const isRetryable = (e: unknown): boolean =>
+  e instanceof BackendError ? e.code === 'network' || e.code === 'rate_limited' || e.code === 'unavailable' : true

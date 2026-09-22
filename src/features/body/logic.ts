@@ -151,18 +151,75 @@ export const toDisplay = (kg: number, unit: Unit): number => round1(kgToUnit(kg,
 /** Display value -> kg to store (2 decimals keeps lb round-trips exact at 0.1 lb). */
 export const fromDisplay = (v: number, unit: Unit): number => Math.round(unitToKg(v, unit) * 100) / 100
 
-/** Where the quick-log stepper starts: the latest weigh-in, else 75 kg (165 lb). */
-export function stepperStart(latestKg: number | null | undefined, unit: Unit): number {
+/**
+ * Where the weigh-in stepper starts: the latest weigh-in, else the goal weight (closer to a real first weigh-in
+ * than any constant), else 75 kg (165 lb).
+ */
+export function stepperStart(latestKg: number | null | undefined, unit: Unit, goalKg?: number | null): number {
   if (latestKg != null && latestKg > 0) return toDisplay(latestKg, unit)
+  if (goalKg != null && goalKg > 0) return toDisplay(goalKg, unit)
   return unit === 'lb' ? 165 : 75
 }
 
 /** Sensible bounds for a typed body weight. */
 export const WEIGHT_LIMITS: Record<Unit, { min: number; max: number }> = { kg: { min: 30, max: 250 }, lb: { min: 66, max: 550 } }
 
+/**
+ * Bounds handed to the weigh-in Stepper. Deliberately wider than WEIGHT_LIMITS: the Stepper clamps whatever is typed,
+ * and a silent clamp turns "725" (forgotten comma) into a saved 250 kg. With these, the typed value survives, the
+ * screen shows it as out of range and offers the likely fix.
+ */
+export const STEPPER_BOUNDS = { min: 0, max: 9999.9 } as const
+
 export function validWeight(v: number | null, unit: Unit): v is number {
   const l = WEIGHT_LIMITS[unit]
   return v != null && Number.isFinite(v) && v >= l.min && v <= l.max
+}
+
+/**
+ * The likely intended value for an out-of-range weight: "725" → 72.5 and "7250" → 72.5 (forgotten comma),
+ * "8,3" → 83 (comma one digit early). With a reference weigh-in (display unit) the fix must be within 15% of it.
+ */
+export function suggestWeight(v: number, unit: Unit, refDisplay?: number | null): number | null {
+  if (!Number.isFinite(v) || v <= 0 || validWeight(v, unit)) return null
+  const cands = v > WEIGHT_LIMITS[unit].max ? [v / 10, v / 100] : Number.isInteger(v) ? [] : [v * 10]
+  for (const raw of cands) {
+    const c = round1(raw)
+    if (!validWeight(c, unit)) continue
+    if (refDisplay != null && refDisplay > 0 && Math.abs(c - refDisplay) / refDisplay > 0.15) continue
+    return c
+  }
+  return null
+}
+
+/** The weigh-in closest in time to `date` on another day (ties: the earlier one), ignoring `excludeId`. */
+export function nearestEntry(entries: WeightEntry[], date: ISODate, excludeId?: string | null): WeightEntry | null {
+  let best: WeightEntry | null = null
+  let bestGap = Infinity
+  for (const e of entries) {
+    if (!(e.kg > 0) || e.date === date || e.id === excludeId) continue
+    const gap = Math.abs(diffDays(e.date, date))
+    if (gap < bestGap || (gap === bestGap && best && e.date < best.date)) {
+      best = e
+      bestGap = gap
+    }
+  }
+  return best
+}
+
+/**
+ * A weigh-in more than this fraction away from the nearest one asks "is the number right?" (38,3 typed for 83,8).
+ * The allowance grows by 1% for every week between the two, so a real change after a break still saves in one tap.
+ */
+export const JUMP_CONFIRM = 0.05
+
+/** Signed change (kg) vs the reference weigh-in when it is big enough to confirm, else null. */
+export function bigJumpKg(kg: number, date: ISODate, ref: WeightEntry | null): number | null {
+  if (!ref || !(ref.kg > 0) || !Number.isFinite(kg)) return null
+  const weeks = Math.abs(diffDays(ref.date, date)) / 7
+  const allowed = JUMP_CONFIRM + 0.01 * Math.max(0, weeks - 1)
+  const d = kg - ref.kg
+  return Math.abs(d) / ref.kg > allowed ? d : null
 }
 
 /* ------------------------------------------------------------------ history */

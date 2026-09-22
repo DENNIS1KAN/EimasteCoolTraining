@@ -2,7 +2,8 @@ import { Button, Card, CardHeader, EmptyState, Tag } from '../../../ui'
 import { useT } from '../../../i18n'
 import type { ISODate } from '../../../lib/dates'
 import { addDays, startOfWeek } from '../../../lib/dates'
-import { fmtDate, fmtPct } from '../../../lib/format'
+import { fmtPct } from '../../../lib/format'
+import { fmtDayRange } from '../lib/fmt'
 import { glanceTotals, needsPush, needsSetup, type AthleteGlance } from '../lib/glance'
 import { M } from '../messages'
 import { GlanceRow } from './GlanceRow'
@@ -19,7 +20,7 @@ export function GlanceCard({ rows, today, meId, onAdd }: GlanceCardProps) {
   const t = useT(M)
   const totals = glanceTotals(rows)
   const weekStart = startOfWeek(today)
-  const range = `${fmtDate(weekStart, 'dayMonth')} – ${fmtDate(addDays(weekStart, 6), 'dayMonth')}`
+  const range = fmtDayRange(weekStart, addDays(weekStart, 6))
   const needPush = rows.filter(needsPush).length
   const toSetUp = rows.filter(needsSetup).length
 
