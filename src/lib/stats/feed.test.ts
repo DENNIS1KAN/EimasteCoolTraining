@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { at, mkCheer, mkLog, mkMember, mkPlan, mkWeight, squad } from '../testing/fixtures'
-import { fromISODate } from '../dates'
 import { buildFeed, reactionsFor, unseenCheers, type FeedItem } from './feed'
 
 const S = 'stelios'
@@ -66,7 +65,8 @@ describe('buildFeed', () => {
       ['2026-03-23', '2026-03-26', 89.5, -0.5],
       ['2026-03-16', '2026-03-22', 90, null],
     ])
-    expect(weighins[0].at).toBe(fromISODate('2026-04-08').getTime())
+    // the time it was logged (07:00 in the fixture), not noon
+    expect(weighins[0].at).toBe(at('2026-04-08', 7))
     expect(weighins[1].id).toBe(`weighin:${S}:2026-03-23`)
   })
 

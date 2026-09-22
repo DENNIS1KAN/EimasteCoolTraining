@@ -89,6 +89,19 @@ export function lastCheckin(d: SquadData, m: Member, today: ISODate): LastChecki
   }
 }
 
+export type FoodVerdict = 'noPlan' | 'none' | 'soFar' | 'on' | 'mostly' | 'off'
+
+/**
+ * How to sum up the latest food check-in. Today's is still in progress, so it only counts meals "so far" unless
+ * the athlete already rated the day (then their rating stands); earlier days get a verdict from their adherence score.
+ */
+export function foodVerdict(r: Pick<SquadTodayRow, 'lastCheckin' | 'hasPlan'>, today: ISODate): FoodVerdict {
+  const c = r.lastCheckin
+  if (!c) return r.hasPlan ? 'none' : 'noPlan'
+  if (c.date === today) return c.rating ?? 'soFar'
+  return c.score >= 0.8 ? 'on' : c.score >= 0.5 ? 'mostly' : 'off'
+}
+
 export function squadTodayRow(d: SquadData, m: Member, today: ISODate): SquadTodayRow {
   const g = athleteGlance(d, m, today)
   const staleWeighIn = g.flags.includes('noWeighIn')

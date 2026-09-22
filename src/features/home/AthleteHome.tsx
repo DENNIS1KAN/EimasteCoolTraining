@@ -13,6 +13,7 @@ import { CoachNote } from './CoachNote'
 import { HomeHeader } from './HomeHeader'
 import { SquadTodayCard } from './SquadTodayCard'
 import { StatTiles } from './StatTiles'
+import { WeighInPrompt } from './WeighInPrompt'
 import { fmtEyebrowDate } from './format'
 import { useCoach, useNow, useSquadData, useToday, useUnseenCount } from './hooks'
 import { useInboxSlot } from './InboxSlot'
@@ -55,6 +56,7 @@ export function AthleteHome({ me }: { me: Member }) {
           {hasTrainingStats(stats) ? <StatTiles me={me} stats={stats} today={today} /> : null}
         </div>
         <div className="home-col">
+          <WeighInPrompt me={me} today={today} now={now} />
           <div className="grid-2 home-minis">
             <WeightMiniCard memberId={me.id} />
             <TodayNutritionCard memberId={me.id} />

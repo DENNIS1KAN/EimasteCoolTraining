@@ -58,7 +58,9 @@ export function buildFeed(d: SquadData, opts: { memberId?: string; since?: numbe
       }
       for (const [wk, w] of byWeek) {
         const prev = byWeek.get(addDays(wk, -7))
-        const at = Math.max(fromISODate(w.date).getTime(), 0)
+        // When it was logged (updatedAt), kept within that calendar day (back-dated entries show on their own day).
+        const dayStart = fromISODate(w.date).getTime() - 12 * 3600000
+        const at = Math.min(Math.max(w.at, dayStart), dayStart + 24 * 3600000 - 1)
         items.push({ kind: 'weighin', id: `weighin:${m.id}:${wk}`, memberId: m.id, at, weekStart: wk, date: w.date, kg: w.kg, changeKg: prev ? w.kg - prev.kg : null })
       }
     }

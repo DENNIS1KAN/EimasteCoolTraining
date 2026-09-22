@@ -7,6 +7,8 @@ import { readConfig } from './config'
 import { createBackend } from './data/backend'
 import { boot } from './data/store'
 import { getLang } from './i18n'
+// Registers the beforeinstallprompt listener before the browser fires it (Settings offers an Install button).
+import './features/auth/install'
 
 applyTheme()
 document.documentElement.lang = getLang()

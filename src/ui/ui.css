@@ -1595,6 +1595,11 @@
   justify-content: center;
   pointer-events: none;
 }
+/* While a sheet is open (scroll-locked), show toasts at the top so they never cover the sheet's buttons. */
+html.ui-scroll-locked .ui-toaster {
+  top: calc(var(--safe-top) + 12px);
+  bottom: auto;
+}
 .ui-toaster__live {
   display: flex;
   flex-direction: column;

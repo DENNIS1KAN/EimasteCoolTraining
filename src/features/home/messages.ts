@@ -51,6 +51,11 @@ export const HM = defineMessages(
     startSheetTitle: 'When is day 1?',
     theCoach: 'Your coach',
 
+    // morning weigh-in prompt
+    weighTitle: 'Morning weigh-in',
+    weighLast: 'Last: {value} · {when}',
+    weighLog: 'Log',
+
     // coach set-up
     csEyebrow: 'Set up the squad',
     csTitle: 'Get everyone to day 1',
@@ -88,6 +93,7 @@ export const HM = defineMessages(
     foodMostly: 'Mostly on plan',
     foodOff: 'Off plan',
     foodMeals: '{n}/{total} meals',
+    foodCheckedIn: 'Checked in',
     foodSr: 'Food:',
     noAthletesTitle: 'No athletes yet',
     noAthletesBody: 'Add your friends in the coach console and send them their invite links.',
@@ -145,6 +151,10 @@ export const HM = defineMessages(
     startSheetTitle: 'Πότε είναι η 1η μέρα;',
     theCoach: 'ο προπονητής σου',
 
+    weighTitle: 'Πρωινό ζύγισμα',
+    weighLast: 'Τελευταίο: {value} · {when}',
+    weighLog: 'Καταγραφή',
+
     csEyebrow: 'Στήσε την ομάδα',
     csTitle: 'Φέρε όλους στην 1η μέρα',
     csInvite: 'Κάλεσε τους αθλητές σου',
@@ -180,6 +190,7 @@ export const HM = defineMessages(
     foodMostly: 'Σχεδόν εντός',
     foodOff: 'Εκτός πλάνου',
     foodMeals: '{n}/{total} γεύματα',
+    foodCheckedIn: 'Έκανε check-in',
     foodSr: 'Διατροφή:',
     noAthletesTitle: 'Κανένας αθλητής ακόμη',
     noAthletesBody: 'Πρόσθεσε τους φίλους σου από την κονσόλα και στείλε τους το link πρόσκλησης.',

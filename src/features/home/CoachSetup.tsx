@@ -1,15 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useStore } from '../../data/store'
 import { useT } from '../../i18n'
 import { dismissHint, usePrefs } from '../../lib/prefs'
 import { Button, celebrate } from '../../ui'
 import { Checklist, type ChecklistItem } from './Checklist'
-import { HINT_COACH, allDone, coachSteps, currentStep } from './logic/onboarding'
+import { HINT_COACH, SEEN_SUFFIX, checklistView, coachSteps, currentStep } from './logic/onboarding'
 import { HM } from './messages'
 
 /**
  * The coach's set-up checklist for a new squad: invite the athletes, give them a start date, upload meal plans.
- * Shown until everything is in place (or dismissed on this device).
+ * Shown until everything is in place, then as a short "all set" card (or until dismissed on this device).
  */
 export function CoachSetup() {
   const t = useT(HM)
@@ -17,8 +17,12 @@ export function CoachSetup() {
   const members = useStore((s) => s.members)
   const plans = useStore((s) => s.mealPlans)
   const steps = useMemo(() => coachSteps(Object.values(members), Object.values(plans)), [members, plans])
-  const [armed] = useState(() => !allDone(steps))
-  if (prefs.dismissed[HINT_COACH] || !armed) return null
+  const seen = !!prefs.dismissed[HINT_COACH + SEEN_SUFFIX]
+  const view = checklistView(steps, seen, !!prefs.dismissed[HINT_COACH])
+  useEffect(() => {
+    if (view === 'list' && !seen) dismissHint(HINT_COACH + SEEN_SUFFIX)
+  }, [view, seen])
+  if (view === 'hidden') return null
 
   const current = currentStep(steps)
   const items: ChecklistItem[] = steps.map((s) => {

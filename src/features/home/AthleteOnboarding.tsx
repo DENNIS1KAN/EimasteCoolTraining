@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useStore } from '../../data/store'
 import type { Member } from '../../data/types'
 import { useT } from '../../i18n'
@@ -8,13 +8,13 @@ import { Button, Sheet, celebrate } from '../../ui'
 import { LogWeightSheet } from '../body/LogWeightSheet'
 import { StartProgramForm } from '../train/StartProgram'
 import { Checklist, type ChecklistItem } from './Checklist'
-import { HINT_ATHLETE, HINT_PLAN_SEEN, allDone, athleteSteps, currentStep } from './logic/onboarding'
+import { HINT_ATHLETE, HINT_PLAN_SEEN, SEEN_SUFFIX, athleteSteps, checklistView, currentStep } from './logic/onboarding'
 import { HM } from './messages'
 
 /**
  * Fresh-account checklist: set the start date, log the first weigh-in, check the meal plan.
- * Hidden when everything is already done on arrival; if the last step gets done while it is on screen,
- * it turns into a short "all set" card instead of vanishing. Dismissible (per device).
+ * Hidden when everything was already done the first time Home was seen; once someone who saw the list finishes it,
+ * it turns into a short "all set" card (see checklistView). Dismissible (per device).
  */
 export function AthleteOnboarding({ me, coach }: { me: Member; coach: Member | null }) {
   const t = useT(HM)
@@ -33,17 +33,21 @@ export function AthleteOnboarding({ me, coach }: { me: Member; coach: Member | n
   const hasPlan = useStore((s) => Object.values(s.mealPlans).some((p) => p.memberId === me.id && p.active))
   const planSeen = !!prefs.dismissed[HINT_PLAN_SEEN]
   const dismissed = !!prefs.dismissed[HINT_ATHLETE]
+  const seen = !!prefs.dismissed[HINT_ATHLETE + SEEN_SUFFIX]
 
   const steps = useMemo(
     () => athleteSteps({ hasProgram: !!program, programStart: me.programStart, weighIns, hasPlan, checkins, planSeen }),
     [program, me.programStart, weighIns, hasPlan, checkins, planSeen],
   )
-  const [armed] = useState(() => !allDone(steps))
+  const view = checklistView(steps, seen, dismissed)
+  useEffect(() => {
+    if (view === 'list' && !seen) dismissHint(HINT_ATHLETE + SEEN_SUFFIX)
+  }, [view, seen])
   const [sheet, setSheet] = useState<'start' | 'weigh' | null>(null)
   // The weigh-in sheet computes the weight model: mount it on first use only.
   const [weighUsed, setWeighUsed] = useState(false)
 
-  if (dismissed || !armed) return null
+  if (view === 'hidden') return null
 
   const coachName = coach?.name ?? t('theCoach')
   const current = currentStep(steps)

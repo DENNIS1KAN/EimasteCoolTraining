@@ -4,6 +4,8 @@ import type { MealPlan, Member } from '../../../data/types'
 export const HINT_ATHLETE = 'home-onboarding'
 export const HINT_COACH = 'home-coach-setup'
 export const HINT_PLAN_SEEN = 'home-plan-seen'
+/** Set once a checklist was shown with something left to do, so finishing it later earns the "all set" card. */
+export const SEEN_SUFFIX = ':seen'
 
 export type AthleteStepId = 'start' | 'weigh' | 'plan'
 export type CoachStepId = 'invite' | 'start' | 'plans'
@@ -59,4 +61,17 @@ export const allDone = (steps: Step<string>[]): boolean => steps.every((s) => s.
 /** The step to highlight: the first one not done that the viewer can act on (null when only waiting ones are left). */
 export function currentStep<Id extends string>(steps: Step<Id>[]): Id | null {
   return steps.find((s) => !s.done && !s.waiting)?.id ?? null
+}
+
+export type ChecklistView = 'hidden' | 'list' | 'allSet'
+
+/**
+ * What the checklist card shows: nothing once dismissed, and nothing for someone who was already set up when
+ * they first saw Home (the demo squad, or a returning user); the list while steps are open; and an "all set"
+ * card, until dismissed, for someone who saw the list and has now finished it (even on a later visit).
+ */
+export function checklistView(steps: Step<string>[], seen: boolean, dismissed: boolean): ChecklistView {
+  if (dismissed) return 'hidden'
+  if (!allDone(steps)) return 'list'
+  return seen ? 'allSet' : 'hidden'
 }

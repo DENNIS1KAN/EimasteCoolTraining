@@ -24,7 +24,7 @@ export function LatestCard(p: { data: SquadData; me: Member; now: number; limit?
       {items.length ? (
         <div className="home-latest__list">
           {items.map((it) => (
-            <FeedItemView key={it.id} item={it} members={data.members} me={me} unit={me.settings.unit} compact timeLabel={fmtRelative(it.at, now)} />
+            <FeedItemView key={it.id} item={it} members={data.members} me={me} unit={me.settings.unit} compact timeLabel={fmtRelative(Math.min(it.at, now), now)} />
           ))}
         </div>
       ) : (

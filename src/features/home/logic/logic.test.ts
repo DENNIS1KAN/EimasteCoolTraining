@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { at, meals, mkCheckin, mkLog, mkMember, mkPlan, mkWeight, squad } from '../../../lib/testing/fixtures'
 import { dayPart, firstName, greetName, vocative } from './greeting'
-import { allDone, athleteSteps, coachSteps, currentStep, doneCount } from './onboarding'
-import { lastCheckin, squadToday, summarize } from './squadToday'
-import { hasTrainingStats, onSchedulePct, prsInMonth } from './tiles'
+import { allDone, athleteSteps, checklistView, coachSteps, currentStep, doneCount } from './onboarding'
+import { foodVerdict, lastCheckin, squadToday, summarize } from './squadToday'
+import { hasTrainingStats, onSchedulePct, prsInMonth, shouldPromptWeighIn } from './tiles'
 
 describe('greeting', () => {
   it('splits the day per language', () => {
@@ -73,6 +73,16 @@ describe('onboarding', () => {
     expect(currentStep(s)).toBeNull()
   })
 
+  it('shows the list, then an "all set" card only to someone who saw the list', () => {
+    const open = athleteSteps(fresh)
+    const done = athleteSteps({ ...fresh, programStart: '2026-01-05', weighIns: 1, hasPlan: true, planSeen: true })
+    expect(checklistView(open, false, false)).toBe('list')
+    expect(checklistView(done, false, false)).toBe('hidden')
+    expect(checklistView(done, true, false)).toBe('allSet')
+    expect(checklistView(open, true, true)).toBe('hidden')
+    expect(checklistView(done, true, true)).toBe('hidden')
+  })
+
   it('tracks the coach set-up across athletes', () => {
     const a = mkMember({ id: 'a', programStart: '2026-01-05' })
     const b = mkMember({ id: 'b', joined: false })
@@ -96,6 +106,14 @@ describe('tiles', () => {
   it('rounds the on-schedule percentage and waits for the first due workout', () => {
     expect(onSchedulePct({ schedule: null })).toBeNull()
     expect(onSchedulePct({ schedule: { consistency: 0.916 } as never })).toBe(92)
+  })
+
+  it('prompts a morning weigh-in only for regulars who have not weighed in today', () => {
+    expect(shouldPromptWeighIn(['2026-09-21'], '2026-09-22', 7)).toBe(true)
+    expect(shouldPromptWeighIn(['2026-09-21', '2026-09-22'], '2026-09-22', 7)).toBe(false)
+    expect(shouldPromptWeighIn([], '2026-09-22', 7)).toBe(false)
+    expect(shouldPromptWeighIn(['2026-09-21'], '2026-09-22', 13)).toBe(false)
+    expect(shouldPromptWeighIn(['2026-09-21'], '2026-09-22', 2)).toBe(false)
   })
 
   it('hides the tiles until there is something to count', () => {
@@ -181,5 +199,20 @@ describe('squadToday', () => {
     expect(lastCheckin(d, m, WED)).toEqual({ date: '2026-01-06', rating: 'mostly', score: 0.75, meals: 3, mealsTotal: 4 })
     expect(lastCheckin(d, m, '2026-01-04')).toBeNull()
     expect(squadToday(d, WED)[0].hasPlan).toBe(true)
+  })
+
+  it('sums up food without judging a day that is still going', () => {
+    const c = (date: string, p: { rating?: 'on' | 'mostly' | 'off' | null; score?: number; meals?: number } = {}) => ({
+      hasPlan: true,
+      lastCheckin: { date, rating: p.rating ?? null, score: p.score ?? 0, meals: p.meals ?? 0, mealsTotal: 5 },
+    })
+    expect(foodVerdict({ hasPlan: false, lastCheckin: null }, WED)).toBe('noPlan')
+    expect(foodVerdict({ hasPlan: true, lastCheckin: null }, WED)).toBe('none')
+    expect(foodVerdict(c(WED, { score: 0.4, meals: 2 }), WED)).toBe('soFar')
+    expect(foodVerdict(c(WED, { rating: 'on', score: 0.4, meals: 2 }), WED)).toBe('on')
+    expect(foodVerdict(c(WED, { rating: 'on' }), WED)).toBe('on')
+    expect(foodVerdict(c('2026-01-06', { score: 0.4, meals: 2 }), WED)).toBe('off')
+    expect(foodVerdict(c('2026-01-06', { score: 0.8, meals: 4 }), WED)).toBe('on')
+    expect(foodVerdict(c('2026-01-06', { rating: 'mostly', score: 0.5 }), WED)).toBe('mostly')
   })
 })

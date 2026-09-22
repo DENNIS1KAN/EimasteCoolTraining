@@ -7,7 +7,7 @@ import type { SquadData } from '../../lib/stats'
 import { Avatar, ButtonLink, Card, CardHeader, CardLink, EmptyState, Icon, LiveDot, Tag, cx, type IconName } from '../../ui'
 import { NudgeButton } from '../squad/NudgeButton'
 import { fmtTimeOfDay } from './format'
-import { squadToday, summarize, type SquadTodayRow, type TodayStatus } from './logic/squadToday'
+import { foodVerdict, squadToday, summarize, type SquadTodayRow, type TodayStatus } from './logic/squadToday'
 import { HM } from './messages'
 
 type T = (k: keyof typeof HM.en, vars?: Vars) => string
@@ -43,7 +43,7 @@ export function SquadTodayCard({ data, today, meId }: { data: SquadData; today: 
                 <dt className="micro">{t('trainedToday')}</dt>
                 <dd className="num">
                   {sum.trainedToday}
-                  {sum.scheduledToday > 0 ? <span className="home-sq__of">/{Math.max(sum.scheduledToday, sum.trainedToday)}</span> : null}
+                  {sum.scheduledToday > 0 ? <span className="home-sq__of">/{sum.scheduledToday}</span> : null}
                 </dd>
               </div>
               <div className={cx(sum.behind > 0 && 'is-warn')}>
@@ -148,11 +148,12 @@ function Status({ status: s, t }: { status: TodayStatus; t: T }) {
 }
 
 function foodText(r: SquadTodayRow, today: ISODate, t: T): { text: string; tone: 'good' | 'warn' | null } {
+  const v = foodVerdict(r, today)
   const c = r.lastCheckin
-  if (!c) return { text: r.hasPlan ? t('foodNone') : t('foodNoPlan'), tone: null }
-  const verdict = c.score >= 0.8 ? t('foodOn') : c.score >= 0.5 ? t('foodMostly') : t('foodOff')
-  const parts = [verdict]
-  if (c.mealsTotal > 0 && c.meals > 0) parts.push(t('foodMeals', { n: c.meals, total: c.mealsTotal }))
-  parts.push(fmtDayLabel(c.date, fromISODate(today)))
-  return { text: parts.join(' · '), tone: c.score >= 0.8 ? 'good' : c.score < 0.5 ? 'warn' : null }
+  if (!c || v === 'none' || v === 'noPlan') return { text: v === 'noPlan' ? t('foodNoPlan') : t('foodNone'), tone: null }
+  const meals = c.mealsTotal > 0 && c.meals > 0 ? t('foodMeals', { n: c.meals, total: c.mealsTotal }) : null
+  const day = fmtDayLabel(c.date, fromISODate(today))
+  if (v === 'soFar') return { text: [meals ?? t('foodCheckedIn'), day].join(' · '), tone: null }
+  const verdict = v === 'on' ? t('foodOn') : v === 'mostly' ? t('foodMostly') : t('foodOff')
+  return { text: [verdict, meals, day].filter(Boolean).join(' · '), tone: v === 'on' ? 'good' : v === 'off' ? 'warn' : null }
 }

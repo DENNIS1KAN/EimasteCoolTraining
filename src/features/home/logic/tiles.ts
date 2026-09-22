@@ -16,3 +16,12 @@ export function onSchedulePct(s: Pick<MemberStats, 'schedule'>): number | null {
  */
 export const hasTrainingStats = (s: Pick<MemberStats, 'programWeek' | 'workoutsDone' | 'lastWorkoutAt' | 'prs'>): boolean =>
   s.programWeek > 0 || s.workoutsDone > 0 || s.lastWorkoutAt != null || s.prs.length > 0
+
+/**
+ * The morning weigh-in prompt: for someone who already weighs in (the checklist handles the first one), who
+ * hasn't today, while it is still morning (weigh-ins belong before breakfast).
+ */
+export function shouldPromptWeighIn(dates: ISODate[], today: ISODate, hour: number): boolean {
+  if (!dates.length || hour < 4 || hour >= 13) return false
+  return !dates.includes(today)
+}
