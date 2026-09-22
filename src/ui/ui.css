@@ -1590,7 +1590,8 @@
   z-index: var(--z-toast);
   left: calc(var(--sidebar-w) + var(--gutter) + var(--safe-left));
   right: calc(var(--gutter) + var(--safe-right));
-  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 16px);
+  /* above the tab bar and any floating bars (quick-log dock, rest timer): see src/ui/floating.ts */
+  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 16px + var(--float-stack, 0px));
   display: flex;
   justify-content: center;
   pointer-events: none;

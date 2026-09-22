@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DST_AUTUMN, DST_SPRING, MINI, mkLog } from '../testing/fixtures'
 import { BTS_PROGRAM } from '../../data/programs'
-import type { Program } from '../../data/types'
+import type { Program, WorkoutLog } from '../../data/types'
 import { addDays } from '../dates'
 import {
   nextWorkout,
@@ -13,6 +13,7 @@ import {
   scheduledDate,
   workoutOn,
   workoutsDueBy,
+  upcomingWorkout,
 } from './schedule'
 
 const BTS = BTS_PROGRAM
@@ -182,5 +183,31 @@ describe('scheduleStatus', () => {
     const s = scheduleStatus(MINI, START, all, addDays(START, 30))
     expect(s).toMatchObject({ dueBeforeToday: 6, done: 6, finished: true, behindBy: 0, consistency: 1 })
     expect(scheduleStatus(MINI, START, all.slice(0, 3), addDays(START, 30))).toMatchObject({ finished: false, behindBy: 3, consistency: 0.5 })
+  })
+})
+
+describe('upcomingWorkout', () => {
+  const p = BTS_PROGRAM
+  const start = '2026-09-07' // a Monday
+  const mk = (week: number, day: number, done = true) =>
+    ({ id: `m__${p.id}__w${week}d${day}`, memberId: 'm', programId: p.id, week, day, unit: 'kg', ex: {}, done, doneAt: done ? 1 : null, startedAt: null, feel: null, note: '', updatedAt: 1 }) as WorkoutLog
+
+  it('before the start or without a start date, is the first workout not done', () => {
+    expect(upcomingWorkout(p, null, [], '2026-09-01')).toEqual({ week: 1, day: 0 })
+    expect(upcomingWorkout(p, start, [mk(1, 0)], '2026-09-05')).toEqual({ week: 1, day: 1 })
+  })
+  it('skips workouts missed in earlier weeks and suggests this week\'s first not-done workout', () => {
+    const logs = [mk(1, 0), mk(1, 1), mk(1, 2), mk(1, 3), mk(1, 4), mk(2, 0), mk(2, 1), mk(3, 0), mk(3, 1)] // missed W2 Pull/Push/Legs
+    expect(upcomingWorkout(p, start, logs, '2026-09-23')).toEqual({ week: 3, day: 2 }) // Wed of week 3
+  })
+  it('allows catching up within the current week', () => {
+    expect(upcomingWorkout(p, start, [mk(1, 1)], '2026-09-10')).toEqual({ week: 1, day: 0 })
+  })
+  it('moves to the next week once this week is done, and falls back to catch-up after the end', () => {
+    const w1 = [0, 1, 2, 3, 4].map((d) => mk(1, d))
+    expect(upcomingWorkout(p, start, w1, '2026-09-12')).toEqual({ week: 2, day: 0 })
+    expect(upcomingWorkout(p, start, w1, '2026-12-25')).toEqual({ week: 2, day: 0 })
+    const all = p.weeks.flatMap((w, wi) => w.days.map((_, d) => mk(wi + 1, d)))
+    expect(upcomingWorkout(p, start, all, '2026-12-25')).toBeNull()
   })
 })

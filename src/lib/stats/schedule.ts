@@ -107,3 +107,22 @@ export function scheduleStatus(p: Program, start: ISODate | null, logs: WorkoutL
     finished: done >= total,
   }
 }
+
+/**
+ * The workout to do next, aligned with the calendar (use this for "Next", "Today" and the default Train screen):
+ * - before the start (or without a start date): the first workout not done yet;
+ * - during the program: the first not-done workout of the CURRENT program week (catching up within the week is
+ *   fine), else the first not-done workout of a later week. Workouts missed in earlier weeks are not suggested:
+ *   they stay reachable from the week strip, and scheduleStatus().behindBy tells how many were missed;
+ * - after the last week: the first not-done workout anywhere (catch-up), or null when everything is done.
+ */
+export function upcomingWorkout(p: Program, start: ISODate | null, logs: WorkoutLog[], today: ISODate): WorkoutRef | null {
+  if (!start || today < start) return nextWorkout(p, logs)
+  const done = new Set(logs.filter((l) => l.programId === p.id && l.done).map((l) => refKey(l)))
+  const week = programWeekOn(p, start, today)
+  const pastEnd = diffDays(start, today) >= p.weeks.length * 7
+  if (!pastEnd) {
+    for (const r of programWorkouts(p)) if (r.week >= week && !done.has(refKey(r))) return r
+  }
+  return nextWorkout(p, logs)
+}

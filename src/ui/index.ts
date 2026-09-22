@@ -82,3 +82,4 @@ export { useMediaQuery, useWakeLock, useReducedMotion, useIsDesktop } from './ho
 
 export { memberColorVar, initials } from './member'
 export { cx } from './cx'
+export { useFloatingBar, FLOAT_PRIORITY } from './floating'

@@ -5,7 +5,7 @@ import { totalWorkouts } from '../../data/programs'
 import { adherence, checkinPlan, checkinScore, currentPlan } from './nutrition'
 import { goalProgress, weightStats, type WeightStats } from './body'
 import { logTime, personalRecords, sessionSummary, strengthGain, type PR, type ProgramMap } from './lifts'
-import { nextWorkout, programWeekOn, scheduleStatus, type ScheduleStatus, type WorkoutRef } from './schedule'
+import { programWeekOn, scheduleStatus, upcomingWorkout, type ScheduleStatus, type WorkoutRef } from './schedule'
 
 /** The slice of app state the stats need (structurally compatible with the store's TableState). */
 export interface SquadData {
@@ -121,7 +121,7 @@ export function memberStats(d: SquadData, memberId: string, today: ISODate): Mem
     goalProgress: w ? goalProgress(w.startKg, w.trendKg, m?.goalWeightKg ?? null) : null,
     adherence14: adh && adh.days ? adh.ratio : null,
     lastWorkoutAt: doneLogs.length ? Math.max(...doneLogs.map(logTime)) : null,
-    nextWorkout: program ? nextWorkout(program, programLogs) : null,
+    nextWorkout: program ? upcomingWorkout(program, m?.programStart ?? null, programLogs, today) : null,
     points: points(d, memberId, weekStart, addDays(weekStart, 6)),
   }
 }
