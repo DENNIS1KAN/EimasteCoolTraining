@@ -3,6 +3,7 @@ import { useT } from '../../i18n'
 import { Button, Icon, toast, type IconName } from '../../ui'
 import { currentPlatform, isIosOtherBrowser, promptInstall, useInstall, type InstallPlatform } from './install'
 import { AUTH, type AuthKey } from './messages'
+import './install.css'
 
 interface Guide {
   platform: InstallPlatform

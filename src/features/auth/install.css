@@ -1,0 +1,114 @@
+/* Add-to-Home-Screen guide: used on the join welcome step and in Settings. Tokens only. */
+
+.install {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+.install__block {
+  padding: 12px 14px 6px;
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+}
+.install__platform {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font: 800 11px/14px var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.install__note {
+  margin-top: 8px;
+  font: 700 12.5px/1.4 var(--font-body);
+  color: var(--warn);
+}
+.install__steps {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.install__step {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 6px 0;
+}
+.install__step + .install__step {
+  border-top: 1px solid var(--line);
+}
+.install__num {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: 800 15px/1 var(--font-display);
+}
+.install__text {
+  font: 700 13.5px/1.35 var(--font-body);
+  color: var(--ink);
+}
+.install__glyph {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  background: var(--surface-3);
+  color: var(--ink-2);
+}
+.install__more > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 0 4px;
+  font: 700 13px/1 var(--font-body);
+  color: var(--ink-2);
+  list-style: none;
+  cursor: pointer;
+}
+.install__more > summary::-webkit-details-marker {
+  display: none;
+}
+.install__chev {
+  transition: transform var(--dur-1) var(--ease);
+}
+.install__more[open] .install__chev {
+  transform: rotate(180deg);
+}
+.install__more > .install__block + .install__block {
+  margin-top: 10px;
+}
+.install--done {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--r-lg);
+  background: var(--good-soft);
+}
+.install__ok {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.install__title {
+  font: 800 15px/1.3 var(--font-body);
+}
+.install__sub {
+  font: 600 13px/1.4 var(--font-body);
+  color: var(--ink-2);
+}
