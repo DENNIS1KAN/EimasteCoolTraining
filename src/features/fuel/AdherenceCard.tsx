@@ -1,7 +1,7 @@
 import { useId, useMemo } from 'react'
 import { useT } from '../../i18n'
 import { fmtDayLabel, fmtNum, fmtPct } from '../../lib/format'
-import { Card, Icon } from '../../ui'
+import { Card, Icon, useIsDesktop } from '../../ui'
 import { Heatmap } from '../../ui/charts'
 import type { FuelDay } from './lib/adherence'
 import { FM } from './messages'
@@ -17,6 +17,7 @@ export interface AdherenceCardProps {
 export function AdherenceCard({ days, ratio, streak }: AdherenceCardProps) {
   const t = useT(FM)
   const headId = useId()
+  const isDesktop = useIsDesktop()
   const byDate = useMemo(() => new Map(days.map((d) => [d.date, d])), [days])
   const counted = days.filter((d) => d.value != null).length
   const logged = days.filter((d) => d.logged).length
@@ -59,7 +60,7 @@ export function AdherenceCard({ days, ratio, streak }: AdherenceCardProps) {
           days={heat}
           color="var(--heat)"
           max={1}
-          maxCell={20}
+          maxCell={isDesktop ? 28 : 20}
           ariaLabel={t('heatAria', { pct })}
           formatTooltip={(d) => tip(d.date)}
           formatValue={(n) => fmtPct(n)}

@@ -236,7 +236,7 @@ export function Logger({ me, program, week, day }: Props) {
     <div className="tr-page" id="tr-top">
       <PageHeader
         eyebrow={t('eyebrow', { program: programShortName(program), week, total: program.weeks.length })}
-        title={<span lang="en">{t('dayTitle', { day: dayShortName(pday) })}</span>}
+        title={t('dayTitle', { day: dayShortName(pday) })}
         actions={
           <>
             {live ? (

@@ -165,12 +165,12 @@ function ProgressChart({ me, member, name, history, unit }: { me: Member; member
     label: m.name,
     color: memberColorVar(m.color),
     points: pts.map((p) => ({ x: fromISODate(p.date).getTime(), y: Math.round(kgToUnit(p.bestE1rmKg, unit) * 10) / 10 })),
-    area: !rivalId,
+    area: !rivalId && pts.length >= 3,
     emphasis,
     dots: 'end',
   })
   const rival = rivals.find((r) => r.m.id === rivalId) ?? null
-  const series = [toSeries(member, history, !!rival), ...(rival ? [toSeries(rival.m, rival.pts, false)] : [])]
+  const series = [toSeries(member, history, false), ...(rival ? [toSeries(rival.m, rival.pts, false)] : [])]
 
   return (
     <Card as="section" className="lf-chart" aria-labelledby="lf-chart-title">
@@ -229,7 +229,6 @@ function SessionList(p: { member: Member; history: ExercisePoint[]; unit: Unit; 
                 <span className="lf-row__sets num">
                   {p.sets.map((s, i) => (
                     <span key={i} className="nowrap">
-                      {i > 0 ? ', ' : null}
                       {s.kg != null ? (
                         <>
                           {fmtNum(kgToUnit(s.kg, unit), 1)}
@@ -237,6 +236,7 @@ function SessionList(p: { member: Member; history: ExercisePoint[]; unit: Unit; 
                         </>
                       ) : null}
                       {s.reps}
+                      {i < p.sets.length - 1 ? ',' : null}
                     </span>
                   ))}
                   {p.machine ? (

@@ -18,6 +18,16 @@ export function useHeadToHead(stats: Record<string, MemberStats>, a: Member | nu
   return useMemo(() => (sa && sb ? headToHead(sa, sb) : null), [sa, sb])
 }
 
+/** Short leader label under a score: "You lead" / "Thanos leads" / "All square". */
+export function useLeadText() {
+  const t = useT(SQ)
+  return (h: H2H, a: Member, b: Member, viewerId: string | null | undefined): string => {
+    const lead = h.a > h.b ? a : h.b > h.a ? b : null
+    if (!lead) return t('allSquare')
+    return lead.id === viewerId ? t('youLead') : t('leads', { name: lead.name })
+  }
+}
+
 /** "You lead Thanos 5–2" / "Thanos leads you 5–2" / "Stelios leads 5–2", from the viewer's point of view. */
 export function useScoreLine() {
   const t = useT(SQ)

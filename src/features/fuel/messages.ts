@@ -49,8 +49,6 @@ export const FM = defineMessages(
     mealAria: '{name}, {time}',
     showFoods: 'Show foods for {name}',
     allMealsDone: 'Every meal on plan today. Nice work!',
-    noMealsTitle: 'This plan has no meal list',
-    noMealsBody: 'Follow the plan file above and rate your day below.',
 
     // check-in
     howToday: 'How did today go?',
@@ -84,12 +82,9 @@ export const FM = defineMessages(
     tipFuture: '{date}',
     scoreLabel: 'Score',
     daysLogged: '{x} of {y} days logged',
-    newPlanWindow: 'Counting since the plan started',
 
     // history
     olderPlans: 'Earlier plans',
-    olderCount: '{n} earlier plans',
-    olderOne: '1 earlier plan',
     range: '{from} – {to}',
     mealsOne: '1 meal',
     mealsMany: '{n} meals',
@@ -143,7 +138,6 @@ export const FM = defineMessages(
     uploadFailed: 'Could not upload {name}',
     removeFile: 'Remove {name}',
     savePlan: 'Save plan',
-    saving: 'Saving…',
     savedToast: 'Plan saved',
     deletePlan: 'Delete plan',
     deleteTitle: 'Delete this plan?',
@@ -163,7 +157,6 @@ export const FM = defineMessages(
     notFoundBody: 'It may have been deleted.',
     memberMissing: 'Member not found',
     noAccess: 'You can only edit your own meal plans.',
-    backToFuel: 'Back to Fuel',
     unsaved: 'Unsaved changes',
     leaveTitle: 'Leave without saving?',
     leaveBody: 'Your changes to this plan will be lost.',
@@ -175,8 +168,6 @@ export const FM = defineMessages(
     dinner: 'Dinner',
 
     // coach tab
-    nutrition: 'Nutrition',
-    coachIntro: 'Everyone’s plan and how closely they follow it.',
     noActivePlan: 'No active plan',
     noPlanHint: 'Upload a PDF or build meals so {name} can tick them off.',
     adherence14: '14-day adherence',
@@ -186,7 +177,6 @@ export const FM = defineMessages(
     noAthletes: 'No athletes yet',
     noAthletesBody: 'Add squad members from the Members tab.',
     activeTag: 'Active',
-    planOf: 'Plan: {title}',
 
     // home card
     fuelToday: 'Fuel today',
@@ -200,7 +190,7 @@ export const FM = defineMessages(
   {
     // page
     title: 'Διατροφή',
-    editPlan: 'Επεξεργασία πλάνου',
+    editPlan: 'Αλλαγή πλάνου',
     newPlan: 'Νέο πλάνο',
     fromCoach: 'Από τον προπονητή {name}',
     fromName: 'Από {name}',
@@ -244,8 +234,6 @@ export const FM = defineMessages(
     mealAria: '{name}, {time}',
     showFoods: 'Δείξε τα τρόφιμα: {name}',
     allMealsDone: 'Όλα τα γεύματα με το πλάνο σήμερα. Μπράβο!',
-    noMealsTitle: 'Αυτό το πλάνο δεν έχει λίστα γευμάτων',
-    noMealsBody: 'Ακολούθησε το αρχείο του πλάνου και βαθμολόγησε τη μέρα σου παρακάτω.',
 
     // check-in
     howToday: 'Πώς πήγε η σημερινή μέρα;',
@@ -279,12 +267,9 @@ export const FM = defineMessages(
     tipFuture: '{date}',
     scoreLabel: 'Σκορ',
     daysLogged: '{x} από {y} μέρες με καταγραφή',
-    newPlanWindow: 'Μετράει από την αρχή του πλάνου',
 
     // history
     olderPlans: 'Προηγούμενα πλάνα',
-    olderCount: '{n} προηγούμενα πλάνα',
-    olderOne: '1 προηγούμενο πλάνο',
     range: '{from} – {to}',
     mealsOne: '1 γεύμα',
     mealsMany: '{n} γεύματα',
@@ -338,7 +323,6 @@ export const FM = defineMessages(
     uploadFailed: 'Δεν ανέβηκε το {name}',
     removeFile: 'Αφαίρεση {name}',
     savePlan: 'Αποθήκευση πλάνου',
-    saving: 'Αποθήκευση…',
     savedToast: 'Το πλάνο αποθηκεύτηκε',
     deletePlan: 'Διαγραφή πλάνου',
     deleteTitle: 'Να διαγραφεί το πλάνο;',
@@ -358,7 +342,6 @@ export const FM = defineMessages(
     notFoundBody: 'Ίσως έχει διαγραφεί.',
     memberMissing: 'Το μέλος δεν βρέθηκε',
     noAccess: 'Μπορείς να αλλάξεις μόνο τα δικά σου πλάνα διατροφής.',
-    backToFuel: 'Πίσω στη Διατροφή',
     unsaved: 'Μη αποθηκευμένες αλλαγές',
     leaveTitle: 'Φεύγεις χωρίς αποθήκευση;',
     leaveBody: 'Οι αλλαγές σου στο πλάνο θα χαθούν.',
@@ -370,8 +353,6 @@ export const FM = defineMessages(
     dinner: 'Βραδινό',
 
     // coach tab
-    nutrition: 'Διατροφή',
-    coachIntro: 'Το πλάνο του καθενός και πόσο πιστά το ακολουθεί.',
     noActivePlan: 'Χωρίς ενεργό πλάνο',
     noPlanHint: 'Ανέβασε ένα PDF ή φτιάξε γεύματα για να τα τσεκάρει ο/η {name}.',
     adherence14: 'Συνέπεια 14 ημερών',
@@ -381,7 +362,6 @@ export const FM = defineMessages(
     noAthletes: 'Δεν υπάρχουν αθλητές ακόμη',
     noAthletesBody: 'Πρόσθεσε μέλη από την καρτέλα Μέλη.',
     activeTag: 'Ενεργό',
-    planOf: 'Πλάνο: {title}',
 
     // home card
     fuelToday: 'Διατροφή',

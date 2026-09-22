@@ -28,7 +28,7 @@ export default function CoachPage() {
 
   return (
     <div className="coach-page">
-      <PageHeader eyebrow={t('eyebrow', { members: memberCount, date: fmtDate(todayISO(), 'long') })} title={t('title')} account />
+      <PageHeader eyebrow={memberCount === 1 ? t('eyebrowOne', { date: fmtDate(todayISO(), 'long') }) : t('eyebrow', { members: memberCount, date: fmtDate(todayISO(), 'long') })} title={t('title')} account />
       <Tabs<CoachTab>
         options={TABS.map((v) => ({ value: v, label: labels[v] }))}
         value={tab}

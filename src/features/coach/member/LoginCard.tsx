@@ -33,7 +33,7 @@ export function LoginCard({ member }: { member: Member }) {
   }
 
   return (
-    <Card as="section" aria-labelledby="member-login-title" className="stack-lg login-card">
+    <Card as="section" aria-labelledby="member-login-title" className="coach-stack login-card">
       <CardHeader
         title={<span id="member-login-title">{t('login')}</span>}
         action={
@@ -48,7 +48,7 @@ export function LoginCard({ member }: { member: Member }) {
           )
         }
       />
-      <p className="login-card__status">{member.joined && !justReset ? t('statusJoined') : t('statusPending')}</p>
+      <p className="login-card__status">{justReset ? t('statusReset') : member.joined ? t('statusJoined') : t('statusPending')}</p>
 
       {showLink ? (
         invites.error ? (

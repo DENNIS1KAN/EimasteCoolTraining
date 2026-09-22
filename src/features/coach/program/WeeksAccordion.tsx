@@ -91,7 +91,7 @@ function WeekDays({ week, n }: { week: ProgramWeek; n: number }) {
         <div className="week-days__head">
           <p className="week-days__name">{dayShortName(d)}</p>
           {focus ? <p className="week-days__focus">{focus}</p> : null}
-          <p className="week-days__count">{t('exercisesInDay', { n: d.ex.length })}</p>
+          <p className="week-days__count">{d.ex.length === 1 ? t('exerciseOne') : t('exercisesInDay', { n: d.ex.length })}</p>
         </div>
         <ExerciseTable day={d} />
       </div>

@@ -114,7 +114,7 @@ export function MemberEditor({ member, viewer }: MemberEditorProps) {
 
       <div className="member-grid">
         <div className="member-col">
-          <Card as="section" aria-labelledby="member-profile-title" className="stack-lg">
+          <Card as="section" aria-labelledby="member-profile-title" className="coach-stack">
             <CardHeader title={<span id="member-profile-title">{t('profile')}</span>} />
             <TextField label={t('name')} value={draft.name} onChange={(e) => set({ name: e.target.value })} error={err('name')} maxLength={40} autoComplete="off" />
             <ColorPicker label={t('color')} hint={t('colorHint')} value={draft.color} onChange={(color) => set({ color })} used={used} />
@@ -123,7 +123,7 @@ export function MemberEditor({ member, viewer }: MemberEditorProps) {
 
           <ProgramSection draft={draft} set={set} error={err('programStart')} />
 
-          <Card as="section" aria-labelledby="member-goals-title" className="stack-lg">
+          <Card as="section" aria-labelledby="member-goals-title" className="coach-stack">
             <CardHeader title={<span id="member-goals-title">{t('goals')}</span>} />
             <TextField label={t('goal')} placeholder={t('goalPh')} value={draft.goal} onChange={(e) => set({ goal: e.target.value })} maxLength={120} />
             <div className="grid-2">

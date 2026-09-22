@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
-import { Avatar, Button, Segmented, Sheet, TextField } from '../../../ui'
+import { Avatar, Button, Icon, Segmented, Sheet, TextField } from '../../../ui'
 import { useT } from '../../../i18n'
 import { COMMON } from '../../../i18n/common'
 import type { Member, MemberColor, Role } from '../../../data/types'
@@ -35,9 +35,6 @@ export function AddMemberSheet({ open, onClose, members, onCode }: AddMemberShee
   const [formKey, setFormKey] = useState(0)
   const [created, setCreated] = useState<Created | null>(null)
 
-  const close = () => {
-    onClose()
-  }
   const reset = () => {
     setCreated(null)
     setFormKey((k) => k + 1)
@@ -46,13 +43,13 @@ export function AddMemberSheet({ open, onClose, members, onCode }: AddMemberShee
   return (
     <Sheet
       open={open}
-      onClose={close}
+      onClose={onClose}
       afterClose={reset}
       title={created ? t('created', { name: created.name }) : t('addTitle')}
       subtitle={created ? t('createdBody') : t('addSub')}
     >
       {created ? (
-        <CreatedView created={created} onAnother={reset} onDone={close} />
+        <CreatedView created={created} onAnother={reset} onDone={onClose} />
       ) : (
         <AddMemberForm
           key={formKey}
@@ -189,10 +186,11 @@ function CreatedView({ created, onAnother, onDone }: { created: Created; onAnoth
         <p className="add-member__preview-handle">@{created.slug}</p>
       </div>
       {created.link ? <InviteLinkBox member={created} link={created.link} primary /> : <p className="muted">{t('invitesError')}</p>}
-      <Link to={`/coach/member/${created.slug}`} className="add-member__next">
-        {t('setStart')} · {t('program')}
+      <Link to={`/coach/member/${created.slug}`} className="add-member__next" onClick={onDone}>
+        <span>{t('setupNext')}</span>
+        <Icon name="arrow-right" size={16} />
       </Link>
-      <div className="row add-member__footer">
+      <div className="add-member__footer">
         <Button variant="ghost" icon="user-plus" onClick={onAnother} block>
           {t('addAnother')}
         </Button>

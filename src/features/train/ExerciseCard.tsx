@@ -66,7 +66,6 @@ function OpenExercise(p: Props & { x: ExerciseLog }) {
   const firstW = parseNum(x.sets[0]?.w)
   const workingWeight = firstW && firstW > 0 ? firstW : (suggestion?.weight ?? prev?.sets.find((s) => s.weight)?.weight ?? null)
   const swaps = swapCount(e)
-  const extrasSummary = [swaps ? t('swapsCount', { n: swaps }) : null, e.note ? t('noteCount') : null].filter(Boolean).join(' · ')
 
   return (
     <Card as="article" className="tr-ex" id={`ex-${index}`} aria-labelledby={`ex-${index}-name`}>
@@ -145,9 +144,26 @@ function OpenExercise(p: Props & { x: ExerciseLog }) {
 
       <details className="tr-xpand">
         <summary>
-          <Icon name="note" size={18} />
+          <Icon name="list" size={18} />
           <span className="tr-xpand__t">{t('extras')}</span>
-          {extrasSummary ? <span className="tr-xpand__s">{extrasSummary}</span> : null}
+          {swaps || e.note ? (
+            <span className="tr-xpand__s">
+              {swaps ? (
+                <span title={t('swapsCount', { n: swaps })}>
+                  <Icon name="swap" size={14} />
+                  <span className="num">{swaps}</span>
+                  <span className="visually-hidden">{t('swapsCount', { n: swaps })}</span>
+                </span>
+              ) : null}
+              {e.note ? (
+                <span title={t('noteCount')}>
+                  <Icon name="note" size={14} />
+                  <span className="num">1</span>
+                  <span className="visually-hidden">{t('noteCount')}</span>
+                </span>
+              ) : null}
+            </span>
+          ) : null}
           <Icon name="chevron-down" size={18} className="tr-xpand__chev" />
         </summary>
         <ExerciseExtras
@@ -184,7 +200,7 @@ function techTag(tech: Technique, t: T): string | null {
   }
 }
 
-function SpecStrip({ e }: { e: ProgramExercise }) {
+export function SpecStrip({ e }: { e: ProgramExercise }) {
   const t = useT(M)
   const early = fmtRpe(e.e)
   const last = fmtRpe(e.l)

@@ -34,6 +34,8 @@ export function FeedItemView({ item, members, me, unit, compact, timeLabel }: Fe
   const m = members[item.memberId]
   if (!m) return null
   const name = (x: Member | undefined) => (x ? (x.id === me?.id ? t('you') : x.name) : '?')
+  // Greek conjugates by person ("τελείωσε" / "τελείωσες"), so "you" items use their own strings.
+  const isMe = m.id === me?.id
   const time = timeLabel ?? (item.kind === 'weighin' || item.kind === 'badge' ? null : fmtTime(item.at))
   const who = (
     <Link to={memberHref(m)} className="sq-feed__who">
@@ -71,10 +73,10 @@ export function FeedItemView({ item, members, me, unit, compact, timeLabel }: Fe
             <Link to={href} className="sq-feed__what">
               {item.dayName ? (
                 <>
-                  {t('finishedVerb')} <b>{item.dayName}</b>
+                  {t(isMe ? 'finishedVerbYou' : 'finishedVerb')} <b>{item.dayName}</b>
                 </>
               ) : (
-                t('finishedWorkout')
+                t(isMe ? 'finishedWorkoutYou' : 'finishedWorkout')
               )}
             </Link>
             {stamp}
@@ -114,7 +116,7 @@ export function FeedItemView({ item, members, me, unit, compact, timeLabel }: Fe
       body = (
         <>
           <p className="sq-feed__line">
-            {who} {t('weighedIn')}
+            {who} {t(isMe ? 'weighedInYou' : 'weighedIn')}
             {stamp}
           </p>
           <p className="sq-feed__weigh">

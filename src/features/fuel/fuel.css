@@ -355,7 +355,7 @@
 
 /* ------------------------------------------------------------------ meals */
 .fu-meals.ui-card {
-  padding: 10px 14px 4px;
+  padding: 10px 14px 8px;
 }
 .fu-meals__head {
   display: flex;

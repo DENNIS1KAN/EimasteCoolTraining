@@ -17,6 +17,15 @@
 .coach-panel:focus-visible {
   outline: none;
 }
+/* a card whose children stack with the form gap (.ui-card sets display: block, so .stack-lg can't be used on it) */
+.ui-card.coach-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+.ui-card.coach-stack > .ui-card-header {
+  margin-bottom: 0;
+}
 .coach-error {
   font-size: 13px;
   font-weight: 700;
@@ -34,9 +43,15 @@
   margin: 0;
 }
 .color-picker__swatches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(4, 44px);
+  gap: 4px 14px;
+}
+@media (min-width: 560px) {
+  .color-picker__swatches {
+    grid-template-columns: repeat(8, 44px);
+    gap: 4px 6px;
+  }
 }
 .color-swatch {
   display: grid;

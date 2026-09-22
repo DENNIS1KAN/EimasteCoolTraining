@@ -441,3 +441,12 @@
     display: none !important;
   }
 }
+
+.program-overview .ui-card-header {
+  margin-bottom: -6px;
+}
+@media (min-width: 760px) {
+  .ex-row__tech {
+    min-width: 120px;
+  }
+}

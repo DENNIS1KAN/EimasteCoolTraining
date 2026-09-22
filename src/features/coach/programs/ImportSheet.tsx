@@ -140,7 +140,7 @@ function ImportSheetForm({ open, onClose, afterClose }: ImportSheetProps & { aft
 
         {errors.length ? (
           <Banner tone="danger" title={t('problems')} role="alert">
-            <ul className="import-list">
+            <ul className={errors.length === 1 ? 'import-list import-list--single' : 'import-list'}>
               {errors.map((e, i) => (
                 <li key={i}>{e}</li>
               ))}
@@ -175,7 +175,7 @@ function ImportSheetForm({ open, onClose, afterClose }: ImportSheetProps & { aft
                   {week1.days.map((d, i) => (
                     <li key={i}>
                       <Chip size="sm">
-                        {dayShortName(d)} · {t('exercisesInDay', { n: d.ex.length })}
+                        {dayShortName(d)} · {d.ex.length === 1 ? t('exerciseOne') : t('exercisesInDay', { n: d.ex.length })}
                       </Chip>
                     </li>
                   ))}
@@ -185,7 +185,7 @@ function ImportSheetForm({ open, onClose, afterClose }: ImportSheetProps & { aft
             {summary.blocks.length ? <p className="import-blocks">{summary.blocks.join(' → ')}</p> : null}
             {warnings.length ? (
               <Banner tone="warn" title={t('headsUp')}>
-                <ul className="import-list">
+                <ul className={warnings.length === 1 ? 'import-list import-list--single' : 'import-list'}>
                   {warnings.map((w, i) => (
                     <li key={i}>{w}</li>
                   ))}

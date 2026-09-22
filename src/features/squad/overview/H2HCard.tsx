@@ -3,7 +3,7 @@ import { useT } from '../../../i18n'
 import { Avatar, Card, Icon, memberColorVar } from '../../../ui'
 import { WinStrip } from '../components/WinStrip'
 import type { H2H } from '../components/score'
-import { useScoreLine } from '../components/score'
+import { useLeadText, useScoreLine } from '../components/score'
 import { compareHref } from '../format'
 import { SQ } from '../messages'
 
@@ -11,6 +11,7 @@ import { SQ } from '../messages'
 export function H2HCard({ a, b, h2h, viewerId }: { a: Member; b: Member; h2h: H2H; viewerId: string | null }) {
   const t = useT(SQ)
   const scoreLine = useScoreLine()
+  const leadText = useLeadText()
   const involved = viewerId === a.id || viewerId === b.id
   const title = involved ? t('h2hYouVs', { name: (viewerId === a.id ? b : a).name }) : t('h2hVs', { a: a.name, b: b.name })
   const line = scoreLine(h2h, a, b, viewerId)
@@ -41,7 +42,7 @@ export function H2HCard({ a, b, h2h, viewerId }: { a: Member; b: Member; h2h: H2
       </div>
       <WinStrip rows={h2h.rows} a={a} b={b} />
       <p className="sq-h2h__line" aria-hidden="true">
-        <span>{line}</span>
+        <span>{leadText(h2h, a, b, viewerId)}</span>
         <span className="sq-h2h__cta">
           {t('h2hCta')}
           <Icon name="chevron-right" size={14} strokeWidth={2} />

@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router'
 import type { Member } from '../../data/types'
 import { useT } from '../../i18n'
 import { logsOf } from '../../lib/stats'
-import { EmptyState, Icon, PageHeader } from '../../ui'
+import { Card, EmptyState, Icon, PageHeader } from '../../ui'
 import { useAllTimePoints, useSquad } from './hooks'
 import { useHeadToHead } from './components/score'
 import { LiftDuel, RaceChart, VolumeChart, WeightDuel } from './compare/CompareCharts'
@@ -58,6 +58,8 @@ export default function ComparePage() {
   const accessA = weightAccess(a, me)
   const accessB = weightAccess(b, me)
   const duo = { a, b, data, today }
+  // Nothing logged by either yet: one friendly card instead of four empty charts.
+  const quiet = ![a, b].some((m) => Object.values(data.logs).some((l) => l.memberId === m.id && l.done) || Object.values(data.weights).some((w) => w.memberId === m.id))
   return (
     <div className="stack sq-page sq-compare">
       {header}
@@ -71,21 +73,27 @@ export default function ComparePage() {
             unit={unit}
             viewerId={me?.id ?? null}
           />
-          {summary ? (
+          {summary || quiet ? (
             <p className="sq-summary" aria-live="polite">
               <Icon name="sparkles" size={16} />
-              <span>{summary}</span>
+              <span>{summary || t('compareEmpty')}</span>
             </p>
           ) : null}
         </div>
-        <div className="stack sq-compare__charts">
-          <div className="sq-compare__two">
-            <RaceChart {...duo} />
-            <VolumeChart {...duo} unit={unit} />
+        {quiet ? (
+          <Card className="sq-compare__charts">
+            <EmptyState compact icon="flame" title={t('raceEmpty')} body={t('compareEmptyBody')} />
+          </Card>
+        ) : (
+          <div className="stack sq-compare__charts">
+            <div className="sq-compare__two">
+              <RaceChart {...duo} />
+              <VolumeChart {...duo} unit={unit} />
+            </div>
+            <LiftDuel {...duo} unit={unit} accessA={accessA} accessB={accessB} />
+            <WeightDuel {...duo} accessA={accessA} accessB={accessB} />
           </div>
-          <LiftDuel {...duo} unit={unit} accessA={accessA} accessB={accessB} />
-          <WeightDuel {...duo} accessA={accessA} accessB={accessB} />
-        </div>
+        )}
       </div>
     </div>
   )

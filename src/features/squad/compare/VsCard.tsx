@@ -6,7 +6,7 @@ import type { MemberStats, MetricKey } from '../../../lib/stats'
 import { Avatar, memberColorVar } from '../../../ui'
 import { WinStrip } from '../components/WinStrip'
 import { weightText } from '../components/WeightSummary'
-import type { H2H } from '../components/score'
+import { useLeadText, type H2H } from '../components/score'
 import { fmtMetric } from '../logic/metrics'
 import type { WeightAccess } from '../logic/visibility'
 import { SQ } from '../messages'
@@ -36,8 +36,7 @@ export function VsCard({ a, b, h2h, unit, viewerId }: { a: VsSide; b: VsSide; h2
   const t = useT(SQ)
   const ca = memberColorVar(a.member.color)
   const cb = memberColorVar(b.member.color)
-  const lead = h2h.a > h2h.b ? a.member : h2h.b > h2h.a ? b.member : null
-  const leadText = !lead ? t('allSquare') : lead.id === viewerId ? t('youLead') : t('leads', { name: lead.name })
+  const leadText = useLeadText()(h2h, a.member, b.member, viewerId)
   const nameOf = (m: Member) => (m.id === viewerId ? `${m.name} (${t('youLabel')})` : m.name)
 
   const weightSub = (() => {

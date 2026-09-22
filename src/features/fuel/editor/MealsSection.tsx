@@ -50,17 +50,26 @@ function MealEditor({ meal, index, count, errors, onChange, onMove, onRemove }: 
       <div className="fu-ed__meal-nums">
         <TextField type="time" label={t('mealTime')} value={meal.time} error={err('time')} onChange={(e) => onChange({ time: e.target.value })} />
         <NumberField label={t('mealKcal')} value={meal.kcal} decimals={0} min={0} error={err('kcal')} onChange={(v) => onChange({ kcal: v })} />
-        <NumberField label={t('mealProtein')} value={meal.protein} decimals={0} min={0} suffix="g" error={err('protein')} onChange={(v) => onChange({ protein: v })} />
+        <NumberField
+          label={t('mealProtein')}
+          value={meal.protein}
+          decimals={0}
+          min={0}
+          suffix="g"
+          error={err('protein')}
+          onChange={(v) => onChange({ protein: v })}
+        />
       </div>
-      <TextArea
-        label={t('mealItems')}
-        hint={t('mealItemsHint')}
-        rows={3}
-        value={meal.items}
-        onChange={(e) => onChange({ items: e.target.value })}
-      />
+      <TextArea label={t('mealItems')} hint={t('mealItemsHint')} rows={3} value={meal.items} onChange={(e) => onChange({ items: e.target.value })} />
       <div className="fu-ed__meal-tools">
-        <IconButton icon="arrow-up" label={t('moveUp', { name })} variant="ghost" size={40} disabled={index === 0} onClick={() => onMove(index - 1)} />
+        <IconButton
+          icon="arrow-up"
+          label={t('moveUp', { name })}
+          variant="ghost"
+          size={40}
+          disabled={index === 0}
+          onClick={() => onMove(index - 1)}
+        />
         <IconButton
           icon="arrow-down"
           label={t('moveDown', { name })}

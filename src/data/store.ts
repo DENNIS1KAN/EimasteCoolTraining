@@ -83,18 +83,20 @@ function shallowEqual(a: unknown, b: unknown): boolean {
  * so a selector like `s => Object.values(s.members)` only re-renders when a member changes.
  */
 export function useStore<T>(selector: (s: State) => T): T {
-  const cache = useRef<{ s: State; v: T } | null>(null)
+  const cache = useRef<{ s: State; f: (s: State) => T; v: T } | null>(null)
   const sel = useRef(selector)
   sel.current = selector
   const get = () => {
     const c = cache.current
-    if (c && c.s === state) return c.v
-    const v = sel.current(state)
+    const f = sel.current
+    // Re-run when the state OR the selector changed (selectors may close over props).
+    if (c && c.s === state && c.f === f) return c.v
+    const v = f(state)
     if (c && shallowEqual(c.v, v)) {
-      cache.current = { s: state, v: c.v }
+      cache.current = { s: state, f, v: c.v }
       return c.v
     }
-    cache.current = { s: state, v }
+    cache.current = { s: state, f, v }
     return v
   }
   return useSyncExternalStore(subscribe, get, get)

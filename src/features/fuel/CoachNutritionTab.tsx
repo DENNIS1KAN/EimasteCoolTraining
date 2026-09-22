@@ -142,7 +142,7 @@ function AthleteCard({ row, today }: { row: Row; today: ISODate }) {
             {t('editPlan')}
           </ButtonLink>
         )}
-        <ButtonLink to={editorPath(member.slug, 'new')} variant={plan ? 'ghost' : 'primary'} size="sm" icon="plus">
+        <ButtonLink to={editorPath(member.slug, 'new')} variant={plan ? 'ghost' : 'secondary'} size="sm" icon="plus">
           {t('newPlan')}
         </ButtonLink>
       </div>

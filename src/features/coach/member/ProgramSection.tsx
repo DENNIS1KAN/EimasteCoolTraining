@@ -39,7 +39,7 @@ export function ProgramSection({ draft, set, error }: ProgramSectionProps) {
   }
 
   return (
-    <Card as="section" aria-labelledby="member-program-title" className="stack-lg">
+    <Card as="section" aria-labelledby="member-program-title" className="coach-stack">
       <CardHeader title={<span id="member-program-title">{t('program')}</span>} subtitle={status} />
       <Select
         label={t('program')}

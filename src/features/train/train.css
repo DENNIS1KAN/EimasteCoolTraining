@@ -551,12 +551,25 @@
 }
 .tr-xpand__t {
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .tr-xpand__s {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   margin-left: auto;
-  font: 600 12px/1.2 var(--font-body);
   color: var(--muted);
-  white-space: nowrap;
+}
+.tr-xpand__s > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.tr-xpand__s .num {
+  font: 800 14px/1 var(--font-display);
 }
 .tr-xpand__chev {
   transition: transform var(--dur-1) var(--ease);
@@ -1372,4 +1385,80 @@
   justify-self: center;
   box-shadow: none;
   color: var(--ink-2);
+}
+
+/* ------------------------------------------------------------------ read-only workout (MemberWorkoutPage) */
+.tr-ro {
+  padding-bottom: 10px;
+}
+.tr-ro__sets {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tr-ro__set {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 46px;
+  padding: 4px 10px;
+  border-radius: 14px;
+}
+.tr-ro__set + .tr-ro__set {
+  margin-top: 2px;
+}
+.tr-ro__set.is-pr {
+  background: var(--accent-soft);
+}
+.tr-ro__n {
+  width: 18px;
+  text-align: center;
+  font: 800 20px/1 var(--font-display);
+  color: var(--muted);
+}
+.tr-ro__v {
+  flex: 1;
+  font: 800 26px/1 var(--font-display);
+  color: var(--ink);
+}
+.tr-ro__v small {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin-left: 2px;
+}
+.tr-ro__skip {
+  margin: 10px 0 4px;
+  font: 700 13px/18px var(--font-body);
+  color: var(--muted);
+}
+.tr-ro.is-skipped .tr-ex__name {
+  color: var(--ink-2);
+}
+.mw-sum__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.mw-sum__when {
+  font: 600 12px/16px var(--font-body);
+  color: var(--muted);
+}
+.mw-sum__edit {
+  justify-self: start;
+}
+.mw-sum__live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 700 12px/16px var(--font-body);
+  color: var(--warn);
+}
+.lf-avatar {
+  display: inline-grid;
+  border-radius: 50%;
+}
+.lf-avatar:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }

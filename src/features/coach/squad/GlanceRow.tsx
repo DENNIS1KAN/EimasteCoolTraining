@@ -78,7 +78,7 @@ export function GlanceRow({ row, isMe }: { row: AthleteGlance; isMe: boolean }) 
             )}
           </dd>
         </div>
-        <div className={cx('glance-metric', staleWeighIn && 'is-warn')}>
+        <div className={cx('glance-metric', 'glance-metric--text', staleWeighIn && 'is-warn')}>
           <dt className="micro">{t('colWeighIn')}</dt>
           <dd>
             {staleWeighIn ? <Icon name="alert" size={14} strokeWidth={2.2} /> : <Icon name="scale" size={14} />}

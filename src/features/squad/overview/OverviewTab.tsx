@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useT } from '../../../i18n'
-import { Banner, ButtonLink, EmptyState, SectionTitle } from '../../../ui'
+import { EmptyState, SectionTitle } from '../../../ui'
 import { sortedMembers } from '../../../lib/stats'
 import { useAllTimePoints, useNow, useSquad } from '../hooks'
 import { useHeadToHead } from '../components/score'
@@ -11,6 +11,8 @@ import { SQ } from '../messages'
 import { CoachRow } from './CoachRow'
 import { CompetitorCard } from './CompetitorCard'
 import { H2HCard } from './H2HCard'
+import { KickoffCard } from './KickoffCard'
+import { LatestCard } from './LatestCard'
 import { MvpBanner } from './MvpBanner'
 
 export function OverviewTab() {
@@ -47,25 +49,16 @@ export function OverviewTab() {
   }
 
   const topPoints = week[0]?.points.total ?? 0
+  const unstarted = competitors.filter((m) => !m.programStart)
+  const kickoff = !!me && ((me.role === 'coach' && unstarted.length > 0) || (me.role === 'athlete' && !anyActivity))
   return (
     <div className="stack sq-overview">
-      {!anyActivity && me?.role === 'athlete' ? (
-        <Banner
-          tone="accent"
-          icon="flame"
-          title={t('firstWorkoutTitle')}
-          action={
-            <ButtonLink to="/train" size="sm" icon="play">
-              {t('startWorkout')}
-            </ButtonLink>
-          }
-        >
-          {t('firstWorkoutBody')}
-        </Banner>
-      ) : null}
-
       <div className="sq-overview__top">
-        <MvpBanner mvps={crown.map((id) => data.members[id]).filter(Boolean)} points={topPoints} viewerId={me?.id ?? null} />
+        {kickoff && me ? (
+          <KickoffCard viewer={me} unstarted={unstarted} />
+        ) : (
+          <MvpBanner mvps={crown.map((id) => data.members[id]).filter(Boolean)} points={topPoints} viewerId={me?.id ?? null} />
+        )}
         {pair && h2h ? (
           <H2HCard a={pair[0]} b={pair[1]} h2h={h2h} viewerId={me?.id ?? null} />
         ) : (
@@ -97,6 +90,7 @@ export function OverviewTab() {
           ))}
         </div>
       )}
+      <LatestCard me={me} now={now} />
     </div>
   )
 }

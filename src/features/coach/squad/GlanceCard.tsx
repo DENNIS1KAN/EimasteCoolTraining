@@ -45,8 +45,8 @@ export function GlanceCard({ rows, today, meId, onAdd }: GlanceCardProps) {
         <EmptyState
           compact
           icon="users"
-          title={t('noAthletesTitle')}
-          body={t('noAthletesBody')}
+          title={t('emptySquadTitle')}
+          body={t('emptySquadBody')}
           action={
             <Button variant="primary" size="sm" icon="user-plus" onClick={onAdd}>
               {t('addMember')}

@@ -40,7 +40,7 @@ export function CoachNoteCard({ member }: { member: Member }) {
   }
 
   return (
-    <Card as="section" aria-labelledby="member-note-title" className="stack-lg note-card">
+    <Card as="section" aria-labelledby="member-note-title" className="coach-stack note-card">
       <CardHeader title={<span id="member-note-title">{t('coachNote')}</span>} subtitle={t('coachNoteHint')} />
       {member.coachNote ? (
         <figure className="note-live">

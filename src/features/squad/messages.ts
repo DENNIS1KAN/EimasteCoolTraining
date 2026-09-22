@@ -14,6 +14,8 @@ export const SQ = defineMessages(
 
     // overview
     thisWeek: 'This week',
+    latest: 'Latest',
+    seeAll: 'See all',
     weekShort: 'W{n}',
     wkUnit: 'wk',
     notStarted: 'Not started yet',
@@ -56,6 +58,9 @@ export const SQ = defineMessages(
     firstWorkoutTitle: 'Week 1 starts with one workout',
     firstWorkoutBody: 'Nobody has trained yet. Log the first session and take the early lead.',
     startWorkout: 'Start a workout',
+    coachKickoffTitle: 'Set the start dates',
+    coachKickoffBody: 'The program clock and the league start once each athlete has a start date.',
+    setStart: 'Set start date',
 
     // league
     periodLabel: 'Points period',
@@ -108,6 +113,12 @@ export const SQ = defineMessages(
     filterCheers: 'Nudges',
     filterBody: 'Body & food',
     finishedVerb: 'finished',
+    finishedVerbYou: 'finished',
+    weighedInYou: 'weighed in',
+    earnedBadgeYou: 'earned a badge',
+    finishedWorkoutYou: 'finished a workout',
+    cardStreak: 'Week streak',
+    cardOnSchedule: 'On schedule',
     finishedWorkout: 'finished a workout',
     setsN: '{n} sets',
     prsInWorkout: '{n} PRs',
@@ -200,6 +211,8 @@ export const SQ = defineMessages(
     raceTitle: 'The race',
     raceSub: 'Workouts finished, cumulative',
     raceEmpty: 'The race starts with the first workout',
+    compareEmpty: 'Nothing to compare yet. The first workout breaks the deadlock.',
+    compareEmptyBody: 'Charts for the race, weekly volume, a lift duel and weight change appear as soon as you both log.',
     raceAria: 'Cumulative finished workouts: {a} {va}, {b} {vb}',
     volumeTitle: 'Weekly volume',
     volumeSub: 'Last 6 weeks, in {unit}',
@@ -292,6 +305,8 @@ export const SQ = defineMessages(
 
     // overview
     thisWeek: 'Αυτή την εβδομάδα',
+    latest: 'Πρόσφατα',
+    seeAll: 'Όλα',
     weekShort: 'Εβδ. {n}',
     wkUnit: 'εβδ.',
     notStarted: 'Δεν έχει ξεκινήσει ακόμη',
@@ -334,6 +349,9 @@ export const SQ = defineMessages(
     firstWorkoutTitle: 'Η 1η εβδομάδα ξεκινά με μία προπόνηση',
     firstWorkoutBody: 'Κανείς δεν έχει προπονηθεί ακόμη. Κάνε την πρώτη και πάρε κεφάλι.',
     startWorkout: 'Ξεκίνα προπόνηση',
+    coachKickoffTitle: 'Όρισε ημερομηνίες έναρξης',
+    coachKickoffBody: 'Το πρόγραμμα και η βαθμολογία ξεκινούν μόλις κάθε αθλητής έχει ημερομηνία έναρξης.',
+    setStart: 'Όρισε έναρξη',
 
     // league
     periodLabel: 'Περίοδος πόντων',
@@ -386,6 +404,12 @@ export const SQ = defineMessages(
     filterCheers: 'Σκουντήματα',
     filterBody: 'Σώμα & διατροφή',
     finishedVerb: 'τελείωσε',
+    finishedVerbYou: 'τελείωσες',
+    weighedInYou: 'ζυγίστηκες',
+    earnedBadgeYou: 'κέρδισες μετάλλιο',
+    finishedWorkoutYou: 'τελείωσες προπόνηση',
+    cardStreak: 'Σερί',
+    cardOnSchedule: 'Συνέπεια',
     finishedWorkout: 'τελείωσε προπόνηση',
     setsN: '{n} σετ',
     prsInWorkout: '{n} PR',
@@ -478,6 +502,8 @@ export const SQ = defineMessages(
     raceTitle: 'Η κούρσα',
     raceSub: 'Ολοκληρωμένες προπονήσεις, αθροιστικά',
     raceEmpty: 'Η κούρσα ξεκινά με την πρώτη προπόνηση',
+    compareEmpty: 'Τίποτα για σύγκριση ακόμη. Η πρώτη προπόνηση σπάει την ισοπαλία.',
+    compareEmptyBody: 'Η κούρσα, ο εβδομαδιαίος όγκος, η μονομαχία άρσης και η αλλαγή βάρους εμφανίζονται μόλις γράψετε κάτι.',
     raceAria: 'Ολοκληρωμένες προπονήσεις αθροιστικά: {a} {va}, {b} {vb}',
     volumeTitle: 'Εβδομαδιαίος όγκος',
     volumeSub: 'Τελευταίες 6 εβδομάδες, σε {unit}',

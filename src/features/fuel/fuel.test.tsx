@@ -149,12 +149,24 @@ describe('CoachNutritionTab', () => {
     const s = screen.getByRole('region', { name: 'Stelios' })
     expect(within(s).getByText('Cut phase · v2')).toBeTruthy()
     expect(within(s).getByText('Yesterday')).toBeTruthy()
-    expect(within(s).getByRole('link', { name: /Edit plan/ }).getAttribute('href')).toBe('/coach/plan/stelios/cut')
+    expect(
+      within(s)
+        .getByRole('link', { name: /Edit plan/ })
+        .getAttribute('href'),
+    ).toBe('/coach/plan/stelios/cut')
     fireEvent.click(within(s).getByRole('button', { name: /History/ }))
-    expect(within(s).getByRole('link', { name: /Cut phase · v1/ }).getAttribute('href')).toBe('/coach/plan/stelios/old')
+    expect(
+      within(s)
+        .getByRole('link', { name: /Cut phase · v1/ })
+        .getAttribute('href'),
+    ).toBe('/coach/plan/stelios/old')
     const th = screen.getByRole('region', { name: 'Thanos' })
     expect(within(th).getByText('No active plan')).toBeTruthy()
-    expect(within(th).getByRole('link', { name: /New plan/ }).getAttribute('href')).toBe('/coach/plan/thanos/new')
+    expect(
+      within(th)
+        .getByRole('link', { name: /New plan/ })
+        .getAttribute('href'),
+    ).toBe('/coach/plan/thanos/new')
     expect(screen.queryByRole('region', { name: 'Dennis' })).toBeNull()
   })
 })

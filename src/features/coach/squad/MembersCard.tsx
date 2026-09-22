@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Banner, Button, Card, CardHeader, EmptyState } from '../../../ui'
+import { Banner, Button, Card, CardHeader } from '../../../ui'
 import { useT } from '../../../i18n'
 import type { Member } from '../../../data/types'
 import { COMMON } from '../../../i18n/common'
@@ -39,13 +39,11 @@ export function MembersCard({ members, data, invites, meId, onAdd }: MembersCard
     <Card as="section" className="members-card" aria-labelledby="coach-members-title">
       <CardHeader
         title={<span id="coach-members-title">{t('membersTitle')}</span>}
-        subtitle={t('membersSub', { n: members.length })}
+        subtitle={onlyMe ? t('membersSubOne') : t('membersSub', { n: members.length })}
         action={
-          onlyMe ? null : (
-            <Button variant="tonal" size="sm" icon="user-plus" onClick={onAdd}>
-              {t('addMember')}
-            </Button>
-          )
+          <Button variant="tonal" size="sm" icon="user-plus" onClick={onAdd}>
+            {t('addMember')}
+          </Button>
         }
       />
       {invites.error ? (
@@ -65,19 +63,6 @@ export function MembersCard({ members, data, invites, meId, onAdd }: MembersCard
           <MemberRow key={r.member.id} info={r} code={invites.codes?.[r.member.id]} loadingCode={invites.loading && !invites.codes} isMe={r.member.id === meId} />
         ))}
       </ul>
-      {onlyMe ? (
-        <EmptyState
-          compact
-          icon="user-plus"
-          title={t('emptySquadTitle')}
-          body={t('emptySquadBody')}
-          action={
-            <Button variant="primary" icon="user-plus" onClick={onAdd}>
-              {t('addMember')}
-            </Button>
-          }
-        />
-      ) : null}
     </Card>
   )
 }
