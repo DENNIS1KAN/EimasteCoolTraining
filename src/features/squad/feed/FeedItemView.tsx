@@ -151,7 +151,7 @@ export function FeedItemView({ item, members, me, unit, compact, timeLabel }: Fe
       body = (
         <>
           <p className="sq-feed__line">
-            {who} {t('earnedBadge')}
+            {who} {t(isMe ? 'earnedBadgeYou' : 'earnedBadge')}
             {stamp}
           </p>
           <p className="sq-feed__badge">

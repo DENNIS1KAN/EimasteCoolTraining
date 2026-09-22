@@ -85,14 +85,14 @@ export function CompetitorCard({ member, stats, data, today, now, isMe, access, 
 
       <dl className="sq-comp__stats">
         <div>
-          <dt>{t('tileStreak')}</dt>
+          <dt>{t('cardStreak')}</dt>
           <dd className="num">
             {fmtNum(stats.weekStreak, 0)}
             <small>{t('wkUnit')}</small>
           </dd>
         </div>
         <div>
-          <dt>{t('tileOnSchedule')}</dt>
+          <dt>{t('cardOnSchedule')}</dt>
           <dd className="num">{stats.schedule?.consistency != null ? fmtPct(stats.schedule.consistency) : '—'}</dd>
         </div>
         <div>

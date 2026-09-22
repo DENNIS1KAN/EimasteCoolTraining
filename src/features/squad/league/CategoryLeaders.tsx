@@ -19,6 +19,7 @@ const META: Record<CategoryKey, { label: 'catConsistency' | 'catVolumeWeek' | 'c
 export function CategoryLeaders({ cats, members, meId, unit }: { cats: CategoryLeader[]; members: Record<string, Member>; meId: string | null; unit: Unit }) {
   const t = useT(SQ)
   const name = (id: string) => (id === meId ? t('youCap') : (members[id]?.name ?? '?'))
+  const inline = (id: string) => (id === meId ? t('youLabel') : (members[id]?.name ?? '?'))
   return (
     <section className="stack" aria-labelledby="sq-cats-h">
       <SectionTitle title={<span id="sq-cats-h">{t('categoryLeaders')}</span>} />
@@ -41,7 +42,7 @@ export function CategoryLeaders({ cats, members, meId, unit }: { cats: CategoryL
                   </div>
                   <p className="sq-cat__value num">{fmtMetric(c.key, c.value, unit)}</p>
                   {next && leaders.length === 1 ? (
-                    <p className="sq-cat__next">{t('runnerUp', { name: name(next.memberId), value: fmtMetric(c.key, next.value, unit) })}</p>
+                    <p className="sq-cat__next">{t('runnerUp', { name: inline(next.memberId), value: fmtMetric(c.key, next.value, unit) })}</p>
                   ) : null}
                 </>
               ) : (
