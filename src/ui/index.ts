@@ -44,6 +44,7 @@ export {
   parseDecimal,
   sanitizeDecimalDraft,
   canonicalDecimal,
+  displayDecimal,
   decimalsOf,
   matchesAccept,
 } from './fields'

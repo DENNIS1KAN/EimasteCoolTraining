@@ -72,7 +72,11 @@ type IconName = 'home' | 'train' | 'body' | 'fuel' | 'squad' | 'play' | 'check' 
 <ConfirmSheet open title body confirmLabel danger? onConfirm onClose />
 
 <TextField label hint? error? {...inputProps} />
-<NumberField label? value onChange(valueString) decimals?={1} min? max? suffix?="kg" />   // accepts a comma, inputMode="decimal"
+<NumberField label? value onChange(valueString) decimals?={1} min? max? suffix?="kg" />
+   // accepts a comma, inputMode="decimal"; shows the Greek comma ("67,5") but reports canonical strings ("67.5").
+   // min/max are validated, never forced: an out-of-range entry stays as typed and shows a range error on blur,
+   // so the caller must still validate before saving (onChange fires on every keystroke).
+displayDecimal(canonical, lang?)   // "67.5" -> "67,5" in Greek: use it for any decimal you put into an input or placeholder
 <TextArea label hint? rows? {...textareaProps} />
 <Select label options={[{ value, label }]} value onChange />
 <Switch checked onChange label description? />
@@ -97,4 +101,7 @@ The account sheet, bottom tab bar, desktop sidebar, offline/demo/sync banners an
 Pages render **inside** the shell: a scroll container with the gutter, the safe areas and space for the tab bar already applied.
 A page is usually `<PageHeader …/>` followed by a `.stack` of cards.
 Fixed bottom UI (the rest timer or the quick-log dock) must sit above the tab bar: `bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 8px)`.
+`--tabbar-h` is the bar's footprint including the raised volt Train button in its middle, so that offset clears the button too.
+Floating bars register with `useFloatingBar(ref, FLOAT_PRIORITY.x)` (src/ui/floating.ts) to stack instead of overlapping;
+their total height is published as `--float-stack`, which the page's bottom padding and the toaster already add.
 On desktop (≥ 1024 px) the tab bar becomes a left sidebar and `--tabbar-h` is 0.

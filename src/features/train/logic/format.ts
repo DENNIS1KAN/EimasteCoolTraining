@@ -50,20 +50,5 @@ export function durationParts(ms: number): { h: number; m: number } {
   return { h: Math.floor(min / 60), m: min % 60 }
 }
 
-const GREEK = /[Ͱ-Ͽἀ-῿]/
-
-/**
- * The language of a program string (day or exercise name) for its `lang` attribute: 'el' when it has Greek
- * letters (so CSS uppercase drops the tonos: "ΠΟΔΙΑ", not "ΠΌΔΙΑ"), else 'en' (the built-in program is English).
- */
-export const textLang = (s: string): 'el' | 'en' => (GREEK.test(s) ? 'el' : 'en')
-
-/** Uppercase that follows Greek rules (no tonos on capitals: "Ώμοι" -> "ΩΜΟΙ", "ΐ" -> "Ϊ"); Latin is untouched. */
-export function upperText(s: string): string {
-  if (!GREEK.test(s)) return s.toUpperCase()
-  return s
-    .normalize('NFD')
-    .replace(/([Ͱ-Ͽἀ-῿][̀-ͯ]*?)[́͂̓̔]/g, '$1')
-    .normalize('NFC')
-    .toLocaleUpperCase('el')
-}
+// Greek-aware helpers live in src/lib/text (shared with squad and the UI kit).
+export { textLang, upperText } from '../../../lib/text'

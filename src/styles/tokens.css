@@ -41,11 +41,12 @@
   --heat: #0b1020; /* adherence heatmap ink (= accent-strong) */
 
   /* ---------------------------------------------------------------- status (always paired with an icon or label) */
-  --good: #4f7f00;
+  /* Text-strength status inks: >= 4.5:1 on their own -soft band over white (Delta pills, tags, banners). */
+  --good: #487500;
   --good-soft: rgba(79, 127, 0, 0.11);
-  --warn: #9c6500;
+  --warn: #8f5c00;
   --warn-soft: rgba(196, 132, 0, 0.13);
-  --danger: #d6334f;
+  --danger: #c42a45;
   --danger-soft: rgba(214, 51, 79, 0.1);
   --on-danger: #ffffff;
 
@@ -148,7 +149,7 @@
     --card-border: rgba(140, 160, 205, 0.075);
     --tabbar: rgba(9, 12, 19, 0.93);
     --tabbar-solid: #090c13;
-    --statusbar: rgba(7, 9, 15, 0.9);
+    --statusbar: rgba(7, 9, 15, 0.94);
     --scrim: rgba(2, 3, 8, 0.66);
     --knob: #c3cad6;
     --line: #1a1f2b;
@@ -199,7 +200,7 @@
   --card-border: rgba(140, 160, 205, 0.075);
   --tabbar: rgba(9, 12, 19, 0.93);
   --tabbar-solid: #090c13;
-  --statusbar: rgba(7, 9, 15, 0.9);
+  --statusbar: rgba(7, 9, 15, 0.94);
   --scrim: rgba(2, 3, 8, 0.66);
   --knob: #c3cad6;
   --line: #1a1f2b;
