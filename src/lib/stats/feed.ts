@@ -89,6 +89,6 @@ export function reactionsFor(cheers: Record<string, Cheer>, itemId: string): Rec
 /** Nudges/messages addressed to a member they haven't seen yet, newest first. */
 export function unseenCheers(cheers: Record<string, Cheer>, memberId: string): Cheer[] {
   return Object.values(cheers)
-    .filter((c) => c.toId === memberId && !c.seenAt)
+    .filter((c) => c.toId === memberId && !c.seenAt && c.kind !== 'kudos')
     .sort((a, b) => b.createdAt - a.createdAt)
 }

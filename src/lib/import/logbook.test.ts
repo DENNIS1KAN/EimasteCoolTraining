@@ -194,7 +194,29 @@ describe('importLogbookCSV', () => {
     expect(noUnit.logs[0].unit).toBe('lb')
     const bad = importLogbookCSV(csv('1,,Upper,1,,,1,60,stone,5,yes,,no,', '1,,Upper,1,,,2,60,stone,5,yes,,no,'), opts)
     expect(bad.logs[0].unit).toBe('kg')
-    expect(bad.warnings).toEqual(['Row 2: unknown unit "stone"; assumed kg.'])
+    expect(bad.warnings).toEqual(['Row 2: unknown unit "stone"; used the workout\'s unit.'])
+  })
+
+  it('sets without a unit take the workout unit instead of being converted from the default', () => {
+    const r = importLogbookCSV(csv('1,,Upper,1,,,1,135,lb,5,yes,,no,', '1,,Upper,1,,,2,135,,5,yes,,no,', '1,,Upper,1,,,3,140,lbs,5,yes,,no,'), opts)
+    expect(r.logs[0].unit).toBe('lb')
+    expect(r.logs[0].ex['0'].sets.map((s) => s.w)).toEqual(['135', '135', '140'])
+    expect(r.warnings).toEqual([])
+  })
+
+  it('takes the variant from the first row that names the performed exercise, and warns on a mix', () => {
+    const r = importLogbookCSV(
+      csv(
+        '1,,Upper,1,,45° Incline Barbell Press,1,30,kg,8,yes,,no,',
+        '1,,Upper,1,45° Incline Machine Press,45° Incline Barbell Press,2,30,kg,8,yes,,no,',
+        '1,,Upper,1,45° Incline DB Press,45° Incline Barbell Press,3,30,kg,8,yes,,no,',
+      ),
+      opts,
+    )
+    expect(r.logs[0].ex['0'].v).toBe(2)
+    expect(r.warnings).toEqual([
+      'Row 4: "45° Incline DB Press" differs from "45° Incline Machine Press" logged earlier for 45° Incline Barbell Press in week 1; kept "45° Incline Machine Press".',
+    ])
   })
 
   it('reads done flags leniently and warns on nonsense', () => {

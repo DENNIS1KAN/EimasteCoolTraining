@@ -116,9 +116,9 @@ describe('reactionsFor', () => {
 })
 
 describe('unseenCheers', () => {
-  it('lists unseen cheers addressed to the member, newest first (kudos included, as notifications)', () => {
+  it('lists unseen nudges/messages addressed to the member, newest first (kudos are reactions, not inbox items)', () => {
     const { d } = fixture()
-    expect(unseenCheers(d.cheers, S).map((c) => c.id)).toEqual(['k3', 'k1', 'k2'])
+    expect(unseenCheers(d.cheers, S).map((c) => c.kind)).not.toContain('kudos')
     expect(unseenCheers(d.cheers, T).map((c) => c.id)).toEqual(['n1'])
     expect(unseenCheers(d.cheers, D)).toEqual([])
   })

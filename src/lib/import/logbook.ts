@@ -152,7 +152,8 @@ function convertWeight(w: string, from: Unit, to: Unit): string {
 
 interface SetRow {
   set: SetLog
-  unit: Unit
+  /** null when the row gave no (valid) unit: the weight is taken to be in the workout's unit. */
+  unit: Unit | null
   row: number
 }
 interface ExGroup {
@@ -237,8 +238,8 @@ export function importLogbookCSV(text: string, opts: LogbookImportOptions): Logb
     }
     let unit = parseUnit(get('unit'))
     if (unit === undefined) {
-      warn(`Row ${rowNo}: unknown unit "${get('unit')}"; assumed ${defaultUnit}.`, `unit:${norm(get('unit'))}`)
-      unit = defaultUnit
+      warn(`Row ${rowNo}: unknown unit "${get('unit')}"; used the workout's unit.`, `unit:${norm(get('unit'))}`)
+      unit = null
     }
     let ok = parseYesNo(get('done'))
     if (ok === null) {
@@ -253,13 +254,19 @@ export function importLogbookCSV(text: string, opts: LogbookImportOptions): Logb
       if (v === null) warn(`Row ${rowNo}: "${performed}" is not ${e.n} or one of its substitutions; logged as ${e.n}.`, `var:${key}:${exRes.index}`)
       x = { v: v ?? 0, performed, m: '', sets: new Map() }
       g.ex.set(exRes.index, x)
+    } else if (norm(performed) && !norm(x.performed)) {
+      // the first rows had no performed name: this row decides the variant
+      const v = resolveVariant(e, performed)
+      if (v === null) warn(`Row ${rowNo}: "${performed}" is not ${e.n} or one of its substitutions; logged as ${e.n}.`, `var:${key}:${exRes.index}`)
+      x.v = v ?? 0
+      x.performed = performed
     } else if (norm(performed) && norm(performed) !== norm(x.performed)) {
       warn(`Row ${rowNo}: "${performed}" differs from "${x.performed}" logged earlier for ${e.n} in week ${week}; kept "${x.performed}".`, `mix:${key}:${exRes.index}`)
     }
     if (!x.m) x.m = get('machine')
     const prev = x.sets.get(setNo)
     if (prev) warn(`Row ${rowNo}: set ${setNo} of ${e.n} (week ${week}, ${dayShortName(day)}) repeats row ${prev.row}; the later row wins.`)
-    x.sets.set(setNo, { set: { w: get('weight'), r: get('reps'), ok }, unit: unit ?? defaultUnit, row: rowNo })
+    x.sets.set(setNo, { set: { w: get('weight'), r: get('reps'), ok }, unit, row: rowNo })
   }
 
   const now = opts.now ?? Date.now()
@@ -270,10 +277,10 @@ export function importLogbookCSV(text: string, opts: LogbookImportOptions): Logb
   return { logs, warnings }
 }
 
-/** Most frequent unit among the set rows (first seen wins ties). */
+/** Most frequent unit among the set rows that name one (first seen wins ties). */
 function majorityUnit(g: Group, fallback: Unit): Unit {
   const count = new Map<Unit, number>()
-  for (const x of g.ex.values()) for (const s of x.sets.values()) count.set(s.unit, (count.get(s.unit) ?? 0) + 1)
+  for (const x of g.ex.values()) for (const s of x.sets.values()) if (s.unit) count.set(s.unit, (count.get(s.unit) ?? 0) + 1)
   let best: Unit = fallback
   let n = 0
   for (const [u, c] of count) if (c > n) [best, n] = [u, c]
@@ -290,7 +297,8 @@ function buildLog(g: Group, opts: LogbookImportOptions, defaultUnit: Unit, now: 
     const sets = Array.from({ length: Math.max(...x.sets.keys()) }, (_, i) => {
       const s = x.sets.get(i + 1)
       if (!s) return { ...EMPTY_SET }
-      if (s.unit !== unit) converted = true
+      if (!s.unit || s.unit === unit) return s.set
+      converted = true
       return { ...s.set, w: convertWeight(s.set.w, s.unit, unit) }
     })
     if (x.m || sets.some((s) => s.w || s.r || s.ok)) content = true
