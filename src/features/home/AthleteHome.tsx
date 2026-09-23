@@ -10,6 +10,7 @@ import { TodayNutritionCard } from '../fuel/TodayNutritionCard'
 import { SquadPulseCard } from '../squad/SquadPulseCard'
 import { AthleteOnboarding } from './AthleteOnboarding'
 import { CoachNote } from './CoachNote'
+import { CoachSetup } from './CoachSetup'
 import { HomeHeader } from './HomeHeader'
 import { SquadTodayCard } from './SquadTodayCard'
 import { StatTiles } from './StatTiles'
@@ -21,7 +22,8 @@ import { hasTrainingStats } from './logic/tiles'
 import { HM } from './messages'
 
 /**
- * Athlete home: greeting, onboarding (fresh accounts), coach note, cheers, today's workout (hero), the three
+ * Athlete home, also the home of a coach who trains and competes (the default; he also gets the squad set-up
+ * checklist and "Squad today" with a link to the coach console): greeting, onboarding (fresh accounts), coach note, cheers, today's workout (hero), the three
  * stat tiles, weight + fuel minis and the squad pulse. Desktop: training on the left, body/food/squad on the right.
  */
 export function AthleteHome({ me }: { me: Member }) {
@@ -49,6 +51,7 @@ export function AthleteHome({ me }: { me: Member }) {
       <HomeHeader me={me} now={now} eyebrow={when ? `${date} · ${when}` : date} unseen={unseen} onBell={onBell} />
       <div className="home-grid">
         <div className="home-col">
+          {me.role === 'coach' ? <CoachSetup /> : null}
           <AthleteOnboarding me={me} coach={coach} />
           <CoachNote me={me} coach={coach} now={now} />
           {slot}

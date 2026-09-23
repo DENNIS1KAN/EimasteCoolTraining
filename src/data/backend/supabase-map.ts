@@ -44,11 +44,11 @@ type MemberProfile = Omit<Member, 'id' | 'slug' | 'role' | 'joined' | 'updatedAt
 /** Columns of members that are not part of the editable `data` object. */
 const MEMBER_COLUMNS = ['id', 'slug', 'role', 'joined', 'updatedAt'] as const
 
-export function defaultMemberProfile(role: Role, slug: string): MemberProfile {
+export function defaultMemberProfile(_role: Role, slug: string): MemberProfile {
   return {
     name: slug,
     color: 'blue',
-    competes: role === 'athlete',
+    competes: true,
     goal: '',
     goalWeightKg: null,
     heightCm: null,
@@ -56,7 +56,7 @@ export function defaultMemberProfile(role: Role, slug: string): MemberProfile {
     programStart: null,
     coachNote: '',
     coachNoteAt: null,
-    settings: { unit: 'kg', machines: {}, weightVisibility: 'change' },
+    settings: { unit: 'kg', machines: {}, weightVisibility: 'exact' },
   }
 }
 

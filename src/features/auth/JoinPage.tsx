@@ -8,6 +8,7 @@ import { memberColorVar } from '../../ui/member'
 import { AuthScreen } from './AuthScreen'
 import { authError, authErrorVars, isFatalJoinError, type AuthError, type AuthErrorKey } from './errors'
 import { InstallGuide } from './InstallGuide'
+import { forgetJoinLink } from './joinLink'
 import { setLastProfile } from './lastProfile'
 import { AUTH } from './messages'
 import { checkPassword } from './password'
@@ -52,7 +53,10 @@ function JoinFlow({ slug, code }: { slug: string; code: string }) {
   const name = profile?.name ?? capitalize(slug)
   const check = checkPassword(password, confirm)
   const unknownProfile = status === 'ready' && !profile
-  const fatal: AuthErrorKey | null = !slug || !code || unknownProfile ? 'errInvalidInvite' : error && isFatalJoinError(error.key) ? error.key : null
+  // An invite that was already used (e.g. the join link saved as a Home Screen icon): straight to signing in.
+  const spent = !demo && step === 'form' && !!profile?.joined
+  const fatal: AuthErrorKey | null =
+    !slug || !code || unknownProfile ? 'errInvalidInvite' : spent ? 'errAlreadyJoined' : error && isFatalJoinError(error.key) ? error.key : null
 
   const signInInstead = () => {
     setLastProfile(slug)
@@ -67,6 +71,7 @@ function JoinFlow({ slug, code }: { slug: string; code: string }) {
     try {
       await getBackend().join(slug, code, password)
       setLastProfile(slug)
+      forgetJoinLink()
       setStep('welcome')
       celebrate({ intensity: 'big' })
     } catch (err) {

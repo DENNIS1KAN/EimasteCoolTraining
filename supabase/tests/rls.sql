@@ -153,9 +153,9 @@ begin
     'invite codes: every symbol is used');
   perform ect_test.eq((select string_agg(slug || ':' || role || ':' || (data->>'color') || ':' || (data->>'competes'), ',' order by slug)
                          from public.members),
-    'dennis:coach:aqua:false,stelios:athlete:blue:true,thanos:athlete:orange:true', 'seed: roles, colors, competes');
+    'dennis:coach:aqua:true,stelios:athlete:blue:true,thanos:athlete:orange:true', 'seed: roles, colors, everyone competes');
   perform ect_test.eq((select data->>'programId' || '/' || (data->'settings'->>'unit') || '/' || (data->'settings'->>'weightVisibility')
-                         from public.members where slug = 'stelios'), 'bts-12/kg/change', 'seed: default profile data');
+                         from public.members where slug = 'stelios'), 'bts-12/kg/exact', 'seed: default profile data');
   perform ect_test.eq((select count(*) from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public')::text,
     '7', 'realtime: the 7 data tables are published once');
   perform ect_test.eq((select count(*) from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'member_invites')::text,
@@ -490,7 +490,7 @@ begin
   perform ect_test.eq(m.role || '/' || (m.data->>'name') || '/' || (m.data->>'color') || '/' || (m.data->>'competes') || '/'
                       || (m.data->>'programId') || '/' || coalesce(m.data->>'programStart', 'null') || '/'
                       || (m.data->'settings')::text,
-    'athlete/Eleni/green/true/bts-12/null/{"unit": "kg", "machines": {}, "weightVisibility": "change"}',
+    'athlete/Eleni/green/true/bts-12/null/{"unit": "kg", "machines": {}, "weightVisibility": "exact"}',
     'new member gets default profile data');
   perform ect_test.eq((ect_test.invite('eleni') ~ '^[A-Z2-9]{12}$')::text, 'true', 'new member gets an invite');
   perform ect_test.fails($q$select public.create_member('eleni', 'Eleni', 'athlete', 'green')$q$, 'slug_taken', 'member handles are unique');

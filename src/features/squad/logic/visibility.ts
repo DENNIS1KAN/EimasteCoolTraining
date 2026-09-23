@@ -11,9 +11,9 @@ export type WeightAccess = 'exact' | 'change' | 'hidden'
 export function weightAccess(member: Pick<Member, 'id' | 'settings'>, viewer: Pick<Member, 'id' | 'role'> | null | undefined): WeightAccess {
   if (viewer && (viewer.id === member.id || viewer.role === 'coach')) return 'exact'
   const v = member.settings?.weightVisibility
-  if (v === 'exact') return 'exact'
+  if (v === 'change') return 'change'
   if (v === 'private') return 'hidden'
-  return 'change'
+  return 'exact'
 }
 
 /**

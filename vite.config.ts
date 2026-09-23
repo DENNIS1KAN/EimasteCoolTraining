@@ -27,6 +27,9 @@ export default defineConfig({
         name: 'Eimaste Cool Training',
         short_name: 'Eimaste Cool',
         description: 'Train together: workouts, weight, meal plans and friendly competition.',
+        // The app root, never a join link: the installed icon opens Home (or the sign-in screen), whatever page
+        // the manifest was read on. `id` keeps the installed app the same app if start_url ever changes.
+        id: './',
         start_url: './',
         scope: './',
         display: 'standalone',

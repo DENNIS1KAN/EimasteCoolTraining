@@ -19,7 +19,7 @@ describe('LocalBackend.reset', () => {
       const before = seeded.members.find((x) => x.id === m.id)!
       expect(m).toMatchObject({ name: before.name, color: before.color, role: before.role, competes: before.competes, slug: before.slug })
       expect(m).toMatchObject({ goal: '', goalWeightKg: null, heightCm: null, programStart: null, coachNote: '', coachNoteAt: null })
-      expect(m.settings).toEqual({ unit: 'kg', machines: {}, weightVisibility: 'change' })
+      expect(m.settings).toEqual({ unit: 'kg', machines: {}, weightVisibility: 'exact' })
     }
   })
 

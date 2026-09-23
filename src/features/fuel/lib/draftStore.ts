@@ -1,5 +1,5 @@
 import type { FileRef } from '../../../data/types'
-import type { MealDraft, PlanDraft } from './draft'
+import type { FoodDraft, MealDraft, PlanDraft } from './draft'
 import { TARGET_KEYS } from './draft'
 
 /**
@@ -21,9 +21,33 @@ export const draftKey = (memberId: string, planId: string): string => `${PREFIX}
 const isStr = (v: unknown): v is string => typeof v === 'string'
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v != null && !Array.isArray(v)
 
-function isMeal(v: unknown): v is MealDraft {
-  return isObj(v) && isStr(v.id) && isStr(v.name) && isStr(v.time) && isStr(v.items) && isStr(v.kcal) && isStr(v.protein)
+function isFood(v: unknown): v is FoodDraft {
+  return (
+    isObj(v) &&
+    isStr(v.id) &&
+    (v.ref === null || isStr(v.ref)) &&
+    ['name', 'grams', 'pieces', 'kcal', 'protein', 'carbs', 'fat'].every((k) => isStr(v[k])) &&
+    typeof v.manual === 'boolean'
+  )
 }
+
+/** A stored meal; drafts saved by builds before food lists lack carbs, fat and foods (filled in by normalize). */
+function isMeal(v: unknown): boolean {
+  return (
+    isObj(v) &&
+    isStr(v.id) &&
+    isStr(v.name) &&
+    isStr(v.time) &&
+    isStr(v.items) &&
+    isStr(v.kcal) &&
+    isStr(v.protein) &&
+    (v.carbs === undefined || isStr(v.carbs)) &&
+    (v.fat === undefined || isStr(v.fat)) &&
+    (v.foods === undefined || (Array.isArray(v.foods) && v.foods.every(isFood)))
+  )
+}
+
+const normalizeMeal = (m: MealDraft): MealDraft => ({ ...m, carbs: m.carbs ?? '', fat: m.fat ?? '', foods: m.foods ?? [] })
 
 function isFile(v: unknown): v is FileRef {
   return isObj(v) && isStr(v.path) && isStr(v.name)
@@ -51,7 +75,7 @@ export function loadDraft(key: string, now: number = Date.now()): StoredDraft | 
     if (!raw) return null
     const v: unknown = JSON.parse(raw)
     if (isObj(v) && typeof v.savedAt === 'number' && now - v.savedAt <= DRAFT_MAX_AGE_MS && isPlanDraft(v.draft)) {
-      return { draft: v.draft, savedAt: v.savedAt }
+      return { draft: { ...v.draft, meals: v.draft.meals.map(normalizeMeal) }, savedAt: v.savedAt }
     }
     localStorage.removeItem(key)
   } catch {

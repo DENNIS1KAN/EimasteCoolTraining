@@ -6,7 +6,19 @@ const key = draftKey('m1', 'new')
 const draft = {
   ...emptyDraft('2026-09-22'),
   title: 'Cut v3',
-  meals: [{ id: 'a', name: 'Breakfast', time: '08:00', items: 'Oats', kcal: '400', protein: '30' }],
+  meals: [
+    {
+      id: 'a',
+      name: 'Breakfast',
+      time: '08:00',
+      items: 'Oats',
+      kcal: '400',
+      protein: '30',
+      carbs: '',
+      fat: '',
+      foods: [{ id: 'f1', ref: 'oats', name: 'Oats', grams: '80', pieces: '', kcal: '303', protein: '10.6', carbs: '54.2', fat: '5.2', manual: false }],
+    },
+  ],
   files: [{ path: 'm1/x.pdf', name: 'plan.pdf', type: 'application/pdf', size: 10 }],
 }
 
@@ -29,7 +41,13 @@ describe('stored meal plan drafts', () => {
     localStorage.setItem(key, 'not json')
     expect(loadDraft(key, 2)).toBeNull()
   })
+  it('reads drafts saved before meals had food lists', () => {
+    const old = { ...draft, meals: [{ id: 'a', name: 'Breakfast', time: '08:00', items: 'Oats', kcal: '400', protein: '30' }] }
+    localStorage.setItem(key, JSON.stringify({ draft: old, savedAt: 1000 }))
+    expect(loadDraft(key, 2000)?.draft.meals[0]).toEqual({ ...old.meals[0], carbs: '', fat: '', foods: [] })
+  })
   it('checks the draft shape', () => {
+    expect(isPlanDraft({ ...draft, meals: [{ ...draft.meals[0], foods: [{ id: 'f1' }] }] })).toBe(false)
     expect(isPlanDraft(draft)).toBe(true)
     expect(isPlanDraft({ ...draft, meals: [{ id: 'a' }] })).toBe(false)
     expect(isPlanDraft({ ...draft, kcal: 2400 })).toBe(false)

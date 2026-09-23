@@ -12,6 +12,7 @@ import { editorPath } from './access'
 import { byNewest, useNow } from './hooks'
 import { fuelDays, lastCheckinDate, recentAdherence, type FuelDay } from './lib/adherence'
 import { FM } from './messages'
+import { TargetChips } from './PlanSummary'
 import './fuel.css'
 import './fuel-coach.css'
 
@@ -35,7 +36,8 @@ function buildRows(
   const plansAll = Object.values(mealPlans)
   const cis = Object.values(checkins)
   const athletes = Object.values(members)
-    .filter((m) => m.role === 'athlete')
+    // Athletes, plus a coach who trains along (competes) or has a plan of his own.
+    .filter((m) => m.role === 'athlete' || m.competes || plansAll.some((p) => p.memberId === m.id))
     .sort((a, b) => a.name.localeCompare(b.name))
   return athletes.map((member) => {
     const plans = plansAll.filter((p) => p.memberId === member.id).sort(byNewest)
@@ -105,6 +107,8 @@ function AthleteCard({ row, today }: { row: Row; today: ISODate }) {
           </Tag>
         )}
       </div>
+
+      {plan && <TargetChips plan={plan} />}
 
       {plan ? (
         <div className="fu-cn__stats">

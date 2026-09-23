@@ -99,4 +99,16 @@ describe('HomePage (coach)', () => {
     expect(within(setup).getByText('1 of 2 have joined')).toBeTruthy()
     expect(within(setup).getByText('0 of 2 ready')).toBeTruthy()
   })
+
+  it('a coach who competes (the default) gets the athlete home, plus the set-up and the squad', () => {
+    const start = addDays(today, -15)
+    const playing = { ...coach, competes: true, programId: BTS_PROGRAM.id, programStart: start }
+    seed([athlete('stelios', { programStart: start, joined: false }), athlete('thanos', { programStart: start }), playing], 'dennis')
+    ui()
+    expect(screen.getByText(/Week 3 of 12/)).toBeTruthy()
+    expect(screen.getByRole('region', { name: 'Get everyone to day 1' })).toBeTruthy()
+    const card = screen.getByRole('region', { name: 'Squad today' })
+    expect(within(card).getByText('Stelios')).toBeTruthy()
+    expect(within(card).queryByText('Dennis')).toBeNull()
+  })
 })

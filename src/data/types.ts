@@ -170,15 +170,42 @@ export interface FileRef {
   size: number
 }
 
+/** One food in a meal, with the macros of the portion (not per 100 g). */
+export interface MealFood {
+  id: string
+  /** Display name as the coach entered or picked it. */
+  name: string
+  /** Portion in grams (null for a custom food entered without a weight). */
+  grams: number | null
+  kcal: number | null
+  protein: number | null
+  carbs: number | null
+  fat: number | null
+  /** Id in the built-in food database (src/features/fuel/foods), when picked from it. */
+  ref?: string | null
+  /** Pieces, for foods counted by the piece (2 eggs, 1 pita); grams stays the source of truth. */
+  pieces?: number | null
+}
+
 export interface Meal {
   id: string
   name: string
   /** "08:00" or "" */
   time: string
-  /** Free text, one food per line. */
+  /**
+   * Free text. Plans made before food lists: one food per line. With `foods`: extra notes for the meal
+   * ("horta with lemon, as much as you like").
+   */
   items: string
+  /**
+   * The meal's foods with their macros. When present and not empty they are the source of truth, and the meal's
+   * kcal/protein/carbs/fat below are their sums (kept in sync on save, so older readers still see totals).
+   */
+  foods?: MealFood[]
   kcal: number | null
   protein: number | null
+  carbs?: number | null
+  fat?: number | null
 }
 
 export interface MealPlan {

@@ -261,7 +261,7 @@ export type WeightMode = 'exact' | 'change' | 'hidden'
 /** How `viewer` may see `member`'s weight: themselves and the coach see everything; others follow the member's setting. */
 export function weightModeFor(viewer: Pick<Member, 'id' | 'role'> | null | undefined, member: Pick<Member, 'id' | 'settings'>): WeightMode {
   if (viewer && (viewer.id === member.id || viewer.role === 'coach')) return 'exact'
-  const v = member.settings?.weightVisibility ?? 'change'
+  const v = member.settings?.weightVisibility ?? 'exact'
   return v === 'private' ? 'hidden' : v
 }
 

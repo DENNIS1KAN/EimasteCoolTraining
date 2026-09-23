@@ -7,6 +7,7 @@ import { COMMON } from '../../i18n/common'
 import { todayISO } from '../../lib/dates'
 import { fmtRelative } from '../../lib/format'
 import { uuid } from '../../lib/ids'
+import { parseNum } from '../../lib/units'
 import { Banner, Button, ButtonLink, Card, ConfirmSheet, EmptyState, PageHeader, toast, useIsDesktop } from '../../ui'
 import { mayOpenEditor } from './access'
 import { BasicsSection } from './editor/BasicsSection'
@@ -225,7 +226,7 @@ export default function MealPlanEditorPage() {
   )
   const basics = <BasicsSection draft={draft} errors={errors} onChange={change} />
   const targets = <TargetsSection draft={draft} errors={errors} onChange={change} />
-  const meals = <MealsSection meals={draft.meals} errors={errors} onChange={(m) => change({ meals: m })} />
+  const meals = <MealsSection meals={draft.meals} errors={errors} kcalTarget={parseNum(draft.kcal)} onChange={(m) => change({ meals: m })} />
   const notes = <NotesSection notes={draft.notes} onChange={(n) => change({ notes: n })} />
   const files = (
     <FilesSection

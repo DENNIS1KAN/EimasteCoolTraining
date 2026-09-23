@@ -170,6 +170,12 @@ describe('pairs', () => {
     expect(defaultPair(comps, dennis)?.map((m) => m.id)).toEqual([S, T])
     expect(defaultPair([stelios], stelios)).toBeNull()
   })
+  it('puts a coach who competes in his own corner, against his closest rival', () => {
+    const playing = { ...dennis, competes: true }
+    const withCoach = [stelios, thanos, playing]
+    expect(defaultPair(withCoach, playing, { stelios: 120, thanos: 60, dennis: 70 })?.map((m) => m.id)).toEqual([D, T])
+    expect(resolvePair(withCoach, playing, null, null, { stelios: 120, thanos: 60, dennis: 110 })?.map((m) => m.id)).toEqual([D, S])
+  })
   it('resolves and repairs pairs from the URL', () => {
     expect(resolvePair(comps, dennis, 'eleni', 'thanos')?.map((m) => m.id)).toEqual(['eleni', T])
     expect(resolvePair(comps, stelios, null, null)?.map((m) => m.id)).toEqual([S, T])

@@ -1,9 +1,11 @@
 import type { MealPlan } from '../../data/types'
-import { useT } from '../../i18n'
+import { useLang, useT } from '../../i18n'
 import { fmtNum } from '../../lib/format'
 import { Chip } from '../../ui'
 import { PlanFiles } from './PlanFiles'
 import { PlanNotes } from './PlanNotes'
+import { displayFoodName } from './foods'
+import { hasFoods, mealTotals } from './lib/macros'
 import { FM } from './messages'
 
 /** Target chips: "2,400 kcal", "P 180 g", "C 250 g", "F 70 g", "3 L". */
@@ -29,28 +31,33 @@ export function TargetChips({ plan }: { plan: MealPlan }) {
 
 /** Read-only view of a whole plan (used for earlier plans). */
 export function PlanSummary({ plan }: { plan: MealPlan }) {
+  const lang = useLang()
   return (
     <div className="fu-summary">
       <TargetChips plan={plan} />
       {plan.meals.length > 0 && (
         <ol className="fu-summary__meals">
-          {plan.meals.map((m) => (
-            <li key={m.id}>
-              <div className="fu-summary__meal">
-                <span className="fu-summary__name">
-                  {m.name}
-                  {m.time && <span className="fu-meal__time">{m.time}</span>}
-                </span>
-                {m.kcal != null && (
-                  <span className="fu-meal__kcal num">
-                    {fmtNum(m.kcal, 0)}
-                    <small>kcal</small>
+          {plan.meals.map((m) => {
+            const kcal = mealTotals(m).kcal
+            const foods = hasFoods(m) ? m.foods.map((f) => displayFoodName(f, lang)) : m.items.split('\n').filter((l) => l.trim())
+            return (
+              <li key={m.id}>
+                <div className="fu-summary__meal">
+                  <span className="fu-summary__name">
+                    {m.name}
+                    {m.time && <span className="fu-meal__time">{m.time}</span>}
                   </span>
-                )}
-              </div>
-              {m.items.trim() && <p className="fu-summary__foods">{m.items.split('\n').filter(Boolean).join(', ')}</p>}
-            </li>
-          ))}
+                  {kcal != null && (
+                    <span className="fu-meal__kcal num">
+                      {fmtNum(kcal, 0)}
+                      <small>kcal</small>
+                    </span>
+                  )}
+                </div>
+                {foods.length > 0 && <p className="fu-summary__foods">{foods.join(', ')}</p>}
+              </li>
+            )
+          })}
         </ol>
       )}
       <PlanFiles files={plan.files} />

@@ -1,5 +1,6 @@
 import type { CheckinRating, Meal, MealPlan, NutritionCheckin } from '../../../data/types'
 import { dailyId } from '../../../lib/ids'
+import { mealTotals, type MacroField } from './macros'
 
 /** "08:00" / "8:05" -> minutes after midnight; anything else -> null. */
 export function mealMinutes(time: string | null | undefined): number | null {
@@ -57,31 +58,33 @@ export interface DaySummary {
   macros: MacroProgress[]
 }
 
-const sum = (xs: (number | null | undefined)[]): number => xs.reduce<number>((a, x) => a + (x ?? 0), 0)
+const sum = (xs: (number | null | undefined)[]): number => Math.round(xs.reduce<number>((a, x) => a + (x ?? 0), 0) * 10) / 10
 
 export function daySummary(plan: MealPlan | null, ticked: readonly string[]): DaySummary {
   const meals = plan?.meals ?? []
   const done = new Set(ticked)
-  const eatenMeals = meals.filter((m) => done.has(m.id))
-  const hasKcal = meals.some((m) => m.kcal != null)
-  const hasProtein = meals.some((m) => m.protein != null)
-  const kcalPlanned = hasKcal ? sum(meals.map((m) => m.kcal)) : null
-  const kcalEaten = hasKcal ? sum(eatenMeals.map((m) => m.kcal)) : null
+  const totals = meals.map(mealTotals)
+  const eaten = totals.filter((_, i) => done.has(meals[i].id))
+  const has = (f: MacroField) => totals.some((t) => t[f] != null)
+  const kcalPlanned = has('kcal') ? sum(totals.map((t) => t.kcal)) : null
+  const kcalEaten = has('kcal') ? sum(eaten.map((t) => t.kcal)) : null
   const kcalTarget = plan?.kcal ?? (kcalPlanned || null)
   const kcalLeft = kcalTarget != null && kcalEaten != null ? kcalTarget - kcalEaten : null
   const share = kcalPlanned && kcalEaten != null ? kcalEaten / kcalPlanned : null
 
-  const protein: MacroProgress = hasProtein
-    ? { key: 'protein', target: plan?.protein ?? sum(meals.map((m) => m.protein)), eaten: sum(eatenMeals.map((m) => m.protein)), mode: 'exact' }
-    : estimated('protein', plan?.protein ?? null, share)
+  // Real numbers wherever the meals carry the macro (food lists always do); otherwise an estimate from kcal.
+  const macro = (key: MacroKey): MacroProgress =>
+    has(key)
+      ? { key, target: plan?.[key] ?? sum(totals.map((t) => t[key])), eaten: sum(eaten.map((t) => t[key])), mode: 'exact' }
+      : estimated(key, plan?.[key] ?? null, share)
   return {
     mealsTotal: meals.length,
-    mealsTicked: eatenMeals.length,
+    mealsTicked: eaten.length,
     kcalPlanned,
     kcalEaten,
     kcalTarget,
     kcalLeft,
-    macros: [protein, estimated('carbs', plan?.carbs ?? null, share), estimated('fat', plan?.fat ?? null, share)],
+    macros: [macro('protein'), macro('carbs'), macro('fat')],
   }
 }
 

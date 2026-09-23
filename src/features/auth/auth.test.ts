@@ -116,3 +116,15 @@ describe('detectPlatform', () => {
     expect(isIosOtherBrowser(IPHONE)).toBe(false)
   })
 })
+
+describe('forgetJoinLink', () => {
+  it('swaps a claimed join link for the app root, so a Home Screen icon never reopens it', async () => {
+    const { forgetJoinLink } = await import('./joinLink')
+    window.history.replaceState(null, '', '/EimasteCoolTraining/#/join/stelios?code=ABCDEFGHJKLM')
+    const before = window.history.length
+    forgetJoinLink()
+    expect(window.location.pathname).toBe('/EimasteCoolTraining/')
+    expect(window.location.hash).toBe('#/')
+    expect(window.history.length).toBe(before)
+  })
+})

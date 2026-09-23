@@ -73,19 +73,26 @@ After this, every change pushed to `main` redeploys automatically.
 2. Open **Coach → Squad**. Each athlete has an invite link with **Copy** and **Share** buttons. Send Stelios and Thanos their links by WhatsApp or Viber.
    Each of them opens the link once and picks a password. After that, they sign in by tapping their name and typing that password.
 3. Still in the coach console:
-   - Set each athlete's **program start date**. Week 1, day 1 is that date.
+   - Set each athlete's **program start date** (yours too: the coach trains and competes like everyone else, unless you switch "Competes in leaderboards" off on your own profile). Week 1, day 1 is that date.
    - Add goals, goal weights and a coach note.
-   - **Nutrition**: create a meal plan for each athlete. You can type the meals and targets, attach the PDF or photos from their nutritionist, or both.
+   - **Nutrition**: create a meal plan for each athlete. Add the foods of each meal from the built-in list (type in English or Greek) with their grams, and the app adds up kcal, protein, carbs and fat per meal and per day, next to your targets. Foods that are not in the list can be typed with their macros. You can also attach the PDF or photos from their nutritionist.
 4. Tell everyone to **add the app to their home screen**. It then opens full-screen like a normal app and keeps working with a weak gym signal:
    - iPhone: Safari → Share → *Add to Home Screen*
    - Android: Chrome → ⋮ → *Install app*
 
+   The welcome screen after joining shows these steps. The icon always opens the app itself, never the invite link
+   (the link is used up once someone joins). On iPhone the icon keeps its own sign-in, separate from Safari:
+   the first time, tap your name and type the password you picked.
+
 ### Weight privacy (tell the squad)
 Each person picks in **Settings** how their body weight appears to the others:
-- **Change only** (the default): the squad screens show their progress (kg lost or gained, and %), never their weigh-ins.
+- **Exact weight** (the default, full transparency): everyone sees their weigh-ins and trend.
+- **Change only**: the squad screens show their progress (kg lost or gained, and %), never their weigh-ins.
   The exact numbers still reach the others' phones behind the scenes, so this is about what the app shows.
 - **Private**: the database hides their weigh-ins from everyone except them and the coach.
-- **Exact weight**: everyone sees their weigh-ins and trend.
+
+Squads set up before this default changed keep what they had: each person can switch in **Settings**, and the coach
+can switch "Competes in leaderboards" per member (himself included) in **Coach → Squad → (member)**.
 
 ### After an app update
 Run [`supabase/schema.sql`](../supabase/schema.sql) again (SQL Editor → paste → **Run**). It is safe to re-run:

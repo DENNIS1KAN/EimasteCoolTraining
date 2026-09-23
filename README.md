@@ -13,12 +13,12 @@ Friendly competition pushes each person to pull the others forward.
 
 | | |
 | --- | --- |
-| **Home** | Today's workout, week streak, on-schedule %, PRs, weight trend, today's nutrition, the coach's note, nudges from friends and a squad pulse. A different dashboard for the coach. |
+| **Home** | Today's workout, week streak, on-schedule %, PRs, weight trend, today's nutrition, the coach's note, nudges from friends and a squad pulse. The coach trains and competes too, so he gets the same home plus the squad set-up and "Squad today", one tap from the coach console (a coach switched off from competing gets a squad-only dashboard). |
 | **Train** | The original BTS logbook, rebuilt. Weeks 1–12, the five days and every exercise's sets, reps, RPE, rest and last-set technique. Last time's numbers appear as placeholders. Each exercise gets an "aim" suggestion. PR badges appear live, with estimated 1RM. Substitutions and remembered machines are there. A warm-up ramp is calculated from your working weight. There's a rest timer that follows you across screens, with sound and vibration, and the screen stays awake. A finish sheet with a summary and how it felt. Plus exercise history charts. |
 | **Body** | Weigh-ins with a smoothed trend, a goal with an ETA, the weekly rate and a history. Body fat and waist are optional. A quick-log dock sits within reach of your thumb, and there's a squad "% change" race. |
-| **Fuel** | The coach's meal plan: daily targets, meals, notes and attached PDFs or photos. A daily check-in lets you tick meals, rate the day and count water. Adherence shows as a heatmap and a streak. |
+| **Fuel** | The coach's meal plan: daily targets, meals with their foods, notes and attached PDFs or photos. Every meal shows its kcal and protein/carbs/fat, and opens to the food list with grams and macros. A daily check-in lets you tick meals (the targets card counts the real macros of what you ticked), rate the day and count water. Adherence shows as a heatmap and a streak. |
 | **Squad** | Everyone's progress, a league with points (workouts, PRs, perfect weeks, weigh-ins, on-plan days), badges, and an activity feed with kudos and nudges. **Head-to-head** shows the tale of the tape, the workout race, weekly volume, a lift duel and weight change. Plus member profiles. |
-| **Coach console** | Invite links (via WhatsApp or anything else) and adding members. Set start dates, goals and coach notes. Create and upload meal plans. Import and export programs (JSON or CSV, with a template). Back up everything. |
+| **Coach console** | Invite links (via WhatsApp or anything else) and adding members. Set start dates, goals, coach notes and who competes (everyone, the coach included, by default). Create and upload meal plans: search the built-in food list (about 200 Greek staples and gym basics, in English or Greek, accents optional), enter grams or pieces and the app works out the macros; own foods with typed macros too. Meal and day totals are checked live against the targets, with "Set targets from meals". Import and export programs (JSON or CSV, with a template). Back up everything. |
 | **Everywhere** | English and Greek, light and dark themes, phone-first layouts with a desktop layout too. It installs as an app (PWA) and works offline at the gym, syncing later. Data updates live when a friend logs something. |
 
 ## How it works
@@ -34,8 +34,9 @@ Friendly competition pushes each person to pull the others forward.
   - Only signed-in squad members can read squad data, and each member can write only their own rows.
   - The coach manages everyone.
   - Fields that belong to the coach (role, coach note, "competes") are protected by a trigger.
-  - Weight privacy: *Private* is enforced by the database, so nobody but you and the coach can read your weigh-ins.
-    *Change only* (the default) is a display choice: squad screens show your progress (kg lost or gained, and %), never your weigh-ins, but the exact numbers still reach squad mates' devices.
+  - Weight privacy: the default is *Exact weight*, full transparency: squad mates see your weigh-ins and trend.
+    *Change only* is a display choice: squad screens show your progress (kg lost or gained, and %), never your weigh-ins, but the exact numbers still reach squad mates' devices.
+    *Private* is enforced by the database, so nobody but you and the coach can read your weigh-ins.
   - Meal-plan files are visible only to their owner and the coach.
   - Invite codes are 12 characters, single-use and rotate; each login gets at most 5 wrong codes per hour.
   - An update older than the stored row is ignored, so a phone replaying an old queue cannot undo newer edits.

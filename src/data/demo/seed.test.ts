@@ -17,6 +17,8 @@ import {
 } from '../../lib/stats'
 import { BTS_PROGRAM } from '../programs'
 import { createDemoSnapshot, DEMO_IDS } from './seed'
+import { foodById, macrosFor } from '../../features/fuel/foods'
+import { checkTarget, mealTotals, planTotals } from '../../features/fuel/lib/macros'
 
 const byId = <T extends { id: string }>(rows: T[]) => Object.fromEntries(rows.map((r) => [r.id, r]))
 
@@ -83,15 +85,49 @@ describe.each(TODAYS)('createDemoSnapshot(%s)', (today) => {
   const sStats = memberStats(d, S, today)
   const tStats = memberStats(d, T, today)
 
-  it('has the three demo members, athletes in program week 3', () => {
+  it('has the three demo members, all competing in program week 3 (the coach too)', () => {
     expect(snap.members.map((m) => m.id).sort()).toEqual([D, S, T].sort())
-    expect(d.members[D]).toMatchObject({ role: 'coach', color: 'aqua', competes: false })
-    expect(d.members[S]).toMatchObject({ role: 'athlete', color: 'blue', programId: 'bts-12', programStart: start })
-    expect(d.members[T]).toMatchObject({ role: 'athlete', color: 'orange', programId: 'bts-12', programStart: start })
+    expect(d.members[D]).toMatchObject({ role: 'coach', color: 'aqua', competes: true, programId: 'bts-12', programStart: start })
+    expect(d.members[S]).toMatchObject({ role: 'athlete', color: 'blue', competes: true, programId: 'bts-12', programStart: start })
+    expect(d.members[T]).toMatchObject({ role: 'athlete', color: 'orange', competes: true, programId: 'bts-12', programStart: start })
     expect(programWeekOn(BTS_PROGRAM, start, today)).toBe(3)
-    expect(d.members[S].settings.weightVisibility).toBe('exact')
-    expect(d.members[T].settings.weightVisibility).toBe('change')
-    expect(snap.logs.some((l) => l.memberId === D)).toBe(false)
+    for (const id of [D, S, T]) expect(d.members[id].settings.weightVisibility).toBe('exact')
+  })
+
+  it('gives the coach a lighter history: fewer sessions, a few weigh-ins a week', () => {
+    const dStats = memberStats(d, D, today)
+    const done = (id: string) => snap.logs.filter((l) => l.memberId === id && l.done).length
+    expect(done(D)).toBeGreaterThan(5)
+    expect(done(D)).toBeLessThan(done(S))
+    expect(dStats.schedule?.behindBy).toBeGreaterThanOrEqual(2)
+    expect(dStats.prs.length).toBeGreaterThan(0)
+    const weighIns = snap.weights.filter((w) => w.memberId === D).length
+    expect(weighIns).toBeGreaterThan(4)
+    expect(weighIns).toBeLessThan(snap.weights.filter((w) => w.memberId === S).length)
+    // kudos on the coach's sessions come from the athletes
+    for (const c of snap.cheers.filter((c) => c.kind === 'kudos' && c.toId === D)) expect([S, T]).toContain(c.fromId)
+    expect(snap.cheers.some((c) => c.kind === 'kudos' && c.toId === D)).toBe(true)
+  })
+
+  it('builds the meal plans from the food database, adding up close to the targets', () => {
+    expect(snap.mealPlans.filter((p) => p.active).map((p) => p.memberId).sort()).toEqual([D, S, T].sort())
+    for (const p of snap.mealPlans) {
+      const t = planTotals(p.meals)
+      for (const f of ['kcal', 'protein', 'carbs', 'fat'] as const) {
+        expect(checkTarget(f, t[f], p[f]).verdict, `${p.title} ${f}: ${t[f]} vs ${p[f]}`).toBe('on')
+      }
+      for (const m of p.meals) {
+        expect(m.foods?.length, `${p.title} ${m.name}`).toBeGreaterThan(0)
+        for (const f of m.foods!) {
+          const food = foodById(f.ref)
+          expect(food, f.ref ?? f.name).not.toBeNull()
+          expect(f).toMatchObject(macrosFor(food!, f.grams!))
+          if (f.pieces != null) expect(f.grams).toBeCloseTo(f.pieces * food!.unit!.g, 5)
+        }
+        // stored totals agree with the foods
+        expect({ kcal: m.kcal, protein: m.protein, carbs: m.carbs, fat: m.fat }).toEqual(mealTotals(m))
+      }
+    }
   })
 
   it('has nothing dated after today', () => {
@@ -110,9 +146,13 @@ describe.each(TODAYS)('createDemoSnapshot(%s)', (today) => {
     for (const c of snap.cheers) expect(c.id).toMatch(UUID)
     for (const p of snap.mealPlans) {
       expect(p.id).toMatch(UUID)
-      for (const m of p.meals) expect(m.id).toMatch(UUID)
+      for (const m of p.meals) {
+        expect(m.id).toMatch(UUID)
+        for (const f of m.foods ?? []) expect(f.id).toMatch(UUID)
+      }
     }
-    const ids = [...snap.cheers, ...snap.mealPlans, ...snap.mealPlans.flatMap((p) => p.meals)].map((x) => x.id)
+    const meals = snap.mealPlans.flatMap((p) => p.meals)
+    const ids = [...snap.cheers, ...snap.mealPlans, ...meals, ...meals.flatMap((m) => m.foods ?? [])].map((x) => x.id)
     expect(new Set(ids).size).toBe(ids.length)
     for (const t of [snap.logs, snap.weights, snap.checkins]) expect(new Set(t.map((x) => x.id)).size).toBe(t.length)
   })

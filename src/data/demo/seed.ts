@@ -1,19 +1,23 @@
 /**
  * Deterministic demo data: a coach (Dennis) and two athletes (Stelios, Thanos) in week 3 of the BTS program.
+ * The coach trains the program too and competes, lighter: a busy coach who misses a session most weeks.
  *
  * Everything is placed relative to `today`, and every random choice comes from a PRNG keyed by *relative*
  * position (program week/day, days since program start), so the same weekday always tells the same story:
  * - Stelios (blue): early bird on a cut, never misses a session, logs his food, fewer PRs.
  * - Thanos (orange): night owl on a lean bulk, missed Pull + Push in week 2, stronger legs, more volume and PRs.
+ * - Dennis (aqua): lunchtime sessions, three missed so far, weighs in a few times a week to stay at maintenance.
  * Nothing is dated after `now` (default: the end of `today`).
  */
-import type { Cheer, CheckinRating, ExerciseLog, Meal, MealPlan, Member, NutritionCheckin, SetLog, Snapshot, WeightEntry, WorkoutLog } from '../types'
+import type { Cheer, CheckinRating, ExerciseLog, Meal, MealFood, MealPlan, Member, NutritionCheckin, SetLog, Snapshot, WeightEntry, WorkoutLog } from '../types'
 import type { ISODate } from '../../lib/dates'
 import { addDays, dateRange, diffDays, isoFromMs, startOfWeek } from '../../lib/dates'
 import { dailyId, logId } from '../../lib/ids'
 import { personalRecords } from '../../lib/stats/lifts'
 import { refKey, workoutOn } from '../../lib/stats/schedule'
 import { BTS_PROGRAM, exerciseName, restSeconds, warmupSetCount, workingSets } from '../programs'
+import { foodById, macrosFor } from '../../features/fuel/foods'
+import { withDerivedTotals } from '../../features/fuel/lib/macros'
 
 export const DEMO_IDS = { dennis: 'demo-dennis', stelios: 'demo-stelios', thanos: 'demo-thanos' } as const
 
@@ -107,7 +111,7 @@ const COACH_NOTES = {
 
 function member(p: Partial<Member> & Pick<Member, 'id' | 'slug' | 'name' | 'role' | 'color'>): Member {
   return {
-    competes: p.role === 'athlete',
+    competes: true,
     goal: '',
     goalWeightKg: null,
     heightCm: null,
@@ -115,7 +119,7 @@ function member(p: Partial<Member> & Pick<Member, 'id' | 'slug' | 'name' | 'role
     programStart: null,
     coachNote: '',
     coachNoteAt: null,
-    settings: { unit: 'kg', machines: {}, weightVisibility: 'change' },
+    settings: { unit: 'kg', machines: {}, weightVisibility: 'exact' },
     joined: true,
     updatedAt: 1,
     ...p,
@@ -131,11 +135,10 @@ function members(start: ISODate): Member[] {
       name: 'Dennis',
       role: 'coach',
       color: 'aqua',
-      competes: false,
-      programId: null,
       heightCm: 180,
-      goal: 'Get these two to week 12 in one piece',
-      settings: { unit: 'kg', machines: {}, weightVisibility: 'private' },
+      goal: 'Get these two to week 12 in one piece (and keep up with them)',
+      programStart: start,
+      settings: { unit: 'kg', machines: DENNIS.machines, weightVisibility: 'exact' },
       updatedAt: at(addDays(start, -10), hm(21)),
     }),
     member({
@@ -165,7 +168,7 @@ function members(start: ISODate): Member[] {
       programStart: start,
       coachNote: COACH_NOTES.thanos,
       coachNoteAt: noteAt + 4 * MIN,
-      settings: { unit: 'kg', machines: THANOS.machines, weightVisibility: 'change' },
+      settings: { unit: 'kg', machines: THANOS.machines, weightVisibility: 'exact' },
       updatedAt: noteAt + 4 * MIN,
     }),
   ]
@@ -184,7 +187,7 @@ interface Special {
 }
 
 interface Lifter {
-  key: 'stelios' | 'thanos'
+  key: 'stelios' | 'thanos' | 'dennis'
   id: string
   /** Weight (kg) for a hard set of ~9 reps, per performed exercise. 0 = bodyweight (weight left empty). */
   base: Record<string, number>
@@ -322,6 +325,59 @@ const THANOS: Lifter = {
     w2d4: { extra: [3], note: 'Back after a crazy work week. Legs felt amazing', feel: 5 },
   },
 }
+
+/** The coach: a solid lifter who trains at lunch, progresses slowly and misses a session most weeks. */
+const DENNIS: Lifter = {
+  key: 'dennis',
+  id: DEMO_IDS.dennis,
+  base: {
+    '45° Incline Barbell Press': 60,
+    'Cable Crossover Ladder': 15,
+    'Wide-Grip Pull-Up': 0,
+    'High-Cable Lateral Raise': 7.5,
+    'Pendlay Deficit Row': 65,
+    'Overhead Cable Triceps Extension (Bar)': 30,
+    'Bayesian Cable Curl': 12.5,
+    'Lying Leg Curl': 47.5,
+    'Smith Machine Squat': 90,
+    'Barbell RDL': 100,
+    'Leg Extension': 65,
+    'Standing Calf Raise': 90,
+    'Cable Crunch': 50,
+    'Neutral-Grip Lat Pulldown': 70,
+    'Chest-Supported Machine Row': 62.5,
+    'Neutral-Grip Seated Cable Row': 65,
+    '1-Arm 45° Cable Rear Delt Flye': 7.5,
+    'Machine Shrug': 110,
+    'EZ-Bar Cable Curl': 32.5,
+    'Machine Preacher Curl': 27.5,
+    'Barbell Bench Press': 75,
+    'Machine Shoulder Press': 52.5,
+    'Bottom-Half DB Flye': 15,
+    'Cable Triceps Kickback': 10,
+    'Roman Chair Leg Raise': 0,
+    'Leg Press': 170,
+    'Seated Leg Curl': 52.5,
+    'DB Bulgarian Split Squat': 20,
+    'Machine Hip Adduction': 65,
+    'Machine Hip Abduction': 60,
+  },
+  subs: {},
+  machines: { 'Leg Press': 'Hammer Strength', 'Machine Shoulder Press': 'Technogym' },
+  odds: [0.8, 1.2, 5, 1.5],
+  ease: [],
+  extraSets: [],
+  startMin: (dow, r) => (dow === 5 ? hm(10, 30) + r.int(0, 20) : hm(13, 5) + r.int(0, 20)),
+  restFactor: 1.1,
+  feel: [3, 4, 4, 4],
+  specials: {
+    w1d0: { note: 'Training with the boys this time. Let’s see who blinks first', feel: 4 },
+    w2d1: { note: 'Lunch break session, 45 minutes flat', feel: 3 },
+  },
+}
+
+/** Weeks 1 Pull, 2 Push and Legs: coaching got in the way. */
+const DENNIS_MISSED = new Set(['w1d2', 'w2d3', 'w2d4'])
 
 /** Weeks 2 Pull and Push: work trip. */
 const THANOS_MISSED = new Set(['w2d2', 'w2d3'])
@@ -527,14 +583,39 @@ function thanosWeights(start: ISODate, today: ISODate): WeightEntry[] {
   return out
 }
 
+/** Two or three mornings a week, holding steady around 88 kg (maintenance). */
+function dennisWeights(start: ISODate, today: ISODate): WeightEntry[] {
+  const out: WeightEntry[] = []
+  for (const date of dateRange(addDays(start, -7), today)) {
+    const off = diffDays(start, date)
+    const days = parityOf(off) === 0 ? [0, 3] : [0, 2, 4]
+    if (off !== 0 && !days.includes(dowOf(off))) continue
+    const r = rng(`dennis:weight:${off}`)
+    const kg = off === 0 ? 88.4 : 88.4 - (off * 0.1) / 7 + r.range(-0.35, 0.35)
+    out.push(weighIn(DEMO_IDS.dennis, date, kg, at(date, hm(7, 15) + r.int(0, 20)), { note: off === 0 ? 'Coach joins the program too' : '' }))
+  }
+  return out
+}
+
 /* ------------------------------------------------------------------ nutrition */
+
+/** A food from the built-in database: [food id, grams] or [food id, grams, pieces]. */
+type FoodSpec = [ref: string, grams: number, pieces?: number]
 
 interface MealSpec {
   name: string
   time: string
-  items: string[]
-  kcal: number
-  protein: number
+  foods: FoodSpec[]
+  /** Extra notes for the meal. */
+  notes?: string
+}
+
+function mealFood(key: string, [ref, grams, pieces]: FoodSpec): MealFood {
+  const food = foodById(ref)
+  if (!food) throw new Error(`Demo seed: unknown food ${ref}`)
+  const out: MealFood = { id: uuidFor(key), name: food.en, grams, ...macrosFor(food, grams), ref }
+  if (pieces != null) out.pieces = pieces
+  return out
 }
 
 function plan(
@@ -542,14 +623,26 @@ function plan(
   memberId: string,
   p: Pick<MealPlan, 'title' | 'notes' | 'startDate' | 'kcal' | 'protein' | 'carbs' | 'fat' | 'waterL' | 'active' | 'createdAt' | 'updatedAt'>,
   meals: MealSpec[],
+  createdBy: string = DEMO_IDS.dennis,
 ): MealPlan {
-  const ms: Meal[] = meals.map((m, i) => ({ id: uuidFor(`${key}:meal:${i}`), name: m.name, time: m.time, items: m.items.join('\n'), kcal: m.kcal, protein: m.protein }))
-  return { id: uuidFor(key), memberId, meals: ms, files: [], createdBy: DEMO_IDS.dennis, ...p }
+  const ms: Meal[] = meals.map((m, i) =>
+    withDerivedTotals({
+      id: uuidFor(`${key}:meal:${i}`),
+      name: m.name,
+      time: m.time,
+      items: m.notes ?? '',
+      foods: m.foods.map((f, k) => mealFood(`${key}:meal:${i}:food:${k}`, f)),
+      kcal: null,
+      protein: null,
+    }),
+  )
+  return { id: uuidFor(key), memberId, meals: ms, files: [], createdBy, ...p }
 }
 
 function mealPlans(start: ISODate): MealPlan[] {
   const v2At = at(addDays(start, -8), hm(18, 30))
   const bulkAt = at(addDays(start, -8), hm(19, 10))
+  const dennisAt = at(addDays(start, -8), hm(21, 5))
   return [
     plan(
       'plan:stelios:v1',
@@ -568,10 +661,14 @@ function mealPlans(start: ISODate): MealPlan[] {
         updatedAt: v2At,
       },
       [
-        { name: 'Breakfast', time: '08:00', items: ['Greek yogurt 2% (250 g)', 'Oats (70 g)', 'Honey (1 tbsp)'], kcal: 620, protein: 38 },
-        { name: 'Lunch', time: '14:30', items: ['Chicken breast (200 g)', 'Rice (200 g cooked)', 'Greek salad, feta (50 g)'], kcal: 820, protein: 58 },
-        { name: 'Snack', time: '18:00', items: ['Whey shake (30 g)', 'Banana', 'Almonds (20 g)'], kcal: 380, protein: 30 },
-        { name: 'Dinner', time: '21:00', items: ['Salmon (180 g)', 'Potatoes (300 g)', 'Horta with lemon'], kcal: 780, protein: 44 },
+        { name: 'Breakfast', time: '08:00', foods: [['greek-yogurt-2', 250], ['oats', 80], ['honey', 21], ['banana', 118, 1]] },
+        {
+          name: 'Lunch',
+          time: '14:30',
+          foods: [['chicken-breast-cooked', 170], ['rice-white-cooked', 250], ['tomato', 120, 1], ['cucumber', 100], ['feta', 40], ['olive-oil', 15]],
+        },
+        { name: 'Snack', time: '18:00', foods: [['whey', 30, 1], ['banana', 118, 1], ['almonds', 20]] },
+        { name: 'Dinner', time: '21:00', foods: [['salmon-cooked', 150], ['potato-boiled', 300], ['horta', 200], ['olive-oil', 5]], notes: 'Horta with lemon' },
       ],
     ),
     plan(
@@ -603,11 +700,21 @@ function mealPlans(start: ISODate): MealPlan[] {
         updatedAt: v2At,
       },
       [
-        { name: 'Post-workout breakfast', time: '08:00', items: ['Greek yogurt 2% (300 g)', 'Oats (50 g)', 'Honey (1 tsp)', 'Blueberries (100 g)'], kcal: 480, protein: 36 },
-        { name: 'Snack', time: '11:00', items: ['Whey shake (30 g) with water', 'Apple', 'Almonds (15 g)'], kcal: 290, protein: 26 },
-        { name: 'Lunch', time: '14:30', items: ['Chicken souvlaki, 2 skewers (200 g)', 'Rice (180 g cooked)', 'Horta with lemon, 1 tsp olive oil', 'Tzatziki (50 g)'], kcal: 690, protein: 50 },
-        { name: 'Afternoon snack', time: '18:00', items: ['Cottage cheese (200 g)', '1 barley rusk (paximadi)', 'Cherry tomatoes & cucumber'], kcal: 300, protein: 26 },
-        { name: 'Dinner', time: '21:00', items: ['Grilled sea bream or salmon (200 g)', 'Baked potato (250 g)', 'Greek salad, light feta (40 g), 1 tsp olive oil'], kcal: 640, protein: 42 },
+        { name: 'Post-workout breakfast', time: '08:00', foods: [['greek-yogurt-2', 250], ['oats', 60], ['honey', 7, 1], ['blueberries', 100]] },
+        { name: 'Snack', time: '11:00', foods: [['whey', 30, 1], ['apple', 180, 1], ['almonds', 15]], notes: 'Shake with water' },
+        {
+          name: 'Lunch',
+          time: '14:30',
+          foods: [['chicken-souvlaki', 180, 2], ['rice-white-cooked', 150], ['horta', 200], ['olive-oil', 5], ['tzatziki', 50]],
+          notes: 'Horta with lemon',
+        },
+        { name: 'Afternoon snack', time: '18:00', foods: [['cottage-2', 100], ['rusk-barley', 30, 1], ['cherry-tomatoes', 150, 10], ['cucumber', 100]] },
+        {
+          name: 'Dinner',
+          time: '21:00',
+          foods: [['sea-bream', 150], ['potato-baked', 250], ['tomato', 120, 1], ['cucumber', 100], ['feta-light', 40], ['olive-oil', 10]],
+          notes: 'Sea bream or salmon, whatever the fishmonger has',
+        },
       ],
     ),
     plan(
@@ -635,12 +742,50 @@ function mealPlans(start: ISODate): MealPlan[] {
         updatedAt: bulkAt,
       },
       [
-        { name: 'Breakfast', time: '09:00', items: ['Oats (100 g) cooked in milk (300 ml)', 'Banana', 'Peanut butter (20 g)'], kcal: 650, protein: 22 },
-        { name: 'Snack', time: '12:00', items: ['2 slices wholegrain bread', 'Turkey (80 g) & a slice of gouda', 'Orange juice (250 ml)'], kcal: 400, protein: 22 },
-        { name: 'Lunch', time: '15:00', items: ['Chicken kritharaki: chicken (180 g), orzo (100 g dry)', 'Greek salad, feta (30 g)'], kcal: 800, protein: 50 },
-        { name: 'Afternoon snack', time: '18:30', items: ['Greek yogurt 2% (200 g)', 'Honey (1 tbsp)', 'Walnuts (20 g)'], kcal: 300, protein: 18 },
-        { name: 'Pre-workout', time: '19:45', items: ['Banana', '2 rice cakes with honey'], kcal: 250, protein: 3 },
-        { name: 'Dinner', time: '22:30', items: ['Pork or chicken souvlaki (150 g)', 'Pita', 'Oven potatoes (200 g)', 'Tzatziki'], kcal: 700, protein: 45 },
+        { name: 'Breakfast', time: '09:00', foods: [['oats', 100], ['milk-semi', 300], ['banana', 118, 1], ['peanut-butter', 16, 1]], notes: 'Oats cooked in the milk' },
+        { name: 'Snack', time: '12:00', foods: [['bread-wholegrain', 60, 2], ['turkey-slices', 80, 4], ['gouda', 20, 1], ['orange-juice', 250]] },
+        {
+          name: 'Lunch',
+          time: '15:00',
+          foods: [['chicken-breast-cooked', 100], ['orzo-cooked', 250], ['tomato-passata', 100], ['tomato', 120, 1], ['cucumber', 100], ['feta', 30]],
+          notes: 'Chicken kritharaki with a Greek salad',
+        },
+        { name: 'Afternoon snack', time: '18:30', foods: [['greek-yogurt-2', 150], ['honey', 21, 3], ['walnuts', 10]] },
+        { name: 'Pre-workout', time: '19:45', foods: [['banana', 118, 1], ['rice-cakes', 18, 2], ['honey', 14, 2]] },
+        {
+          name: 'Dinner',
+          time: '22:30',
+          foods: [['pork-souvlaki', 90, 1], ['pita-souvlaki', 70, 1], ['potatoes-oven-greek', 200], ['tzatziki', 50]],
+          notes: 'Pork or chicken souvlaki, both fine',
+        },
+      ],
+    ),
+    plan(
+      'plan:dennis:maintenance',
+      DEMO_IDS.dennis,
+      {
+        title: 'Maintenance',
+        notes: ['# Targets', '- 2,700 kcal · 170 g protein', '- Hold 88 kg while training with the squad', '# Rules', '- Lunch before the session, big dinner after'].join('\n'),
+        startDate: addDays(start, -7),
+        kcal: 2700,
+        protein: 170,
+        carbs: 300,
+        fat: 85,
+        waterL: 3,
+        active: true,
+        createdAt: dennisAt,
+        updatedAt: dennisAt,
+      },
+      [
+        { name: 'Breakfast', time: '08:00', foods: [['egg', 100, 2], ['bread-village', 80, 2], ['feta', 30], ['tomato', 120, 1]] },
+        { name: 'Lunch', time: '12:30', foods: [['chicken-breast-cooked', 150], ['rice-white-cooked', 400], ['broccoli', 150], ['olive-oil', 10]] },
+        { name: 'Snack', time: '16:30', foods: [['greek-yogurt-2', 250], ['honey', 21, 3], ['walnuts', 10], ['apple', 180, 1]] },
+        {
+          name: 'Dinner',
+          time: '20:30',
+          foods: [['beef-steak-cooked', 180], ['potatoes-oven-greek', 250], ['bread-village', 40, 1], ['lettuce', 100], ['olive-oil', 5]],
+          notes: 'Steak or bifteki, grilled',
+        },
       ],
     ),
   ]
@@ -687,6 +832,15 @@ const THANOS_FORTNIGHT: (DayFood | null)[] = [
   { eaten: null, rating: 'mostly' },
 ]
 
+/** The coach logs when he remembers: training weekdays mostly, rarely on weekends. */
+function dennisDay(off: number): DayFood | null {
+  const dow = dowOf(off)
+  if (dow === 0 || dow === 1 || dow === 3) return { eaten: all(4), rating: 'on' }
+  if (dow === 4) return { eaten: without(4, 2), rating: 'mostly' }
+  if (dow === 5) return { eaten: null, rating: 'mostly' }
+  return null
+}
+
 /** Stelios's v2 meal index -> the same meal in v1 (v1 had no 11:00 snack). */
 const V2_TO_V1: (number | null)[] = [0, null, 1, 2, 3]
 
@@ -697,6 +851,7 @@ function checkins(plans: MealPlan[], start: ISODate, today: ISODate): NutritionC
   const sPlan = active(DEMO_IDS.stelios)
   const sV1 = plans.find((p) => p.memberId === DEMO_IDS.stelios && !p.active)!
   const tPlan = active(DEMO_IDS.thanos)
+  const dPlan = active(DEMO_IDS.dennis)
   const row = (p: MealPlan, date: ISODate, food: DayFood, waterL: number, updatedAt: number): NutritionCheckin => ({
     id: dailyId(p.memberId, date),
     memberId: p.memberId,
@@ -723,6 +878,12 @@ function checkins(plans: MealPlan[], start: ISODate, today: ISODate): NutritionC
     const rt = rng(`thanos:food:${off}`)
     const t = THANOS_FORTNIGHT[((off % 14) + 14) % 14]
     if (t) out.push(row(tPlan, date, t, round1(rt.range(1.5, 3)), at(date, hm(23, 5) + rt.int(0, 40))))
+  }
+  for (const date of dateRange(dPlan.startDate, yesterday)) {
+    const off = diffDays(start, date)
+    const rd = rng(`dennis:food:${off}`)
+    const d = dennisDay(off)
+    if (d) out.push(row(dPlan, date, d, round1(rd.range(2, 3)), at(date, hm(22, 10) + rd.int(0, 30))))
   }
   // today so far: Stelios ticks meals as he goes, Thanos logs at night
   out.push({ ...row(sPlan, today, { eaten: [0, 1], rating: 'on' }, 1.2, at(today, hm(11, 20))), rating: null })
@@ -758,11 +919,17 @@ function cheers(logs: WorkoutLog[], today: ISODate, start: ISODate): Cheer[] {
   for (const l of logs) {
     if (!l.done || l.doneAt == null) continue
     const prs = prCount.get(l.id) ?? 0
-    const rival = l.memberId === DEMO_IDS.stelios ? DEMO_IDS.thanos : DEMO_IDS.stelios
-    const reactors: [string, number][] = [
-      [DEMO_IDS.dennis, prs >= 3 ? 1 : 0.6],
-      [rival, prs >= 2 ? 0.85 : 0.5],
-    ]
+    // the coach cheers his athletes; the athletes cheer each other, and the coach now and then
+    const reactors: [string, number][] =
+      l.memberId === DEMO_IDS.dennis
+        ? [
+            [DEMO_IDS.stelios, prs >= 2 ? 0.7 : 0.4],
+            [DEMO_IDS.thanos, prs >= 2 ? 0.6 : 0.3],
+          ]
+        : [
+            [DEMO_IDS.dennis, prs >= 3 ? 1 : 0.6],
+            [l.memberId === DEMO_IDS.stelios ? DEMO_IDS.thanos : DEMO_IDS.stelios, prs >= 2 ? 0.85 : 0.5],
+          ]
     for (const [from, p] of reactors) {
       const r = rng(`kudos:${from}:${l.id}`)
       if (!r.chance(p)) continue
@@ -840,6 +1007,7 @@ export function createDemoSnapshot(today: ISODate, now?: number): Snapshot {
   const logs = [
     ...workouts(STELIOS, start, today, clock, new Set(), false),
     ...workouts(THANOS, start, today, clock, THANOS_MISSED, true),
+    ...workouts(DENNIS, start, today, clock, DENNIS_MISSED, false),
   ].sort((a, b) => (a.startedAt ?? 0) - (b.startedAt ?? 0))
   const plans = mealPlans(start)
   const past = <T extends { updatedAt: number }>(rows: T[]) => rows.filter((x) => x.updatedAt <= clock)
@@ -847,7 +1015,7 @@ export function createDemoSnapshot(today: ISODate, now?: number): Snapshot {
     members: members(start),
     programs: [],
     logs,
-    weights: past([...steliosWeights(start, today), ...thanosWeights(start, today)]),
+    weights: past([...steliosWeights(start, today), ...thanosWeights(start, today), ...dennisWeights(start, today)]),
     mealPlans: plans,
     checkins: past(checkins(plans, start, today)),
     cheers: cheers(logs, today, start)

@@ -141,7 +141,7 @@ language sql immutable set search_path = public as $$
   select jsonb_build_object(
     'name', p_name,
     'color', p_color,
-    'competes', p_role = 'athlete',
+    'competes', true,
     'goal', '',
     'goalWeightKg', null,
     'heightCm', null,
@@ -149,7 +149,7 @@ language sql immutable set search_path = public as $$
     'programStart', null,
     'coachNote', '',
     'coachNoteAt', null,
-    'settings', jsonb_build_object('unit', 'kg', 'machines', '{}'::jsonb, 'weightVisibility', 'change')
+    'settings', jsonb_build_object('unit', 'kg', 'machines', '{}'::jsonb, 'weightVisibility', 'exact')
   )
 $$;
 
@@ -173,7 +173,7 @@ create or replace function public.weights_shared(p_member uuid) returns boolean
 language sql stable security definer set search_path = public as $$
   select coalesce(
     (select m.data->'settings'->>'weightVisibility' from public.members m where m.id = p_member),
-    'change'
+    'exact'
   ) <> 'private'
 $$;
 

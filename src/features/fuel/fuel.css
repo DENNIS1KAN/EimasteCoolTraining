@@ -509,6 +509,82 @@ button.fu-meal__body {
   font: 600 12.5px/18px var(--font-body);
   color: var(--ink-2);
 }
+.fu-meal__macros {
+  display: inline-flex;
+  flex-wrap: wrap;
+  column-gap: 6px;
+  font: 600 11.5px/15px var(--font-body);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+.fu-meal__macros b {
+  font-weight: 800;
+  color: var(--muted);
+}
+.fu-meal__chev {
+  flex: none;
+  margin: 0 -4px 0 -4px;
+  color: var(--muted);
+}
+.fu-foods {
+  list-style: none;
+  margin: 0;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
+.fu-foods__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px dashed var(--line);
+}
+.fu-foods__row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.fu-foods__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.fu-foods__name {
+  font: 700 13px/17px var(--font-body);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.fu-foods__amt {
+  font: 600 11.5px/15px var(--font-body);
+  color: var(--muted);
+}
+.fu-foods__nums {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-width: 52%;
+}
+.fu-foods__nums .fu-meal__macros {
+  justify-content: flex-end;
+  font-size: 11px;
+}
+.fu-foods__kcal {
+  font: 800 14px/17px var(--font-display);
+  color: var(--ink);
+}
+.fu-foods__kcal small {
+  font: 700 10.5px/1 var(--font-body);
+  color: var(--muted);
+}
+.fu-meal__notes {
+  margin: 6px 0 0;
+  font: 600 12px/16px var(--font-body);
+  color: var(--ink-2);
+  white-space: pre-line;
+}
 .fu-meal__protein {
   margin-top: 4px;
   font: 600 12px/16px var(--font-body);

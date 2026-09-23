@@ -121,7 +121,7 @@ describe('members', () => {
       programStart: null,
       coachNote: '',
       coachNoteAt: null,
-      settings: { unit: 'kg', machines: {}, weightVisibility: 'change' },
+      settings: { unit: 'kg', machines: {}, weightVisibility: 'exact' },
       joined: false,
       updatedAt: 42,
     })
@@ -137,7 +137,7 @@ describe('members', () => {
       updated_at: 7,
     })
     expect(m).toMatchObject({ id: ME, slug: 'dennis', role: 'coach', joined: true, updatedAt: 7, name: 'dennis', color: 'blue', competes: false })
-    expect(m.settings).toEqual({ unit: 'lb', machines: {}, weightVisibility: 'change' })
+    expect(m.settings).toEqual({ unit: 'lb', machines: {}, weightVisibility: 'exact' })
   })
 
   it('writes only the profile data and timestamp', () => {

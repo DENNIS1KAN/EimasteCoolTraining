@@ -61,7 +61,8 @@ export const AUTH = defineMessages(
     alreadyTitle: 'You are already in',
     welcomeEyebrow: "You're in",
     welcomeTitle: 'Welcome to the squad, {name}',
-    welcomeBody: 'One last thing: put the app on your Home Screen so it opens full screen, like a real app.',
+    welcomeBody:
+      'One last thing: put the app on your Home Screen so it opens full screen, like a real app. If the icon asks you to sign in, tap your name and use the password you just picked.',
     letsGo: "Let's go",
     startFailed: "Couldn't open the app. Check your connection and try again.",
 
@@ -142,7 +143,8 @@ export const AUTH = defineMessages(
     alreadyTitle: 'Είσαι ήδη μέσα',
     welcomeEyebrow: 'Μπήκες',
     welcomeTitle: 'Καλώς ήρθες στην ομάδα, {name}',
-    welcomeBody: 'Ένα τελευταίο: βάλε την εφαρμογή στην αρχική οθόνη για να ανοίγει σε πλήρη οθόνη, σαν κανονική εφαρμογή.',
+    welcomeBody:
+      'Ένα τελευταίο: βάλε την εφαρμογή στην αρχική οθόνη για να ανοίγει σε πλήρη οθόνη, σαν κανονική εφαρμογή. Αν από το εικονίδιο σου ζητήσει σύνδεση, πάτα το όνομά σου και βάλε τον κωδικό που μόλις διάλεξες.',
     letsGo: 'Πάμε',
     startFailed: 'Δεν άνοιξε η εφαρμογή. Έλεγξε τη σύνδεση και ξαναδοκίμασε.',
 
