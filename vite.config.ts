@@ -63,6 +63,8 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    // generous: CI runners are slower than a laptop, and a few tests drive the real supabase-js client
+    testTimeout: 20000,
     include: ['src/**/*.test.{ts,tsx}'],
   },
 })
