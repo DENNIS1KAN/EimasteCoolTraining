@@ -79,7 +79,8 @@ export default function LoginPage() {
   return (
     <AuthScreen glow={current ? memberColorVar(current.color) : undefined} className="auth--login" texture={false}>
       <section className="auth-hero" aria-labelledby="auth-title">
-        <span className="auth__texture" aria-hidden="true">
+        {/* lang="el" so the CSS uppercase drops the tonos: ΕΙΜΑΣΤΕ, not ΕΊΜΑΣΤΕ */}
+        <span className="auth__texture" aria-hidden="true" lang="el">
           Είμαστε
         </span>
         <BrandMark size={64} className="auth-hero__mark" />
