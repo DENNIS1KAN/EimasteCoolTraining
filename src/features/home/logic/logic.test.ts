@@ -1,21 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import { at, meals, mkCheckin, mkLog, mkMember, mkPlan, mkWeight, squad } from '../../../lib/testing/fixtures'
-import { dayPart, firstName, greetName, vocative } from './greeting'
+import { dayPart, firstName, greetName } from './greeting'
 import { allDone, athleteSteps, checklistView, coachSteps, currentStep, doneCount } from './onboarding'
 import { foodVerdict, lastCheckin, squadToday, summarize } from './squadToday'
 import { hasTrainingStats, onSchedulePct, prsInMonth, shouldPromptWeighIn } from './tiles'
 
 describe('greeting', () => {
-  it('splits the day per language', () => {
-    expect(dayPart(7, 'en')).toBe('morning')
-    expect(dayPart(12, 'en')).toBe('afternoon')
-    expect(dayPart(12, 'el')).toBe('morning')
-    expect(dayPart(13, 'el')).toBe('afternoon')
-    expect(dayPart(18, 'en')).toBe('evening')
-    expect(dayPart(23, 'el')).toBe('evening')
+  it('splits the day at noon and six', () => {
+    expect(dayPart(7)).toBe('morning')
+    expect(dayPart(12)).toBe('afternoon')
+    expect(dayPart(17)).toBe('afternoon')
+    expect(dayPart(18)).toBe('evening')
+    expect(dayPart(23)).toBe('evening')
     // a late session is still "evening", not morning
-    expect(dayPart(2, 'en')).toBe('evening')
-    expect(dayPart(5, 'en')).toBe('morning')
+    expect(dayPart(2)).toBe('evening')
+    expect(dayPart(5)).toBe('morning')
   })
 
   it('uses the first name', () => {
@@ -24,16 +23,9 @@ describe('greeting', () => {
     expect(firstName('')).toBe('')
   })
 
-  it('puts Greek names in the vocative and leaves Latin names alone', () => {
-    expect(vocative('Στέλιος')).toBe('Στέλιο')
-    expect(vocative('Θάνος')).toBe('Θάνο')
-    expect(vocative('Κώστας')).toBe('Κώστα')
-    expect(vocative('Γιάννης')).toBe('Γιάννη')
-    expect(vocative('Παντελής')).toBe('Παντελή')
-    expect(vocative('Μαρία')).toBe('Μαρία')
-    expect(vocative('Stelios')).toBe('Stelios')
-    expect(greetName('Στέλιος Παπαδόπουλος', 'el')).toBe('Στέλιο')
-    expect(greetName('Στέλιος Παπαδόπουλος', 'en')).toBe('Στέλιος')
+  it('greets people by their first name, whatever the script', () => {
+    expect(greetName('Stelios Papadopoulos')).toBe('Stelios')
+    expect(greetName('Στέλιος Παπαδόπουλος')).toBe('Στέλιος')
   })
 })
 

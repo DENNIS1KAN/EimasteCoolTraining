@@ -6,22 +6,24 @@ import { AvatarStack, PageHeader, Segmented } from '../../ui'
 import { programWeekOn } from '../../lib/stats'
 import { useToday } from './hooks'
 import { SQ } from './messages'
-import { FeedTab } from './feed/FeedTab'
+import { ChatTab } from './chat/ChatTab'
 import { LeagueTab } from './league/LeagueTab'
 import { OverviewTab } from './overview/OverviewTab'
 import './squad.css'
 
-type Tab = 'overview' | 'league' | 'feed'
-const TABS: Tab[] = ['overview', 'league', 'feed']
+type Tab = 'overview' | 'league' | 'chat'
+const TABS: Tab[] = ['overview', 'league', 'chat']
 
-/** Everyone's progress: this week at a glance, the league and the activity feed (?tab=overview|league|feed). */
+/** Everyone's progress: this week at a glance, the league and the squad chat (?tab=overview|league|chat). */
 export default function SquadPage() {
   const t = useT(SQ)
   const me = useMe()
   const today = useToday()
   const [params, setParams] = useSearchParams()
-  const raw = params.get('tab') as Tab | null
-  const tab: Tab = raw && TABS.includes(raw) ? raw : 'overview'
+  const raw = params.get('tab')
+  // ?tab=feed is where the activity feed used to live; the chat replaced it, so old links still land somewhere sensible
+  const asked = (raw === 'feed' ? 'chat' : raw) as Tab | null
+  const tab: Tab = asked && TABS.includes(asked) ? asked : 'overview'
   const members = useStore((s) => s.members)
   const programs = useStore((s) => s.programs)
   const list = useMemo(
@@ -65,11 +67,11 @@ export default function SquadPage() {
         options={[
           { value: 'overview', label: t('tabOverview') },
           { value: 'league', label: t('tabLeague') },
-          { value: 'feed', label: t('tabFeed') },
+          { value: 'chat', label: t('tabChat') },
         ]}
       />
       <div role="tabpanel" id={`sq-panel-${tab}`} aria-labelledby={`sq-tab-${tab}`} className="sq-panel">
-        {tab === 'overview' ? <OverviewTab /> : tab === 'league' ? <LeagueTab /> : <FeedTab />}
+        {tab === 'overview' ? <OverviewTab /> : tab === 'league' ? <LeagueTab /> : <ChatTab />}
       </div>
     </div>
   )

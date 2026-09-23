@@ -38,8 +38,8 @@ export interface MealDraft {
   foods: FoodDraft[]
 }
 
-export type TargetKey = 'kcal' | 'protein' | 'carbs' | 'fat' | 'waterL'
-export const TARGET_KEYS: TargetKey[] = ['kcal', 'protein', 'carbs', 'fat', 'waterL']
+export type TargetKey = 'kcal' | 'protein' | 'carbs' | 'fat'
+export const TARGET_KEYS: TargetKey[] = ['kcal', 'protein', 'carbs', 'fat']
 
 export interface PlanDraft extends Record<TargetKey, string> {
   title: string
@@ -168,7 +168,6 @@ export function draftFromPlan(p: MealPlan): PlanDraft {
     protein: str(p.protein),
     carbs: str(p.carbs),
     fat: str(p.fat),
-    waterL: str(p.waterL),
     meals: p.meals.map(mealDraftFrom),
     files: [...p.files],
     active: p.active,
@@ -176,7 +175,7 @@ export function draftFromPlan(p: MealPlan): PlanDraft {
 }
 
 export function emptyDraft(today: ISODate): PlanDraft {
-  return { title: '', startDate: today, notes: '', kcal: '', protein: '', carbs: '', fat: '', waterL: '', meals: [], files: [], active: true }
+  return { title: '', startDate: today, notes: '', kcal: '', protein: '', carbs: '', fat: '', meals: [], files: [], active: true }
 }
 
 /** "Cut phase · v2" -> "Cut phase · v3", "Lean bulk" -> "Lean bulk · v2". */
@@ -227,7 +226,6 @@ const LIMITS: Record<TargetKey, number> = {
   protein: 1000,
   carbs: 1500,
   fat: 1000,
-  waterL: 10,
 }
 /** Per meal or per food. */
 const PORTION_LIMITS: Record<MacroField | 'grams' | 'pieces', number> = { kcal: 5000, protein: 500, carbs: 1000, fat: 500, grams: 5000, pieces: 100 }
@@ -302,7 +300,6 @@ export function planFromDraft(d: PlanDraft, base: Pick<MealPlan, 'id' | 'memberI
     protein: num(d.protein),
     carbs: num(d.carbs),
     fat: num(d.fat),
-    waterL: num(d.waterL),
     meals: d.meals.map((m) => {
       const meal: Meal = {
         id: m.id,

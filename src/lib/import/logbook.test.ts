@@ -11,7 +11,7 @@ import { LOGBOOK_CSV_COLUMNS, exportLogbookCSV, importLogbookCSV as importWithIs
 /** The importer with its warnings as English sentences. */
 function importLogbookCSV(text: string, o: LogbookImportOptions) {
   const r = importWithIssues(text, o)
-  return { ...r, warnings: r.warnings.map((w) => issueText(w, 'en')) }
+  return { ...r, warnings: r.warnings.map((w) => issueText(w)) }
 }
 
 const BTS = BTS_PROGRAM
@@ -278,14 +278,14 @@ describe('importLogbookCSV', () => {
     expect(r.warnings[0]).toMatch(/^Row 4:/)
   })
 
-  it('returns structured warnings that read in Greek too', () => {
+  it('returns structured warnings that also render as sentences', () => {
     const r = importWithIssues(csv('99,,Upper,1,,,1,60,kg,5,yes,,no,', '1,,Upper,1,,Nonexistent Lift,1,60,kg,5,yes,,no,'), opts)
     expect(r.warnings[0]).toEqual({ key: 'badWeek', vars: { week: '99', program: BTS.name, max: 12 }, row: 2 })
-    expect(r.warnings.map((w) => issueText(w, 'el'))).toEqual([
-      `Γραμμή 2: η εβδομάδα «99» δεν υπάρχει στο ${BTS.name} (1-12)· παραλείφθηκε.`,
-      'Γραμμή 3: το «Nonexistent Lift» δεν υπάρχει σε αυτή την προπόνηση· μπήκε στη θέση 1 (45° Incline Barbell Press).',
+    expect(r.warnings.map((w) => issueText(w))).toEqual([
+      `Row 2: week "99" is not a week of ${BTS.name} (1-12); skipped.`,
+      'Row 3: "Nonexistent Lift" is not in this workout; used position 1 (45° Incline Barbell Press).',
     ])
-    expect(issueText(importWithIssues('', opts).warnings[0], 'el')).toBe('Το αρχείο είναι κενό.')
+    expect(issueText(importWithIssues('', opts).warnings[0])).toBe('The file is empty.')
   })
 })
 

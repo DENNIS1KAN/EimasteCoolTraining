@@ -3,20 +3,12 @@ import { defineMessages, useT } from '../i18n'
 import { Button, EmptyState } from '../ui'
 import { isChunkLoadError } from './appUpdate'
 
-const M = defineMessages(
-  {
-    title: 'This screen didn’t open',
-    body: 'Something went wrong here. Your logged data is safe. Reload the app to try again.',
-    offline: 'You seem to be offline and this screen isn’t saved on the phone yet. Try again when you have a connection.',
-    reload: 'Reload',
-  },
-  {
-    title: 'Η οθόνη δεν άνοιξε',
-    body: 'Κάτι πήγε στραβά εδώ. Τα δεδομένα σου είναι ασφαλή. Φόρτωσε ξανά την εφαρμογή για να ξαναδοκιμάσεις.',
-    offline: 'Φαίνεται ότι είσαι εκτός σύνδεσης και αυτή η οθόνη δεν έχει αποθηκευτεί ακόμα στο κινητό. Δοκίμασε ξανά με σύνδεση.',
-    reload: 'Φόρτωσε ξανά',
-  },
-)
+const M = defineMessages({
+  title: 'This screen didn’t open',
+  body: 'Something went wrong here. Your logged data is safe. Reload the app to try again.',
+  offline: 'You seem to be offline and this screen isn’t saved on the phone yet. Try again when you have a connection.',
+  reload: 'Reload',
+})
 
 function PageError({ error }: { error: unknown }) {
   const t = useT(M)

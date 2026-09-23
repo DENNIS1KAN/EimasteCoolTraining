@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useLang, useT } from '../../i18n'
+import { useT } from '../../i18n'
 import { COMMON } from '../../i18n/common'
 import { put, update, useStore } from '../../data/store'
 import type { Member, Program } from '../../data/types'
@@ -30,7 +30,6 @@ const MAX_WARNINGS = 80
 export function ImportSheet({ preview, me, program, onClose, onChooseAnother }: Props) {
   const t = useT(SETTINGS)
   const c = useT(COMMON)
-  const lang = useLang()
   const programName = useProgramName(program)
   const existing = useStore((s) => s.logs)
   const [overwrite, setOverwrite] = useState(false)
@@ -122,7 +121,7 @@ export function ImportSheet({ preview, me, program, onClose, onChooseAnother }: 
             </summary>
             <ul>
               {warnings.slice(0, MAX_WARNINGS).map((w, i) => (
-                <li key={i}>{issueText(w, lang)}</li>
+                <li key={i}>{issueText(w)}</li>
               ))}
               {warnings.length > MAX_WARNINGS ? <li className="muted">+{warnings.length - MAX_WARNINGS}</li> : null}
             </ul>

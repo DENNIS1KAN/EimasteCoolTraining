@@ -3,7 +3,6 @@ import type { CheckinRating } from '../../data/types'
 import { useT } from '../../i18n'
 import { Card, Icon, TextField, type IconName } from '../../ui'
 import { FM } from './messages'
-import { WaterGlasses } from './WaterGlasses'
 
 const RATINGS: { value: CheckinRating; icon: IconName }[] = [
   { value: 'on', icon: 'check' },
@@ -14,18 +13,15 @@ const RATINGS: { value: CheckinRating; icon: IconName }[] = [
 export interface CheckinCardProps {
   isToday: boolean
   rating: CheckinRating | null
-  waterL: number | null
-  waterTargetL: number | null
   note: string
   /** The viewer is the coach logging their own day: the note is for themselves, not "for your coach". */
   coachSelf?: boolean
   readOnly?: boolean
   onRate: (r: CheckinRating) => void
-  onWater: (litres: number) => void
   onNote: (text: string) => void
 }
 
-/** The day's overall rating, water glasses and a note for the coach. */
+/** The day's overall rating and a note for the coach. */
 export function CheckinCard(p: CheckinCardProps) {
   const t = useT(FM)
   const headId = useId()
@@ -54,7 +50,6 @@ export function CheckinCard(p: CheckinCardProps) {
           </button>
         ))}
       </div>
-      <WaterGlasses valueL={p.waterL} targetL={p.waterTargetL} readOnly={p.readOnly} onChange={p.onWater} />
       <TextField
         label={t('note')}
         placeholder={p.coachSelf ? t('notePhSelf') : t('notePh')}

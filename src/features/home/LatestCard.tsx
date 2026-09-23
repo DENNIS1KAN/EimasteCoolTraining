@@ -4,7 +4,7 @@ import { useT } from '../../i18n'
 import { fmtRelative } from '../../lib/format'
 import { buildFeed, type SquadData } from '../../lib/stats'
 import { Card, CardHeader, CardLink, EmptyState } from '../../ui'
-import { FeedItemView } from '../squad/feed/FeedItemView'
+import { FeedItemView } from '../squad/chat/FeedItemView'
 import { HM } from './messages'
 
 /**

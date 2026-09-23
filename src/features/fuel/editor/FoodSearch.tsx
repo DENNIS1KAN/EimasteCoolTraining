@@ -1,5 +1,5 @@
 import { useId, useMemo, useState, type KeyboardEvent } from 'react'
-import { useLang, useT } from '../../../i18n'
+import { useT } from '../../../i18n'
 import { fmtNum } from '../../../lib/format'
 import { Icon, cx } from '../../../ui'
 import { foodName, macrosFor, searchFoods, unitLabel, type Food } from '../foods'
@@ -17,11 +17,10 @@ export interface FoodSearchProps {
  */
 export function FoodSearch({ mealName, onPick, onCustom }: FoodSearchProps) {
   const t = useT(FM)
-  const lang = useLang()
   const listId = useId()
   const [q, setQ] = useState('')
   const [active, setActive] = useState(0)
-  const results = useMemo(() => searchFoods(q, lang, 7), [q, lang])
+  const results = useMemo(() => searchFoods(q, 7), [q])
   const query = q.trim()
   const count = results.length + (query ? 1 : 0)
   const open = query.length > 0
@@ -86,7 +85,6 @@ export function FoodSearch({ mealName, onPick, onCustom }: FoodSearchProps) {
           {results.map((f, i) => {
             const per = f.unit ? f.unit.g : 100
             const m = macrosFor(f, per)
-            const other = foodName(f, lang === 'el' ? 'en' : 'el')
             return (
               <li
                 key={f.id}
@@ -98,13 +96,12 @@ export function FoodSearch({ mealName, onPick, onCustom }: FoodSearchProps) {
                 onMouseEnter={() => setActive(i)}
                 onClick={() => choose(i)}
               >
-                <span className="fu-fs__name">{foodName(f, lang)}</span>
+                <span className="fu-fs__name">{foodName(f)}</span>
                 <span className="fu-fs__sub">
-                  <span className="fu-fs__other">{other}</span>
                   <span className="fu-fs__macros num">
                     {fmtNum(m.kcal ?? 0, 0)} kcal · {t('proteinShort')} {fmtNum(m.protein ?? 0, 1)} · {t('carbsShort')} {fmtNum(m.carbs ?? 0, 1)} ·{' '}
                     {t('fatShort')} {fmtNum(m.fat ?? 0, 1)}
-                    <small>{f.unit ? t('perUnit', { unit: unitLabel(f.unit.kind, 1, lang), g: fmtNum(f.unit.g, 1) }) : t('per100')}</small>
+                    <small>{f.unit ? t('perUnit', { unit: unitLabel(f.unit.kind, 1), g: fmtNum(f.unit.g, 1) }) : t('per100')}</small>
                   </span>
                 </span>
               </li>

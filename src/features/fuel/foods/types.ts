@@ -12,8 +12,7 @@ export interface Food {
   /** Stable id, stored in meal plans (MealFood.ref): never rename one. */
   id: string
   en: string
-  el: string
-  /** Extra search words: other names, brands of a kind, Greeklish spellings. */
+  /** Extra search words: the Greek name, other names, brands of a kind, Greeklish spellings. */
   aliases?: string[]
   kcal: number
   protein: number

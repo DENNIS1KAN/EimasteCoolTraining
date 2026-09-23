@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useStore } from '../../data/store'
-import type { Cheer } from '../../data/types'
+import type { Cheer, Post } from '../../data/types'
 import { todayISO, type ISODate } from '../../lib/dates'
 import type { SquadData } from '../../lib/stats'
 
 const NO_CHEERS: Record<string, Cheer> = {}
+const NO_POSTS: Record<string, Post> = {}
 
 /** A clock that ticks every `ms` and when the tab becomes visible again (so "today" rolls over after midnight). */
 export function useNow(ms = 60_000): number {
@@ -40,7 +41,7 @@ export function useSquadData(withCheers = false): SquadData {
   const checkins = useStore((s) => s.checkins)
   const cheers = useStore((s) => (withCheers ? s.cheers : NO_CHEERS))
   return useMemo(
-    () => ({ members, programs, logs, weights, mealPlans, checkins, cheers }),
+    () => ({ members, programs, logs, weights, mealPlans, checkins, cheers, posts: NO_POSTS }),
     [members, programs, logs, weights, mealPlans, checkins, cheers],
   )
 }

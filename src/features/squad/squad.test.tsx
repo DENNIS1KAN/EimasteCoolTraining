@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { __resetForTests, getState, setState } from '../../data/store'
 import type { Cheer } from '../../data/types'
-import { setLang } from '../../i18n'
+
 import { addDays, startOfWeek, todayISO } from '../../lib/dates'
 import { at, mkCheer, mkLog, mkMember, MINI } from '../../lib/testing/fixtures'
 import { CheerInbox } from './CheerInbox'
@@ -49,7 +49,6 @@ const cheers = () => Object.values(getState().cheers)
 
 beforeEach(() => {
   __resetForTests()
-  setLang('en')
 })
 afterEach(cleanup)
 
@@ -198,9 +197,6 @@ describe('summary line', () => {
     const en = renderHook(() => useSummaryText()).result.current
     expect(en(clauses, S, T, 's')).toBe("Thanos out-lifts you on legs; you're more consistent.")
     expect(en(clauses, S, T, 'd')).toBe('Thanos out-lifts Stelios on legs; Stelios is more consistent.')
-    setLang('el')
-    const el = renderHook(() => useSummaryText()).result.current
-    expect(el(clauses, S, T, 's')).toBe('Thanos σε περνάει στα πόδια, ενώ εσύ είσαι πιο συνεπής.')
   })
 })
 

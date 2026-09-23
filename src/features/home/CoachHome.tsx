@@ -2,13 +2,13 @@ import type { Member } from '../../data/types'
 import { useStore } from '../../data/store'
 import { useT } from '../../i18n'
 import { SquadPulseCard } from '../squad/SquadPulseCard'
-import { CoachNote } from './CoachNote'
 import { CoachSetup } from './CoachSetup'
+import { SquadChatCard } from './SquadChatCard'
 import { HomeHeader } from './HomeHeader'
 import { LatestCard } from './LatestCard'
 import { SquadTodayCard } from './SquadTodayCard'
 import { fmtEyebrowDate } from './format'
-import { useCoach, useNow, useSquadData, useToday, useUnseenCount } from './hooks'
+import { useNow, useSquadData, useToday, useUnseenCount } from './hooks'
 import { useInboxSlot } from './InboxSlot'
 import { HM } from './messages'
 
@@ -25,7 +25,6 @@ export function CoachHome({ me }: { me: Member }) {
   const today = useToday(now)
   const data = useSquadData()
   const feedData = useSquadData(true)
-  const otherCoach = useCoach(me.id)
   const unseen = useUnseenCount(me.id)
   const { slot, onBell } = useInboxSlot(unseen)
   const athletes = useStore((s) => {
@@ -42,10 +41,10 @@ export function CoachHome({ me }: { me: Member }) {
       <div className="home-grid">
         <div className="home-col">
           <CoachSetup />
-          <CoachNote me={me} coach={otherCoach} now={now} />
           {slot}
           <SquadTodayCard data={data} today={today} meId={me.id} />
           <SquadPulseCard />
+          <SquadChatCard />
         </div>
         <div className="home-col">
           <LatestCard data={feedData} me={me} now={now} skip={PULSE_FEED_ITEMS} />

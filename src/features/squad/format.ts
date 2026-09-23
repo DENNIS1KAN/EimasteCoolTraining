@@ -1,9 +1,9 @@
-import { getLang, localeOf } from '../../i18n'
+import { LOCALE } from '../../i18n'
 import { fmtDuration } from '../../lib/format'
 
 /** Time of day in the current locale: "18:40". */
 export function fmtTime(ms: number): string {
-  return new Intl.DateTimeFormat(localeOf(getLang()), { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(ms))
+  return new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(ms))
 }
 
 /** A session's duration as the Finish sheet shows it: never under "1 min" (a quick session doesn't read "0 min"). */
@@ -18,7 +18,7 @@ export const fmtProgress = (weekLabel: string, done: number, total: number): str
 /** Human list: "A, B and C" / "Α, Β και Γ". */
 export function fmtList(names: string[]): string {
   try {
-    return new Intl.ListFormat(localeOf(getLang()), { style: 'long', type: 'conjunction' }).format(names)
+    return new Intl.ListFormat(LOCALE, { style: 'long', type: 'conjunction' }).format(names)
   } catch {
     return names.join(', ')
   }

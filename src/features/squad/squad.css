@@ -1701,9 +1701,16 @@ a.sq-mvp:active {
 .sq-tr__bars > span {
   display: flex;
   height: 6px;
+  /* The track is always drawn, so a level metric reads as an empty channel rather than a missing row. */
+  background: var(--surface-3);
+  border-radius: 4px;
 }
 .sq-tr__bars > span:first-child {
   justify-content: flex-end;
+  border-radius: 4px 0 0 4px;
+}
+.sq-tr__bars > span:last-child {
+  border-radius: 0 4px 4px 0;
 }
 .sq-tr__bars i {
   display: block;
@@ -2038,4 +2045,179 @@ a.sq-mvp:active {
   .sq-tr__bars i {
     animation: none;
   }
+}
+
+/* ------------------------------------------------------------------ chat */
+
+/* The composer: one component, two shapes. Compact (Home) is a single line until it is focused. */
+.sq-composer {
+  position: sticky;
+  bottom: 0;
+  padding-top: 8px;
+  background: linear-gradient(to top, var(--surface) 62%, transparent);
+}
+.sq-composer.is-compact {
+  position: static;
+  padding-top: 10px;
+  background: none;
+}
+.sq-composer__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--card-border);
+  border-radius: var(--r-lg, 16px);
+}
+.sq-composer__input {
+  flex: 1;
+  min-width: 0;
+  min-height: 34px;
+  padding: 8px 2px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: 600 14px/1.4 var(--font-body);
+  resize: none;
+  field-sizing: content;
+}
+.sq-composer__input:focus {
+  outline: none;
+}
+.sq-composer__input::placeholder {
+  color: var(--faint);
+}
+.sq-composer__photo,
+.sq-composer__send {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--muted);
+}
+.sq-composer__send {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.sq-composer__send:disabled {
+  background: var(--surface-3);
+  color: var(--faint);
+}
+.sq-composer__photo:disabled {
+  opacity: 0.4;
+}
+.sq-composer__thumbs {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+.sq-composer__thumbs li {
+  position: relative;
+}
+.sq-composer__thumbs img {
+  display: block;
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid var(--card-border);
+}
+.sq-composer__thumbs button {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: grid;
+  place-items: center;
+  width: 21px;
+  height: 21px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--surface);
+}
+
+/* Photos on a post: one is large, several tile into a square grid. */
+.sq-photos {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.sq-photos--2,
+.sq-photos--3,
+.sq-photos--4 {
+  grid-template-columns: 1fr 1fr;
+}
+.sq-photos img,
+.sq-photos__ph {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 260px;
+  min-height: 92px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--surface-3);
+}
+.sq-photos--1 img {
+  max-height: 320px;
+}
+
+.sq-feed--empty {
+  gap: 12px;
+}
+
+/* ------------------------------------------------------------------ chat on Home */
+
+.home-chat__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.home-chat__head .sub {
+  flex: 1;
+  min-width: 0;
+}
+.home-chat__all {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--muted);
+  font: 700 12px var(--font-body);
+  text-decoration: none;
+}
+.home-chat__list {
+  display: block;
+  margin-top: 6px;
+  color: inherit;
+  text-decoration: none;
+}
+.home-chat__empty {
+  margin-top: 6px;
+  color: var(--muted);
+  font: 600 12.5px/1.5 var(--font-body);
+}
+
+.sq-feed__del {
+  margin-left: auto;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--faint);
+}
+.sq-feed__del:hover {
+  color: var(--danger);
+  background: var(--surface-2);
 }

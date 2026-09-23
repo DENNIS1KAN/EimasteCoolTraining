@@ -21,7 +21,6 @@ const plan = (meals: Meal[], extra: Partial<MealPlan> = {}): MealPlan => ({
   protein: null,
   carbs: null,
   fat: null,
-  waterL: null,
   meals,
   files: [],
   active: true,

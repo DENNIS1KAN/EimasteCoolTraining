@@ -1,13 +1,15 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { useStore } from '../../../data/store'
-import type { Member, Unit } from '../../../data/types'
+import type { Member, Post, Unit } from '../../../data/types'
 import { useT } from '../../../i18n'
 import { fmtNum, fmtVolume, fmtWeight } from '../../../lib/format'
 import { kgToUnit } from '../../../lib/units'
 import type { FeedItem } from '../../../lib/stats'
 import { Avatar, Delta, Icon, PRBadge } from '../../../ui'
 import { BadgeMedal, useBadgeText } from '../badges'
+import { PhotoGrid } from './PhotoGrid'
+import { canDelete } from './postActions'
 import { KudosBar } from '../KudosBar'
 import { fmtSessionDuration, fmtTime, memberHref, memberWorkoutHref } from '../format'
 import { kudosOwner } from '../logic/feedGroups'
@@ -27,9 +29,11 @@ export interface FeedItemViewProps {
   compact?: boolean
   /** Show the relative day instead of the time of day. */
   timeLabel?: string
+  /** Delete a post (Chat tab only; the Home card is a link, so it offers no destructive action). */
+  onDelete?: (postId: string) => void
 }
 
-export function FeedItemView({ item, members, me, unit, compact, timeLabel }: FeedItemViewProps) {
+export function FeedItemView({ item, members, me, unit, compact, timeLabel, onDelete }: FeedItemViewProps) {
   const t = useT(SQ)
   const badgeText = useBadgeText()
   // A "Cheer back" is stored as a nudge that points at the one it answers; it reads as a reply, not a nudge.
@@ -192,6 +196,25 @@ export function FeedItemView({ item, members, me, unit, compact, timeLabel }: Fe
             {stamp}
           </p>
           <p className={`sq-bubble${item.kind === 'message' ? ' is-message' : ''}`}>{cheerLine(item)}</p>
+        </>
+      )
+      break
+    }
+    case 'post': {
+      body = (
+        <>
+          <p className="sq-feed__line">
+            {who}
+            {stamp}
+            {item.editedAt ? <span className="sq-feed__meta"> {t('edited')}</span> : null}
+            {!compact && canDelete({ memberId: item.memberId } as Post, me) ? (
+              <button type="button" className="sq-feed__del" aria-label={t('deletePost')} onClick={() => onDelete?.(item.postId)}>
+                <Icon name="trash" size={13} />
+              </button>
+            ) : null}
+          </p>
+          {item.text ? <p className="sq-bubble is-message">{item.text}</p> : null}
+          <PhotoGrid photos={item.photos} />
         </>
       )
       break

@@ -1,4 +1,4 @@
-import type { Cheer } from '../../data/types'
+import type { Cheer, FileRef } from '../../data/types'
 import { dayShortName } from '../../data/programs'
 import type { ISODate } from '../dates'
 import { addDays, fromISODate, startOfWeek } from '../dates'
@@ -18,6 +18,8 @@ export type FeedItem =
   | (Base & { kind: 'badge'; badge: BadgeId })
   | (Base & { kind: 'nudge' | 'message'; toId: string; emoji: string; text: string; cheerId: string })
   | (Base & { kind: 'plan'; planId: string; title: string; byId: string })
+  /** Something a person wrote in the squad chat, as opposed to something the app noticed. */
+  | (Base & { kind: 'post'; postId: string; text: string; photos: FileRef[]; editedAt: number | null })
 
 /**
  * Squad activity, newest first. Weigh-ins are summarised as one item per member per week (the week's last
@@ -75,7 +77,12 @@ export function buildFeed(d: SquadData, opts: { memberId?: string; since?: numbe
     if (opts.memberId && p.memberId !== opts.memberId) continue
     items.push({ kind: 'plan', id: `plan:${p.id}`, memberId: p.memberId, at: p.createdAt, planId: p.id, title: p.title, byId: p.createdBy })
   }
-  const out = items.filter((i) => !opts.since || i.at >= opts.since).sort((a, b) => b.at - a.at)
+  for (const p of Object.values(d.posts)) {
+    if (opts.memberId && p.memberId !== opts.memberId) continue
+    items.push({ kind: 'post', id: `post:${p.id}`, memberId: p.memberId, at: p.createdAt, postId: p.id, text: p.text, photos: p.photos, editedAt: p.editedAt })
+  }
+  // id breaks ties so the order is stable when two things land on the same millisecond
+  const out = items.filter((i) => !opts.since || i.at >= opts.since).sort((a, b) => b.at - a.at || a.id.localeCompare(b.id))
   return opts.limit ? out.slice(0, opts.limit) : out
 }
 

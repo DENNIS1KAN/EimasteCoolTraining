@@ -19,16 +19,16 @@ export function groupFeedByDay(items: FeedItem[]): FeedDay[] {
   return out
 }
 
-export type FeedFilter = 'all' | 'workouts' | 'cheers' | 'body'
+export type FeedFilter = 'all' | 'chat' | 'workouts' | 'body'
 
 export function matchesFilter(it: FeedItem, f: FeedFilter): boolean {
   switch (f) {
     case 'all':
       return true
+    case 'chat':
+      return it.kind === 'post' || it.kind === 'nudge' || it.kind === 'message'
     case 'workouts':
       return it.kind === 'workout' || it.kind === 'badge'
-    case 'cheers':
-      return it.kind === 'nudge' || it.kind === 'message'
     case 'body':
       return it.kind === 'weighin' || it.kind === 'plan'
   }

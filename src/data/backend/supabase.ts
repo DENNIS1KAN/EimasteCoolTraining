@@ -31,6 +31,8 @@ import {
 
 const AUTH_STORAGE_KEY = 'ect-auth'
 const BUCKET = 'meal-plans'
+export const CHAT_BUCKET = 'squad-photos'
+const bucketOf = (ref: FileRef): string => ref.bucket ?? BUCKET
 /** PostgREST returns at most this many rows per request (Supabase's default max-rows). */
 export const PAGE_SIZE = 1000
 const MAX_FILE = 15 * 1024 * 1024
@@ -389,18 +391,18 @@ export class SupabaseBackend implements Backend {
 
   /* ---------------------------------------------------------------- files */
 
-  async uploadFile(memberId: string, file: File): Promise<FileRef> {
+  async uploadFile(memberId: string, file: File, bucket: string = BUCKET): Promise<FileRef> {
     if (file.size > MAX_FILE) throw new BackendError('too_large', 'File is larger than 15 MB')
     const type = contentTypeFor(file.name, file.type)
     const path = `${memberId}/${uuid()}-${safeFileName(file.name)}`
-    await this.data(() => this.sb.storage.from(BUCKET).upload(path, file, { contentType: type, upsert: false }))
-    return { path, name: file.name, type, size: file.size }
+    await this.data(() => this.sb.storage.from(bucket).upload(path, file, { contentType: type, upsert: false }))
+    return { path, name: file.name, type, size: file.size, ...(bucket === BUCKET ? {} : { bucket }) }
   }
 
   async fileUrl(ref: FileRef): Promise<string> {
     const cached = this.signedUrls.get(ref.path)
     if (cached && cached.expires > Date.now()) return cached.url
-    const data = await this.data<{ signedUrl: string }>(() => this.sb.storage.from(BUCKET).createSignedUrl(ref.path, SIGNED_URL_TTL_S))
+    const data = await this.data<{ signedUrl: string }>(() => this.sb.storage.from(bucketOf(ref)).createSignedUrl(ref.path, SIGNED_URL_TTL_S))
     if (!data?.signedUrl) throw new BackendError('not_found', 'File not found')
     // Reuse for most of its lifetime so re-renders don't request a new URL each time.
     this.signedUrls.set(ref.path, { url: data.signedUrl, expires: Date.now() + (SIGNED_URL_TTL_S - 600) * 1000 })
@@ -409,7 +411,7 @@ export class SupabaseBackend implements Backend {
 
   async deleteFile(ref: FileRef): Promise<void> {
     this.signedUrls.delete(ref.path)
-    await this.data(() => this.sb.storage.from(BUCKET).remove([ref.path]))
+    await this.data(() => this.sb.storage.from(bucketOf(ref)).remove([ref.path]))
   }
 
   /* ---------------------------------------------------------------- coach */

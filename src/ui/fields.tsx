@@ -11,7 +11,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react'
-import { getLang, localeOf, useLang, useT, type Lang } from '../i18n'
+import { useT, LOCALE } from '../i18n'
 import { cx } from './cx'
 import { Icon, renderIcon, type IconName } from './Icon'
 import { UIM } from './messages'
@@ -64,10 +64,8 @@ export function canonicalDecimal(draft: string): string {
  * prefilled or copied value matches what the keyboard types and the rest of the UI prints. Storage stays canonical:
  * parseDecimal / canonicalDecimal read either separator back.
  */
-export function displayDecimal(canonical: string | number | null | undefined, lang: Lang = getLang()): string {
-  if (canonical == null) return ''
-  const s = String(canonical)
-  return lang === 'el' ? s.replace('.', ',') : s
+export function displayDecimal(canonical: string | number | null | undefined): string {
+  return canonical == null ? '' : String(canonical)
 }
 
 /** Number of decimals in a step (0.1 -> 1, 2.5 -> 1, 0.25 -> 2, 1 -> 0). */
@@ -177,7 +175,7 @@ export interface NumberFieldProps
   fieldClassName?: string
 }
 
-const fmtBound = (n: number, lang: Lang) => new Intl.NumberFormat(localeOf(lang), { maximumFractionDigits: 3 }).format(n)
+const fmtBound = (n: number) => new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 3 }).format(n)
 
 /**
  * Decimal input that accepts a comma and uses inputMode="decimal". Values arrive and leave canonical ("57.5"); on
@@ -205,14 +203,13 @@ export function NumberField({
   const auto = useId()
   const fid = id ?? auto
   const t = useT(UIM)
-  const lang = useLang()
   const ext = value == null ? '' : String(value)
-  const [draft, setDraft] = useState(() => displayDecimal(ext, lang))
+  const [draft, setDraft] = useState(() => displayDecimal(ext))
   const [lastExt, setLastExt] = useState(ext)
   const [rangeShown, setRangeShown] = useState(false)
   if (ext !== lastExt) {
     setLastExt(ext)
-    if (canonicalDecimal(draft) !== ext) setDraft(displayDecimal(ext, lang))
+    if (canonicalDecimal(draft) !== ext) setDraft(displayDecimal(ext))
   }
   const allowNeg = min == null || min < 0
   const parsed = parseDecimal(canonicalDecimal(draft))
@@ -220,10 +217,10 @@ export function NumberField({
   const rangeError =
     rangeShown && outOfRange
       ? min != null && max != null
-        ? t('rangeBoth', { min: fmtBound(min, lang), max: fmtBound(max, lang) })
+        ? t('rangeBoth', { min: fmtBound(min), max: fmtBound(max) })
         : min != null
-          ? t('rangeMin', { min: fmtBound(min, lang) })
-          : t('rangeMax', { max: fmtBound(max!, lang) })
+          ? t('rangeMin', { min: fmtBound(min) })
+          : t('rangeMax', { max: fmtBound(max!) })
       : null
   const shownError = error ?? rangeError
 
@@ -242,7 +239,7 @@ export function NumberField({
       setRangeShown(true)
     } else if (parsed != null) {
       const out = String(roundTo(parsed, decimals))
-      const shown = draft.includes(',') || lang === 'el' ? out.replace('.', ',') : out
+      const shown = draft.includes(',') ? out.replace('.', ',') : out
       if (shown !== draft) setDraft(shown)
       if (out !== ext) onChange(out)
     } else if (draft !== '' && canonicalDecimal(draft) === '') {

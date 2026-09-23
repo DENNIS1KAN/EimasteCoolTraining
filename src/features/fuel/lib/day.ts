@@ -96,7 +96,7 @@ function estimated(key: MacroKey, target: number | null, share: number | null): 
 
 /** A fresh check-in row for a member's day. */
 export function blankCheckin(memberId: string, date: string, planId: string | null): NutritionCheckin {
-  return { id: dailyId(memberId, date), memberId, date, planId, meals: [], rating: null, waterL: null, note: '', updatedAt: 0 }
+  return { id: dailyId(memberId, date), memberId, date, planId, meals: [], rating: null, note: '', updatedAt: 0 }
 }
 
 /** Tick / untick a meal; the check-in adopts the plan it was logged against. */
@@ -109,7 +109,7 @@ export function toggleMeal(c: NutritionCheckin, mealId: string, planId: string |
 export const nextRating = (cur: CheckinRating | null, picked: CheckinRating): CheckinRating | null => (cur === picked ? null : picked)
 
 /** True when nothing meaningful is left in the row (so it can be deleted instead of stored empty). */
-export const isBlankCheckin = (c: NutritionCheckin): boolean => !c.meals.length && c.rating == null && !c.waterL && !c.note.trim()
+export const isBlankCheckin = (c: NutritionCheckin): boolean => !c.meals.length && c.rating == null && !c.note.trim()
 
 /**
  * The plan that applies on a date. Today follows the current plan as soon as it has started, even when today's

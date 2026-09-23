@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useMe, useStore } from '../../data/store'
-import type { Cheer, Member } from '../../data/types'
+import type { Cheer, Member, Post } from '../../data/types'
 import { todayISO, type ISODate } from '../../lib/dates'
 import { competitors, memberStats, points, type MemberStats, type SquadData } from '../../lib/stats'
 import { visibleStats, weightAccess } from './logic/visibility'
 
 const NO_CHEERS: Record<string, Cheer> = {}
+/** Posts are chat, never an input to anyone's stats: a new message must not recompute the league. */
+const NO_POSTS: Record<string, Post> = {}
 
 /** Today's date, refreshed when the tab comes back after midnight. */
 export function useToday(): ISODate {
@@ -44,7 +46,7 @@ export function useStatsData(): SquadData {
   const mealPlans = useStore((s) => s.mealPlans)
   const checkins = useStore((s) => s.checkins)
   return useMemo(
-    () => ({ members, programs, logs, weights, mealPlans, checkins, cheers: NO_CHEERS }),
+    () => ({ members, programs, logs, weights, mealPlans, checkins, cheers: NO_CHEERS, posts: NO_POSTS }),
     [members, programs, logs, weights, mealPlans, checkins],
   )
 }
@@ -53,6 +55,13 @@ export function useSquadDataWithCheers(): SquadData {
   const base = useStatsData()
   const cheers = useStore((s) => s.cheers)
   return useMemo(() => ({ ...base, cheers }), [base, cheers])
+}
+
+/** Everything the merged stream needs: activity, cheers and the squad's own messages. */
+export function useStreamData(): SquadData {
+  const base = useSquadDataWithCheers()
+  const posts = useStore((s) => s.posts)
+  return useMemo(() => ({ ...base, posts }), [base, posts])
 }
 
 /** Everyone's stats as the viewer may see them (private weights hidden), keyed by member id. */

@@ -47,6 +47,7 @@ const emptyTables = (): TableState => ({
   mealPlans: {},
   checkins: {},
   cheers: {},
+  posts: {},
 })
 
 let state: State = {

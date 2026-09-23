@@ -3,17 +3,20 @@ import { update, useMe, useStore } from '../../../data/store'
 import { useT } from '../../../i18n'
 import { fmtDayLabel } from '../../../lib/format'
 import { buildFeed } from '../../../lib/stats'
-import { ButtonLink, Button, Card, Chip, EmptyState } from '../../../ui'
-import { useSquadDataWithCheers } from '../hooks'
+import { Button, Card, Chip, EmptyState } from '../../../ui'
+import { useStreamData } from '../hooks'
 import { groupFeedByDay, matchesFilter, type FeedFilter } from '../logic/feedGroups'
 import { SQ } from '../messages'
 import { FeedItemView } from './FeedItemView'
+import { Composer } from './Composer'
+import { deletePost } from './postActions'
+import { useMarkChatSeen } from './unread'
 
 const PAGE = 30
-const FILTERS: { value: FeedFilter; label: 'filterAll' | 'filterWorkouts' | 'filterCheers' | 'filterBody' }[] = [
+const FILTERS: { value: FeedFilter; label: 'filterAll' | 'filterChat' | 'filterWorkouts' | 'filterBody' }[] = [
   { value: 'all', label: 'filterAll' },
+  { value: 'chat', label: 'filterChat' },
   { value: 'workouts', label: 'filterWorkouts' },
-  { value: 'cheers', label: 'filterCheers' },
   { value: 'body', label: 'filterBody' },
 ]
 
@@ -57,34 +60,32 @@ function useMoreToRight(): [(el: HTMLElement | null) => void, boolean] {
   return [setEl, more]
 }
 
-export function FeedTab() {
+export function ChatTab() {
   const t = useT(SQ)
   const me = useMe()
-  const data = useSquadDataWithCheers()
+  const data = useStreamData()
+  const postsById = useStore((s) => s.posts)
   const [filter, setFilter] = useState<FeedFilter>('all')
   const [limit, setLimit] = useState(PAGE)
   const [filtersRef, moreFilters] = useMoreToRight()
   useMarkSeen(me?.id ?? null)
 
   const all = useMemo(() => buildFeed(data), [data])
+  useMarkChatSeen(me ?? null, all)
   const items = useMemo(() => all.filter((i) => matchesFilter(i, filter)), [all, filter])
   const days = useMemo(() => groupFeedByDay(items.slice(0, limit)), [items, limit])
   const unit = me?.settings.unit ?? 'kg'
+  const onDelete = (id: string) => {
+    const p = postsById[id]
+    if (p) void deletePost(p)
+  }
 
   if (!all.length) {
     return (
-      <EmptyState
-        icon="sparkles"
-        title={t('feedEmptyTitle')}
-        body={t('feedEmptyBody')}
-        action={
-          me?.role === 'athlete' ? (
-            <ButtonLink to="/train" icon="play">
-              {t('startWorkout')}
-            </ButtonLink>
-          ) : undefined
-        }
-      />
+      <div className="stack sq-feed sq-feed--empty">
+        <EmptyState icon="message" title={t('chatEmptyTitle')} body={t('chatEmptyBody')} />
+        <Composer />
+      </div>
     )
   }
 
@@ -110,7 +111,7 @@ export function FeedTab() {
           <h2 className="eyebrow sq-feed__date">{fmtDayLabel(d.date)}</h2>
           <Card padding="none" className="sq-feed__card">
             {d.items.map((it) => (
-              <FeedItemView key={it.id} item={it} members={data.members} me={me} unit={unit} />
+              <FeedItemView key={it.id} item={it} members={data.members} me={me} unit={unit} onDelete={onDelete} />
             ))}
           </Card>
         </section>
@@ -120,6 +121,7 @@ export function FeedTab() {
           {t('showMore')}
         </Button>
       )}
+      <Composer />
     </div>
   )
 }

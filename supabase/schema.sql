@@ -101,11 +101,26 @@ create table if not exists public.cheers (
   )
 );
 
+-- The squad chat. Activity (workouts, weigh-ins, PRs) is NOT stored here: the app derives it and merges
+-- it with these at render time, so each thing has exactly one home.
+create table if not exists public.posts (
+  id text primary key,
+  member_id uuid not null references public.members on delete cascade,
+  data jsonb not null,
+  created_at bigint not null,
+  updated_at bigint not null,
+  constraint posts_data_check check (
+    jsonb_typeof(data) = 'object' and data->>'memberId' = member_id::text
+  )
+);
+
 -- Foreign keys used by cascades and policies.
 create index if not exists workout_logs_member_idx on public.workout_logs (member_id);
 create index if not exists meal_plans_member_idx on public.meal_plans (member_id);
 create index if not exists cheers_from_idx on public.cheers (from_id);
 create index if not exists cheers_to_idx on public.cheers (to_id);
+create index if not exists posts_member_idx on public.posts (member_id);
+create index if not exists posts_created_idx on public.posts (created_at desc);
 create index if not exists programs_created_by_idx on public.programs (created_by);
 
 alter table public.members enable row level security;
@@ -117,6 +132,7 @@ alter table public.weights enable row level security;
 alter table public.meal_plans enable row level security;
 alter table public.checkins enable row level security;
 alter table public.cheers enable row level security;
+alter table public.posts enable row level security;
 
 -- ----------------------------------------------------------------------------------------- helpers
 
@@ -272,7 +288,7 @@ do $$
 declare
   t text;
 begin
-  foreach t in array array['members', 'programs', 'workout_logs', 'weights', 'meal_plans', 'checkins', 'cheers'] loop
+  foreach t in array array['members', 'programs', 'workout_logs', 'weights', 'meal_plans', 'checkins', 'cheers', 'posts'] loop
     execute format('drop trigger if exists stale_write_guard on public.%I', t);
     execute format('create trigger stale_write_guard before update on public.%I for each row execute function public.skip_stale_write()', t);
   end loop;
@@ -502,12 +518,23 @@ create policy cheers_update on public.cheers for update to authenticated
 create policy cheers_delete on public.cheers for delete to authenticated
   using (from_id = (select public.current_member_id()));
 
+-- posts: the whole squad reads; you write as yourself; you (or the coach, moderating) edit and delete
+create policy posts_select on public.posts for select to authenticated
+  using ((select public.is_member()));
+create policy posts_insert on public.posts for insert to authenticated
+  with check (member_id = (select public.current_member_id()));
+create policy posts_update on public.posts for update to authenticated
+  using (member_id = (select public.current_member_id()))
+  with check (member_id = (select public.current_member_id()));
+create policy posts_delete on public.posts for delete to authenticated
+  using (member_id = (select public.current_member_id()) or (select public.is_coach()));
+
 -- ----------------------------------------------------------------------------------------- privileges
 
 revoke all on table public.members, public.member_invites, public.invite_attempts, public.programs, public.workout_logs,
-  public.weights, public.meal_plans, public.checkins, public.cheers from public, anon, authenticated;
+  public.weights, public.meal_plans, public.checkins, public.cheers, public.posts from public, anon, authenticated;
 grant select, insert, update, delete on table public.members, public.programs, public.workout_logs, public.weights,
-  public.meal_plans, public.checkins, public.cheers to authenticated;
+  public.meal_plans, public.checkins, public.cheers, public.posts to authenticated;
 grant select, update (code) on table public.member_invites to authenticated;
 
 revoke all on function public.now_ms(), public.gen_invite_code(), public.default_member_data(text, text, text),
@@ -534,6 +561,28 @@ on conflict (id) do update
       allowed_mime_types = excluded.allowed_mime_types;
 
 -- Files live under "<member id>/...": the owner and the coach have access.
+-- Squad chat photos. Private, like meal plans: opened with signed URLs, never a public bucket.
+-- The app shrinks images to 1600px before upload, so 10 MB is a generous ceiling, not a target.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('squad-photos', 'squad-photos', false, 10485760,
+        array['image/png', 'image/jpeg', 'image/webp', 'image/heic', 'image/gif'])
+on conflict (id) do update
+  set public = false,
+      file_size_limit = excluded.file_size_limit,
+      allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists ect_squad_photos_select on storage.objects;
+drop policy if exists ect_squad_photos_insert on storage.objects;
+drop policy if exists ect_squad_photos_delete on storage.objects;
+-- Any member may see the squad's photos; you may only add under your own folder; you (or the coach) delete.
+create policy ect_squad_photos_select on storage.objects for select to authenticated
+  using (bucket_id = 'squad-photos' and (select public.is_member()));
+create policy ect_squad_photos_insert on storage.objects for insert to authenticated
+  with check (bucket_id = 'squad-photos' and (storage.foldername(name))[1] = (select public.current_member_id())::text);
+create policy ect_squad_photos_delete on storage.objects for delete to authenticated
+  using (bucket_id = 'squad-photos'
+         and ((select public.is_coach()) or (storage.foldername(name))[1] = (select public.current_member_id())::text));
+
 drop policy if exists ect_meal_plans_select on storage.objects;
 drop policy if exists ect_meal_plans_insert on storage.objects;
 drop policy if exists ect_meal_plans_update on storage.objects;

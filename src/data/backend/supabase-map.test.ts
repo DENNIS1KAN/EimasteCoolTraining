@@ -33,8 +33,6 @@ const member: Member = {
   heightCm: 181,
   programId: 'bts-12',
   programStart: '2026-09-07',
-  coachNote: 'Nice',
-  coachNoteAt: 5,
   settings: { unit: 'kg', machines: { 'Leg Press': 'Hammer' }, weightVisibility: 'exact' },
   joined: true,
   updatedAt: 1700000000000,
@@ -63,7 +61,6 @@ const checkin: NutritionCheckin = {
   planId: 'p1',
   meals: ['m1'],
   rating: 'on',
-  waterL: 2,
   note: '',
   updatedAt: 12,
 }
@@ -77,7 +74,6 @@ const plan: MealPlan = {
   protein: 180,
   carbs: null,
   fat: null,
-  waterL: 3,
   meals: [],
   files: [],
   active: true,
@@ -98,6 +94,7 @@ describe('table names', () => {
       mealPlans: 'meal_plans',
       checkins: 'checkins',
       cheers: 'cheers',
+      posts: 'posts',
     })
     for (const t of TABLES) expect(tableFromSql(SQL_TABLE[t])).toBe(t)
     expect(tableFromSql('member_invites')).toBeNull()
@@ -119,8 +116,6 @@ describe('members', () => {
       heightCm: null,
       programId: 'bts-12',
       programStart: null,
-      coachNote: '',
-      coachNoteAt: null,
       settings: { unit: 'kg', machines: {}, weightVisibility: 'exact' },
       joined: false,
       updatedAt: 42,
@@ -144,7 +139,7 @@ describe('members', () => {
     const patch = memberPatch(member)
     expect(patch.updated_at).toBe(member.updatedAt)
     for (const k of ['id', 'slug', 'role', 'joined', 'updatedAt']) expect(patch.data).not.toHaveProperty(k)
-    expect(patch.data).toMatchObject({ name: 'Stelios', goal: 'Bench 100', coachNote: 'Nice', settings: member.settings })
+    expect(patch.data).toMatchObject({ name: 'Stelios', goal: 'Bench 100', settings: member.settings })
     expect(toRow('members', member)).toEqual({ id: ME, ...patch })
   })
 

@@ -1,7 +1,7 @@
 import { Suspense, type ReactNode } from 'react'
 import { HashRouter, Navigate, Route, Routes } from 'react-router'
 import { useMe, useStatus } from '../data/store'
-import { useLang } from '../i18n'
+
 import { AppShell } from './AppShell'
 import { lazyPage as lazy } from './appUpdate'
 import { BootScreen, ErrorScreen } from './BootScreens'
@@ -53,7 +53,6 @@ function RequireCoach({ children }: { children: ReactNode }) {
 export function App() {
   // Subscribing here re-renders the whole tree top-down on a language switch, so text formatted outside useT
   // (dates, numbers) updates too.
-  useLang()
   const status = useStatus()
 
   if (status === 'booting') return <BootScreen />

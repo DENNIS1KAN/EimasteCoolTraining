@@ -11,8 +11,9 @@ export function useSquadData(): SquadData {
   const mealPlans = useStore((s) => s.mealPlans)
   const checkins = useStore((s) => s.checkins)
   const cheers = useStore((s) => s.cheers)
+  const posts = useStore((s) => s.posts)
   return useMemo(
-    () => ({ members, programs, logs, weights, mealPlans, checkins, cheers }),
-    [members, programs, logs, weights, mealPlans, checkins, cheers],
+    () => ({ members, programs, logs, weights, mealPlans, checkins, cheers, posts }),
+    [members, programs, logs, weights, mealPlans, checkins, cheers, posts],
   )
 }

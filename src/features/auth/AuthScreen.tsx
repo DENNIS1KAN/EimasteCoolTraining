@@ -1,6 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { Brand } from '../../app/Brand'
-import { LangToggle } from './LangToggle'
 import './auth.css'
 
 interface Props {
@@ -26,11 +25,10 @@ export function AuthScreen({ children, brand, glow, className, texture = true }:
         <span className="auth__glow auth__glow--a" />
         <span className="auth__glow auth__glow--b" />
         <span className="auth__glow auth__glow--c" />
-        {texture ? <span className="auth__texture" lang="el">Είμαστε Cool</span> : null}
+        {texture ? <span className="auth__texture">Eimaste Cool</span> : null}
       </div>
       <header className="auth__top">
         {brand ? <Brand size="sm" layout="inline" className="auth__brand" /> : <span />}
-        <LangToggle />
       </header>
       <main className="auth__main">{children}</main>
     </div>

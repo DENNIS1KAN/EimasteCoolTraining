@@ -4,28 +4,16 @@ import { Button } from '../ui'
 import { BrandMark } from './Brand'
 import './AppShell.css'
 
-const M = defineMessages(
-  {
-    loading: 'Loading Eimaste Cool Training',
-    loadingShort: 'Loading…',
-    title: 'Couldn’t start',
-    body: 'Something went wrong while opening the app. Check your connection and try again. If it keeps happening, tell your coach.',
-    retry: 'Try again',
-    details: 'Details',
-    configTitle: 'Setup problem',
-    configHint: 'Fix public/config.js (see docs/SETUP.md).',
-  },
-  {
-    loading: 'Φόρτωση του Eimaste Cool Training',
-    loadingShort: 'Φόρτωση…',
-    title: 'Δεν ξεκίνησε',
-    body: 'Κάτι πήγε στραβά στο άνοιγμα της εφαρμογής. Έλεγξε τη σύνδεσή σου και ξαναδοκίμασε. Αν συνεχίσει, ενημέρωσε τον προπονητή σου.',
-    retry: 'Ξαναδοκίμασε',
-    details: 'Λεπτομέρειες',
-    configTitle: 'Πρόβλημα ρύθμισης',
-    configHint: 'Διόρθωσε το public/config.js (δες το docs/SETUP.md).',
-  },
-)
+const M = defineMessages({
+  loading: 'Loading Eimaste Cool Training',
+  loadingShort: 'Loading…',
+  title: 'Couldn’t start',
+  body: 'Something went wrong while opening the app. Check your connection and try again. If it keeps happening, tell your coach.',
+  retry: 'Try again',
+  details: 'Details',
+  configTitle: 'Setup problem',
+  configHint: 'Fix public/config.js (see docs/SETUP.md).',
+})
 
 /**
  * First paint while the backend boots: the brand mark breathing on --bg.

@@ -1,5 +1,5 @@
 import { useId, useMemo, type CSSProperties } from 'react'
-import { useLang, translate } from '../../i18n'
+import { translate } from '../../i18n'
 import { BADGES, type BadgeId, type BadgeTier } from '../../lib/stats'
 import { Icon, type IconName } from '../../ui'
 import { BADGE_M } from './badgeMessages'
@@ -36,18 +36,17 @@ export interface BadgeText {
 
 /** Title, criterion and tier name for every badge, in the current language. */
 export function useBadgeText(): Record<BadgeId, BadgeText> {
-  const lang = useLang()
   return useMemo(() => {
     const out = {} as Record<BadgeId, BadgeText>
     for (const b of BADGES) {
       out[b.id] = {
-        title: translate(BADGE_M, `title_${b.id}` as keyof typeof BADGE_M.en, undefined, lang),
-        description: translate(BADGE_M, `desc_${b.id}` as keyof typeof BADGE_M.en, undefined, lang),
-        tier: translate(BADGE_M, `tier_${b.tier}`, undefined, lang),
+        title: translate(BADGE_M, `title_${b.id}` as keyof typeof BADGE_M.en, undefined),
+        description: translate(BADGE_M, `desc_${b.id}` as keyof typeof BADGE_M.en, undefined),
+        tier: translate(BADGE_M, `tier_${b.tier}`, undefined),
       }
     }
     return out
-  }, [lang])
+  }, [])
 }
 
 /** 16 scallops around a disc: a rosette outline in viewBox 0 0 48 48. */
@@ -70,10 +69,9 @@ export interface BadgeMedalProps {
 /** Tiered medal (bronze / silver / gold rosette) with the badge's glyph; locked badges are dimmed with a lock. */
 export function BadgeMedal({ id, earned = true, size = 48, decorative, className, style }: BadgeMedalProps) {
   const text = useBadgeText()[id]
-  const lang = useLang()
   const gid = useId().replace(/:/g, '')
   const tier = BADGE_TIER[id] ?? 'bronze'
-  const label = `${text.title} (${text.tier}${earned ? '' : `, ${translate(BADGE_M, 'locked', undefined, lang)}`})`
+  const label = `${text.title} (${text.tier}${earned ? '' : `, ${translate(BADGE_M, 'locked', undefined)}`})`
   const iconSize = Math.round(size * 0.4)
   return (
     <span

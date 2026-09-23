@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chat Navigation Options</title>
+<meta name="description" content="Eimaste Cool Training: three ways to fit a group chat into the app's navigation, side by side.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Sofia+Sans+Extra+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --f-ui:"Manrope",system-ui,-apple-system,sans-serif;
+  --f-num:"Sofia Sans Extra Condensed","Manrope",sans-serif;
+  --page:#E3E7EE; --page-2:#D8DDE6; --page-ink:#0B1020; --page-ink-2:#566074;
+  --bezel:#0E1116; --bezel-edge:#2B3039;
+  --bg:#EDF0F5; --surface-1:#FFFFFF; --surface-2:#F0F2F6; --surface-3:#E4E8EE;
+  --hairline:#E5E8EE; --hairline-strong:#D3D9E2;
+  --ink-1:#0B1020; --ink-2:#4A5467; --ink-3:#737D91; --ink-ph:#8A93A3;
+  --accent:#D4FF3F; --accent-ink:#0B1020; --accent-text:#4D6B00;
+  --accent-surface:#0B1020; --accent-on:#D4FF3F;
+  --accent-soft:rgba(112,150,0,.13); --accent-glow:rgba(150,200,0,.45);
+  --m-stelios:#2a78d6; --m-thanos:#eb6834; --m-dennis:#1baf7a;
+  --good:#4F7F00; --danger:#C42A45;
+  --tabbar:rgba(255,255,255,.96);
+  --card-border:rgba(16,24,40,.09); --card-lift:inset 0 1px 0 #fff;
+  --shadow-1:0 1px 2px rgba(16,24,40,.05),0 8px 22px -12px rgba(16,24,40,.18);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  color-scheme: dark;
+  --page:#030409; --page-2:#0A0D14; --page-ink:#EEF2F8; --page-ink-2:#8A94A8;
+  --bg:#07090F; --surface-1:#0E121B; --surface-2:#151A25; --surface-3:#1D2331;
+  --hairline:#1A1F2B; --hairline-strong:#283042;
+  --ink-1:#F3F6FB; --ink-2:#A2ACBE; --ink-3:#6C768A; --ink-ph:#5E6779;
+  --accent-text:#D4FF3F; --accent-surface:#161E04;
+  --accent-soft:rgba(212,255,63,.11); --accent-glow:rgba(212,255,63,.28);
+  --good:#C5F24A; --danger:#FF5C7A;
+  --tabbar:rgba(9,12,19,.96);
+  --card-border:rgba(140,160,205,.075); --card-lift:inset 0 1px 0 rgba(255,255,255,.035);
+  --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 1px 2px rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#030409; --page-2:#0A0D14; --page-ink:#EEF2F8; --page-ink-2:#8A94A8;
+  --bg:#07090F; --surface-1:#0E121B; --surface-2:#151A25; --surface-3:#1D2331;
+  --hairline:#1A1F2B; --hairline-strong:#283042;
+  --ink-1:#F3F6FB; --ink-2:#A2ACBE; --ink-3:#6C768A; --ink-ph:#5E6779;
+  --accent-text:#D4FF3F; --accent-surface:#161E04;
+  --accent-soft:rgba(212,255,63,.11); --accent-glow:rgba(212,255,63,.28);
+  --good:#C5F24A; --danger:#FF5C7A;
+  --tabbar:rgba(9,12,19,.96);
+  --card-border:rgba(140,160,205,.075); --card-lift:inset 0 1px 0 rgba(255,255,255,.035);
+  --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 1px 2px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--page-ink);font-family:var(--f-ui);
+     -webkit-font-smoothing:antialiased;padding:38px 22px 70px}
+h1,h2,h3,p,ul{margin:0}
+ul{list-style:none;padding:0}
+.ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+.head{max-width:1500px;margin:0 auto 34px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.head h1{font:800 27px var(--f-ui);letter-spacing:-.02em;margin-bottom:8px}
+.head p{color:var(--page-ink-2);font:600 14px/1.55 var(--f-ui);max-width:760px}
+.head b{color:var(--page-ink)}
+.theme-switch{display:flex;background:var(--page-2);border-radius:11px;padding:4px;gap:3px}
+.theme-switch button{border:0;background:none;color:var(--page-ink-2);font:800 13px var(--f-ui);
+  padding:8px 14px;border-radius:8px;cursor:pointer}
+.theme-switch button[aria-pressed="true"]{background:var(--bezel);color:#fff}
+
+.cols{max-width:1500px;margin:0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px}
+@media (max-width:1180px){.cols{grid-template-columns:1fr;max-width:460px}}
+
+.opt{display:flex;flex-direction:column;gap:16px}
+.opt-head{display:flex;align-items:flex-start;gap:12px}
+.badge{width:38px;height:38px;border-radius:11px;flex:none;display:grid;place-items:center;
+  font:900 19px var(--f-num);background:var(--bezel);color:#fff}
+.opt--pick .badge{background:var(--accent);color:var(--accent-ink)}
+.opt-head h2{font:800 18px var(--f-ui);letter-spacing:-.01em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pick{font:800 9.5px var(--f-ui);letter-spacing:.09em;text-transform:uppercase;background:var(--accent);
+  color:var(--accent-ink);border-radius:5px;padding:3px 7px}
+.opt-head p{color:var(--page-ink-2);font:600 12.5px/1.5 var(--f-ui);margin-top:4px}
+
+.phone{border-radius:38px;background:var(--bezel);padding:9px;box-shadow:0 26px 60px -24px rgba(5,10,25,.55),0 0 0 1px var(--bezel-edge)}
+.screen{border-radius:30px;overflow:hidden;background:var(--bg);color:var(--ink-1);height:430px;display:flex;flex-direction:column}
+.scr-top{padding:14px 14px 8px}
+.eyebrow{font:800 10px var(--f-ui);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.title{font:800 25px/1 var(--f-num);text-transform:uppercase;margin-top:3px}
+.scr-body{flex:1;padding:0 13px 8px;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+
+/* in-screen tab strip (Squad's own tabs) */
+.segs{display:flex;gap:5px;background:var(--surface-2);border-radius:11px;padding:4px}
+.segs span{flex:1;text-align:center;font:800 11px var(--f-ui);color:var(--ink-3);padding:6px 4px;border-radius:8px}
+.segs span.on{background:var(--surface-1);color:var(--ink-1);box-shadow:var(--shadow-1)}
+.segs span.gone{color:var(--danger);text-decoration:line-through;opacity:.75}
+
+.card{background:var(--surface-1);border:1px solid var(--card-border);border-radius:15px;padding:10px 11px;
+  box-shadow:var(--shadow-1),var(--card-lift)}
+.card.dup{border-color:var(--danger);border-style:dashed;background:transparent;box-shadow:none}
+.row{display:flex;align-items:center;gap:8px}
+.av{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:#fff;font:800 10px var(--f-ui);flex:none}
+.av.s{background:var(--m-stelios)} .av.t{background:var(--m-thanos)} .av.d{background:var(--m-dennis)}
+.msg b{font:800 11.5px var(--f-ui)} .msg p{font:600 11px/1.4 var(--f-ui);color:var(--ink-2);margin-top:2px}
+.actv{background:var(--surface-2);box-shadow:none}
+.actv p{font:700 11px/1.4 var(--f-ui);color:var(--ink-2)}
+.actv b{color:var(--ink-1)}
+.mut{color:var(--ink-3);font:700 10.5px var(--f-ui)}
+.photo{margin-top:6px;border-radius:9px;height:52px;border:1px solid var(--card-border);
+  background:linear-gradient(135deg,var(--surface-3),var(--surface-2))}
+
+/* the bottom bar: the thing that actually differs */
+.tabbar{display:grid;background:var(--tabbar);border-top:1px solid var(--hairline);padding:7px 3px 10px;position:relative}
+.tabbar.n5{grid-template-columns:repeat(5,1fr)}
+.tabbar.n6{grid-template-columns:repeat(6,1fr)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-3);font:700 8.5px var(--f-ui);position:relative}
+.tabbar.n6 .tab{font-size:7.8px}
+.tab .ic{width:19px;height:19px}
+.tabbar.n6 .tab .ic{width:17px;height:17px}
+.tab.on{color:var(--ink-1)}
+.tab.on .pillbg{position:absolute;top:-3px;width:38px;height:25px;border-radius:9px;background:var(--surface-3);z-index:0}
+.tab .ic,.tab span{position:relative;z-index:1}
+.tab.volt .ic{color:var(--accent-text)}
+.tab.fab{justify-content:flex-start}
+.tab.fab .ic{width:22px;height:22px;color:var(--accent-ink)}
+.fabdot{width:40px;height:40px;border-radius:50%;background:var(--accent);display:grid;place-items:center;
+  margin-top:-15px;box-shadow:0 8px 20px -8px var(--accent-glow);position:relative;z-index:2}
+.tab.fab span{margin-top:1px}
+.tab .dot{position:absolute;top:-1px;right:50%;margin-right:-13px;width:7px;height:7px;border-radius:50%;
+  background:var(--m-thanos);border:2px solid var(--tabbar);z-index:3}
+.tab.new{color:var(--accent-text)}
+.tab.missing{opacity:.32}
+.tab.missing span{text-decoration:line-through}
+
+.notes{background:var(--page-2);border-radius:15px;padding:14px 15px}
+.notes h3{font:800 11px var(--f-ui);letter-spacing:.09em;text-transform:uppercase;color:var(--page-ink-2);margin-bottom:8px}
+.notes li{position:relative;padding-left:20px;font:600 12.5px/1.5 var(--f-ui);color:var(--page-ink-2);margin-bottom:6px}
+.notes li:last-child{margin-bottom:0}
+.notes li b{color:var(--page-ink)}
+.notes li::before{content:"";position:absolute;left:4px;top:7px;width:7px;height:7px;border-radius:2px}
+.notes li.plus::before{background:var(--good)}
+.notes li.minus::before{background:var(--danger)}
+.notes li.plus::before{clip-path:polygon(40% 0,60% 0,60% 40%,100% 40%,100% 60%,60% 60%,60% 100%,40% 100%,40% 60%,0 60%,0 40%,40% 40%)}
+.notes li.minus::before{clip-path:polygon(0 40%,100% 40%,100% 60%,0 60%)}
+
+.foot{max-width:1500px;margin:34px auto 0;padding:20px 22px;background:var(--page-2);border-radius:16px;
+  font:600 13.5px/1.6 var(--f-ui);color:var(--page-ink-2)}
+.foot b{color:var(--page-ink)}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.2 12 4l8 6.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19z"/></symbol>
+<symbol id="i-train" viewBox="0 0 24 24"><rect x="5.2" y="6.5" width="3.3" height="11" rx="1.3"/><rect x="15.5" y="6.5" width="3.3" height="11" rx="1.3"/><path d="M2.5 9.5v5M21.5 9.5v5M8.5 12h7"/></symbol>
+<symbol id="i-body" viewBox="0 0 24 24"><rect x="3.8" y="3.8" width="16.4" height="16.4" rx="4.5"/><path d="M8.2 10.4a5 5 0 0 1 7.6 0"/><path d="M12 10.8l1.6-2.1"/></symbol>
+<symbol id="i-fuel" viewBox="0 0 24 24"><path d="M6.5 3.5v6.2a2 2 0 0 0 4 0V3.5M8.5 3.5v17"/><path d="M17.5 20.5v-17c-2.2 1.3-3.3 3.8-3.3 7v3.3h3.3"/></symbol>
+<symbol id="i-squad" viewBox="0 0 24 24"><circle cx="9" cy="8.2" r="3.4"/><path d="M3 19.5c.6-3.4 3-5.4 6-5.4s5.4 2 6 5.4"/><path d="M15.5 5a3.3 3.3 0 0 1 0 6.3M17.4 14.4c2 .6 3.2 2.3 3.6 5.1"/></symbol>
+<symbol id="i-msg" viewBox="0 0 24 24"><path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 17h-8.2L6.5 20.3V17H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 5z"/></symbol>
+<symbol id="i-cam" viewBox="0 0 24 24"><path d="M3.5 8.5A2 2 0 0 1 5.5 6.5h2L9 4.5h6l1.5 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.4"/></symbol>
+</defs></svg>
+
+<header class="head">
+  <div>
+    <h1>Where does the group chat live?</h1>
+    <p>All three build the <b>same merged stream</b> — activity and messages interleaved, with photos. The only thing that differs is <b>how you reach it</b>, and what that costs the rest of the bar. Look at the bottom bar in each phone.</p>
+  </div>
+  <div class="theme-switch" role="group" aria-label="Theme">
+    <button type="button" data-set-theme="light" aria-pressed="false">Light</button>
+    <button type="button" data-set-theme="dark" aria-pressed="false">Dark</button>
+  </div>
+</header>
+
+<main class="cols">
+
+<!-- ============================== A ============================== -->
+<section class="opt opt--pick">
+  <div class="opt-head">
+    <span class="badge">A</span>
+    <div>
+      <h2>Chat tab, Squad loses its feed <span class="pick">recommended</span></h2>
+      <p>Six tabs. The stream lives in Chat, so Squad's Feed tab is deleted — it would show the same activity twice.</p>
+    </div>
+  </div>
+  <div class="phone"><div class="screen">
+    <div class="scr-top"><p class="eyebrow">3 members · Week 3</p><h2 class="title">Squad chat</h2></div>
+    <div class="scr-body">
+      <div class="card"><div class="row"><span class="av t">T</span><div class="msg" style="flex:1"><b>Thanos</b><p>Leg day done, who is coming tonight</p></div><span class="mut">08:12</span></div></div>
+      <div class="card actv"><div class="row"><span class="av t">T</span><div class="msg" style="flex:1"><p><b>Thanos</b> finished <b>Week 3 · Legs</b> · 2 PRs</p></div></div></div>
+      <div class="card"><div class="row" style="align-items:flex-start"><span class="av d">D</span><div class="msg" style="flex:1"><b>Dennis <span class="mut">coach</span></b><p>Two perfect weeks, Stelio.</p><div class="photo"></div></div></div></div>
+    </div>
+    <nav class="tabbar n6">
+      <span class="tab"><svg class="ic"><use href="#i-home"/></svg><span>Home</span></span>
+      <span class="tab"><svg class="ic"><use href="#i-body"/></svg><span>Body</span></span>
+      <span class="tab volt"><svg class="ic"><use href="#i-train"/></svg><span>Train</span></span>
+      <span class="tab"><svg class="ic"><use href="#i-fuel"/></svg><span>Fuel</span></span>
+      <span class="tab"><svg class="ic"><use href="#i-squad"/></svg><span>Squad</span></span>
+      <span class="tab on new"><i class="pillbg"></i><svg class="ic"><use href="#i-msg"/></svg><span>Chat</span><i class="dot"></i></span>
+    </nav>
+  </div></div>
+  <div class="card" style="border-radius:15px">
+    <p class="eyebrow" style="margin-bottom:7px">Squad page, option A</p>
+    <div class="segs"><span class="on">Overview</span><span>League</span><span class="gone">Feed</span></div>
+  </div>
+  <div class="notes">
+    <h3>Trade-off</h3>
+    <ul>
+      <li class="plus">Chat is <b>one tap from anywhere</b>, with an unread badge.</li>
+      <li class="plus">Activity lives in <b>exactly one place</b>. Nothing to keep in sync.</li>
+      <li class="minus">Six labels get tight — <b>Train loses its raised button</b> and keeps only a volt icon.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================== B ============================== -->
+<section class="opt">
+  <div class="opt-head">
+    <span class="badge">B</span>
+    <div>
+      <h2>Chat replaces Squad in the bar</h2>
+      <p>Stays at five tabs. Squad is no longer a destination — you reach it by tapping someone's avatar.</p>
+    </div>
+  </div>
+  <div class="phone"><div class="screen">
+    <div class="scr-top"><p class="eyebrow">3 members · Week 3</p><h2 class="title">Squad chat</h2></div>
+    <div class="scr-body">
+      <div class="card"><div class="row"><span class="av t">T</span><div class="msg" style="flex:1"><b>Thanos</b><p>Leg day done, who is coming tonight</p></div><span class="mut">08:12</span></div></div>
+      <div class="card actv"><div class="row"><span class="av t">T</span><div class="msg" style="flex:1"><p><b>Thanos</b> finished <b>Week 3 · Legs</b> · 2 PRs</p></div></div></div>
+      <div class="card"><div class="row" style="align-items:flex-start"><span class="av d">D</span><div class="msg" style="flex:1"><b>Dennis <span class="mut">coach</span></b><p>Two perfect weeks, Stelio.</p><div class="photo"></div></div></div></div>
+    </div>
+    <nav class="tabbar n5">
+      <span class="tab"><svg class="ic"><use href="#i-home"/></svg><span>Home</span></span>
+      <span class="tab"><svg class="ic"><use href="#i-body"/></svg><span>Body</span></span>
+      <span class="tab fab"><span class="fabdot"><svg class="ic"><use href="#i-train"/></svg></span><span>Train</span></span>
+      <span class="tab"><svg class="ic"><use href="#i-fuel"/></svg><span>Fuel</span></span>
+      <span class="tab on new"><i class="pillbg"></i><svg class="ic"><use href="#i-msg"/></svg><span>Chat</span><i class="dot"></i></span>
+    </nav>
+  </div></div>
+  <div class="card" style="border-radius:15px">
+    <p class="eyebrow" style="margin-bottom:7px">Squad page, option B</p>
+    <div class="segs"><span class="on">Overview</span><span>League</span><span class="gone">Feed</span></div>
+    <p class="mut" style="margin-top:8px;font-weight:600;line-height:1.45">No longer in the bottom bar. Reached from an avatar or Home's pulse card.</p>
+  </div>
+  <div class="notes">
+    <h3>Trade-off</h3>
+    <ul>
+      <li class="plus">Bar is unchanged — <b>Train keeps its raised button</b>, labels stay roomy.</li>
+      <li class="plus">Still one tap to chat.</li>
+      <li class="minus"><b>The league, head-to-head and compare get buried.</b> Headline features behind two taps tend to stop being used.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================== C ============================== -->
+<section class="opt">
+  <div class="opt-head">
+    <span class="badge">C</span>
+    <div>
+      <h2>Six tabs, Squad keeps its feed</h2>
+      <p>Same six tabs as A, but nothing is removed. Activity then appears in two separate places.</p>
+    </div>
+  </div>
+  <div class="phone"><div class="screen">
+    <div class="scr-top"><p class="eyebrow">3 members · Week 3</p><h2 class="title">Squad chat</h2></div>
+    <div class="scr-body">
+      <div class="card"><div class="row"><span class="av t">T</span><div class="msg" style="flex:1"><b>Thanos</b><p>Leg day done, who is coming tonight</p></div><span class="mut">08:12</span></div></div>
+      <div class="card actv"><div class="row"><span class="av t">T</span><div class="msg" style="flex:1"><p><b>Thanos</b> finished <b>Week 3 · Legs</b> · 2 PRs</p></div></div></div>
+      <div class="card dup"><p class="mut" style="text-align:center;color:var(--danger);font-weight:700">the same item also appears<br>under Squad → Feed</p></div>
+    </div>
+    <nav class="tabbar n6">
+      <span class="tab"><svg class="ic"><use href="#i-home"/></svg><span>Home</span></span>
+      <span class="tab"><svg class="ic"><use href="#i-body"/></svg><span>Body</span></span>
+      <span class="tab volt"><svg class="ic"><use href="#i-train"/></svg><span>Train</span></span>
+      <span class="tab"><svg class="ic"><use href="#i-fuel"/></svg><span>Fuel</span></span>
+      <span class="tab"><svg class="ic"><use href="#i-squad"/></svg><span>Squad</span></span>
+      <span class="tab on new"><i class="pillbg"></i><svg class="ic"><use href="#i-msg"/></svg><span>Chat</span><i class="dot"></i></span>
+    </nav>
+  </div></div>
+  <div class="card" style="border-radius:15px">
+    <p class="eyebrow" style="margin-bottom:7px">Squad page, option C</p>
+    <div class="segs"><span class="on">Overview</span><span>League</span><span style="color:var(--danger)">Feed ⟳</span></div>
+  </div>
+  <div class="notes">
+    <h3>Trade-off</h3>
+    <ul>
+      <li class="plus">Least work — <b>nothing is removed</b>, nothing can regress.</li>
+      <li class="minus"><b>The same workout shows up twice</b>, in two different layouts.</li>
+      <li class="minus">Two screens to keep in step forever. They will drift.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<div class="foot">
+  <b>My recommendation stays A.</b> The merged stream is a strictly better version of Squad's feed — it has everything the feed has, plus what people actually say about it — so keeping both (C) means maintaining two views of one thing. B protects the tab bar but pays for it with the league and head-to-head, which are the features that make the squad competitive in the first place. A's only real cost is the raised Train button, and Home's workout hero is already the main way into a session.
+</div>
+
+<script>
+(function(){
+  var r=document.documentElement, mq=window.matchMedia('(prefers-color-scheme: dark)');
+  var btns=[].slice.call(document.querySelectorAll('[data-set-theme]'));
+  function sync(){var cur=r.getAttribute('data-theme')||(mq.matches?'dark':'light');
+    btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.setTheme===cur));});}
+  btns.forEach(function(b){b.addEventListener('click',function(){r.setAttribute('data-theme',b.dataset.setTheme);sync();});});
+  mq.addEventListener&&mq.addEventListener('change',sync); sync();
+})();
+</script>
+</body>
+</html>

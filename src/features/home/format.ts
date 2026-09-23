@@ -1,10 +1,10 @@
-import { getLang, localeOf } from '../../i18n'
+import { LOCALE } from '../../i18n'
 import type { ISODate } from '../../lib/dates'
 import { fmtDate } from '../../lib/format'
 
 /** Time of day in the current locale: "18:40". */
 export function fmtTimeOfDay(ms: number): string {
-  return new Intl.DateTimeFormat(localeOf(getLang()), { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(ms))
+  return new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(ms))
 }
 
 /** "Thu 24 Sep" / "Πέμ 24 Σεπ" (the eyebrow uppercases it). */

@@ -8,9 +8,8 @@ import { FM } from '../messages'
 import type { SectionProps } from './BasicsSection'
 import { errorKey } from './errors'
 
-const FIELDS: { key: TargetKey; label: 'kcal' | 'protein' | 'carbs' | 'fat' | 'waterL'; suffix: string; decimals: number }[] = [
+const FIELDS: { key: TargetKey; label: 'kcal' | 'protein' | 'carbs' | 'fat'; suffix: string; decimals: number }[] = [
   { key: 'kcal', label: 'kcal', suffix: 'kcal', decimals: 0 },
-  { key: 'waterL', label: 'waterL', suffix: 'L', decimals: 2 },
   { key: 'protein', label: 'protein', suffix: 'g', decimals: 0 },
   { key: 'carbs', label: 'carbs', suffix: 'g', decimals: 0 },
   { key: 'fat', label: 'fat', suffix: 'g', decimals: 0 },

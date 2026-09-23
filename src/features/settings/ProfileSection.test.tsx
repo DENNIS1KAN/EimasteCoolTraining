@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { __resetForTests, getState, setState } from '../../data/store'
-import { setLang } from '../../i18n'
+
 import { MINI, mkMember } from '../../lib/testing/fixtures'
 import { ProfileSection } from './ProfileSection'
 
@@ -9,7 +9,6 @@ const S = mkMember({ id: 's', slug: 'stelios', name: 'Stelios', heightCm: 180 })
 
 beforeEach(() => {
   __resetForTests()
-  setLang('en')
   setState({ status: 'ready', meId: 's', members: { s: S }, programs: { [MINI.id]: MINI } })
 })
 afterEach(cleanup)

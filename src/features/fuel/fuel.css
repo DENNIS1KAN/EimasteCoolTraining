@@ -34,18 +34,6 @@
 .fu-meal__body:focus-visible,
 .fu-day:focus-visible,
 .fu-rate__btn:focus-visible,
-.fu-glass:focus-visible,
-.fu-more:focus-visible,
-.fu-file--link:focus-visible,
-.fu-older__toggle:focus-visible,
-.fu-older__row:focus-visible,
-.fu-cn__hist:focus-visible,
-.fu-cn__item:focus-visible,
-.fu-mini:focus-visible {
-  outline: 2px solid var(--accent-strong);
-  outline-offset: 2px;
-  border-radius: var(--r-sm);
-}
 .fu-tick:focus-visible {
   outline-offset: -4px;
 }
@@ -744,50 +732,6 @@ button.fu-meal__body {
 }
 
 /* water */
-.fu-water__head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
-}
-.fu-water__v {
-  font-size: 16px;
-  line-height: 1;
-  color: var(--ink-2);
-}
-.fu-water__grid {
-  display: grid;
-  gap: 2px;
-  margin-top: 6px;
-}
-.fu-glass {
-  height: 46px;
-  min-width: 0;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: var(--r-sm);
-  background: none;
-  color: var(--line-strong);
-  cursor: pointer;
-}
-.fu-glass:hover {
-  background: var(--surface-2);
-}
-.fu-glass.is-full {
-  color: var(--accent-strong);
-}
-.fu-glass__rim {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.7;
-  stroke-linejoin: round;
-}
-.fu-glass__water {
-  fill: var(--accent);
-  transition: opacity var(--dur-1) var(--ease);
-}
 
 /* ------------------------------------------------------------------ adherence */
 /*

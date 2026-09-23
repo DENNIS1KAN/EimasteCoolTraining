@@ -218,7 +218,7 @@
   background: var(--surface);
   border: 1px solid var(--card-border);
   border-radius: var(--r-xl);
-  box-shadow: var(--shadow-1);
+  box-shadow: var(--shadow-1), var(--card-lift);
   color: var(--ink);
   text-decoration: none;
 }
@@ -541,6 +541,11 @@
   letter-spacing: 0;
   color: var(--ink-2);
 }
+/* "Not yet": the tile keeps its shape and prints a dash, so a fresh account never reads as a zero result. */
+.ui-tile--empty .ui-tile__value {
+  color: var(--faint);
+}
+
 .ui-tile__label {
   margin-top: 6px;
   font: 700 12px/15px var(--font-body);
@@ -1469,6 +1474,10 @@
   transform: rotate(-45deg);
 }
 
+/*
+ * An empty state is a designed screen, not a missing one: a dashed outline reserves the space the
+ * content will occupy, so the layout does not jump the moment the first row arrives.
+ */
 .ui-empty {
   display: flex;
   flex-direction: column;
@@ -1476,9 +1485,12 @@
   gap: 4px;
   padding: 28px 20px;
   text-align: center;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--r-xl);
 }
 .ui-empty--compact {
   padding: 14px 8px;
+  border: 0;
 }
 .ui-empty__icon {
   display: grid;

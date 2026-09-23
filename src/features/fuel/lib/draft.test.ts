@@ -37,7 +37,6 @@ const base: MealPlan = {
   protein: 180,
   carbs: 250,
   fat: 70,
-  waterL: 3,
   meals: [{ id: 'a', name: 'Breakfast', time: '08:00', items: 'Oats\nWhey', kcal: 600, protein: 40, carbs: null, fat: null }],
   files: [{ path: 'm/x.pdf', name: 'x.pdf', type: 'application/pdf', size: 10 }],
   active: false,
@@ -59,12 +58,10 @@ describe('draft round trip', () => {
     const d = {
       ...emptyDraft('2026-09-22'),
       title: '  Bulk ',
-      waterL: '2,5',
       meals: [{ id: 'm1', name: ' Lunch ', time: '9:30', items: ' rice \n\n chicken ', kcal: '', protein: '45', carbs: '60', fat: '', foods: [] }],
     }
     const p = planFromDraft(d, { id: 'n', memberId: 'm', createdBy: 'c', createdAt: 1 })
     expect(p.title).toBe('Bulk')
-    expect(p.waterL).toBe(2.5)
     expect(p.kcal).toBeNull()
     expect(p.meals[0]).toEqual({ id: 'm1', name: 'Lunch', time: '09:30', items: 'rice\nchicken', kcal: null, protein: 45, carbs: 60, fat: null })
   })

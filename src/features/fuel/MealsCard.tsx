@@ -1,6 +1,6 @@
 import { useId, useState } from 'react'
 import type { Meal } from '../../data/types'
-import { useLang, useT } from '../../i18n'
+import { useT } from '../../i18n'
 import { fmtNum } from '../../lib/format'
 import { Card, Icon } from '../../ui'
 import { amountText } from './foodText'
@@ -44,7 +44,6 @@ interface MealRowProps {
 
 function MealRow({ meal, done, next, readOnly, onToggle }: MealRowProps) {
   const t = useT(FM)
-  const lang = useLang()
   const [open, setOpen] = useState(false)
   const foodsId = useId()
   const withFoods = hasFoods(meal)
@@ -52,7 +51,7 @@ function MealRow({ meal, done, next, readOnly, onToggle }: MealRowProps) {
   const legacy = withFoods ? [] : lines(meal.items)
   const notes = withFoods ? meal.items.trim() : ''
   const totals = mealTotals(meal)
-  const summary = withFoods ? foods.map((f) => displayFoodName(f, lang)).join(', ') : legacy.join(', ')
+  const summary = withFoods ? foods.map((f) => displayFoodName(f)).join(', ') : legacy.join(', ')
   const expandable = foods.length > 0 || legacy.length > 0
   const label = (
     <>
@@ -107,11 +106,11 @@ function MealRow({ meal, done, next, readOnly, onToggle }: MealRowProps) {
           {withFoods ? (
             <ul className="fu-foods">
               {foods.map((f) => {
-                const amount = amountText(f, lang)
+                const amount = amountText(f)
                 return (
                   <li key={f.id} className="fu-foods__row">
                     <span className="fu-foods__main">
-                      <span className="fu-foods__name">{displayFoodName(f, lang)}</span>
+                      <span className="fu-foods__name">{displayFoodName(f)}</span>
                       {amount && <span className="fu-foods__amt num">{amount}</span>}
                     </span>
                     <span className="fu-foods__nums num">

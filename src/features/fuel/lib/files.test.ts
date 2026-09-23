@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { setLang } from '../../../i18n'
+
 import { checkUpload, FILE_ACCEPT, fileExt, fileKind, fmtBytes, MAX_FILE_BYTES, orphanedFiles, uploadType } from './files'
 
 describe('files', () => {
@@ -27,13 +27,9 @@ describe('files', () => {
     expect(checkUpload({ size: 100, type: '', name: 'IMG_0001.HEIC' })).toBeNull()
   })
   it('formats sizes', () => {
-    setLang('en')
     expect(fmtBytes(900)).toBe('900 B')
     expect(fmtBytes(84000)).toBe('82 KB')
     expect(fmtBytes(1.2 * 1024 * 1024)).toBe('1.2 MB')
-    setLang('el')
-    expect(fmtBytes(1.2 * 1024 * 1024)).toBe('1,2 MB')
-    setLang('en')
   })
   it('keeps files another plan still uses', () => {
     const f = (path: string) => ({ path, name: path, type: 'application/pdf', size: 1 })

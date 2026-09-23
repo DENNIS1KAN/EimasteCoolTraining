@@ -1,7 +1,7 @@
 import { useDeferredValue, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Banner, Button, Chip, FileDrop, Segmented, Sheet, TextArea, TextField, toast } from '../../../ui'
-import { useLang, useT } from '../../../i18n'
+import { useT } from '../../../i18n'
 import { COMMON } from '../../../i18n/common'
 import { put, useMe, useStore } from '../../../data/store'
 import { dayShortName } from '../../../data/programs'
@@ -37,7 +37,6 @@ export function ImportSheet({ open, onClose }: ImportSheetProps) {
 function ImportSheetForm({ open, onClose, afterClose }: ImportSheetProps & { afterClose: () => void }) {
   const t = useT(M)
   const tc = useT(COMMON)
-  const lang = useLang()
   const me = useMe()
   const navigate = useNavigate()
   const programs = useStore((s) => s.programs)
@@ -146,7 +145,7 @@ function ImportSheetForm({ open, onClose, afterClose }: ImportSheetProps & { aft
           <Banner tone="danger" title={t('problems')} role="alert">
             <ul className={errors.length === 1 ? 'import-list import-list--single' : 'import-list'}>
               {errors.map((e, i) => (
-                <li key={i}>{issueText(e, lang)}</li>
+                <li key={i}>{issueText(e)}</li>
               ))}
             </ul>
           </Banner>
@@ -191,7 +190,7 @@ function ImportSheetForm({ open, onClose, afterClose }: ImportSheetProps & { aft
               <Banner tone="warn" title={t('headsUp')}>
                 <ul className={warnings.length === 1 ? 'import-list import-list--single' : 'import-list'}>
                   {warnings.map((w, i) => (
-                    <li key={i}>{issueText(w, lang)}</li>
+                    <li key={i}>{issueText(w)}</li>
                   ))}
                 </ul>
               </Banner>

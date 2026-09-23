@@ -9,7 +9,7 @@ import { programWorkouts, scheduledDate, workoutOn } from '../stats/schedule'
 const BTS = BTS_PROGRAM
 const HEADER = PROGRAM_CSV_COLUMNS.join(',')
 
-const en = (issues: Parameters<typeof issueText>[0][]): string[] => issues.map((i) => issueText(i, 'en'))
+const en = (issues: Parameters<typeof issueText>[0][]): string[] => issues.map((i) => issueText(i))
 /** The program, with its warnings as English sentences. */
 function ok(r: ParseProgramResult): { program: Program; warnings: string[] } {
   if ('errors' in r) throw new Error(`expected a program, got errors:\n${en(r.errors).join('\n')}`)
@@ -265,10 +265,10 @@ describe('parseProgram: CSV', () => {
     expect(errors(parseProgram(json))).toEqual(['Week 1, day 1 (Upper), exercise 1: working sets "three" is not a whole number between 1 and 20.'])
   })
 
-  it('reads problems in Greek', () => {
+  it('renders problems as sentences', () => {
     const r = parseProgram(csv(['week', 'day', 'exercise', 'working_sets'], ['1', 'A', 'Squat', 'three']))
     if (!('errors' in r)) throw new Error('expected errors')
-    expect(r.errors.map((i) => issueText(i, 'el'))).toEqual(['Γραμμή 2: τα σετ εργασίας πρέπει να είναι ακέραιος από 1 έως 20, όχι «three».'])
+    expect(r.errors.map((i) => issueText(i))).toEqual(['Row 2: working sets "three" is not a whole number between 1 and 20.'])
   })
 
   it('reports missing columns, a header without rows and week gaps', () => {

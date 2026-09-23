@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLang, useT, type Vars } from '../../../i18n'
+import { useT, type Vars } from '../../../i18n'
 import { fmtNum } from '../../../lib/format'
 import { uuid } from '../../../lib/ids'
 import { Button, Card, Chip, IconButton, NumberField, Segmented, Tag, TextArea, TextField, cx } from '../../../ui'
@@ -84,7 +84,6 @@ interface FoodRowProps {
 
 function FoodRow({ food, errors, onChange, onRemove }: FoodRowProps) {
   const t = useT(FM)
-  const lang = useLang()
   const db = foodById(food.ref)
   const unit = db?.unit
   const byPiece = !!unit && food.pieces !== ''
@@ -119,7 +118,7 @@ function FoodRow({ food, errors, onChange, onRemove }: FoodRowProps) {
           value={byPiece ? food.pieces : food.grams}
           decimals={1}
           min={0}
-          suffix={byPiece && unit ? unitLabel(unit.kind, pieces, lang) : 'g'}
+          suffix={byPiece && unit ? unitLabel(unit.kind, pieces) : 'g'}
           error={err(byPiece ? 'pieces' : 'grams')}
           onChange={(v) => onChange(byPiece ? setFoodPieces(food, v) : setFoodGrams(food, v))}
         />
@@ -129,7 +128,7 @@ function FoodRow({ food, errors, onChange, onRemove }: FoodRowProps) {
             ariaLabel={t('amountUnit', { name: label })}
             options={[
               { value: 'g', label: 'g', ariaLabel: t('inGrams') },
-              { value: 'pc', label: unitLabel(unit.kind, 2, lang), ariaLabel: t('inPieces') },
+              { value: 'pc', label: unitLabel(unit.kind, 2), ariaLabel: t('inPieces') },
             ]}
             value={byPiece ? 'pc' : 'g'}
             onChange={(v) => onChange(setFoodByPiece(food, v === 'pc'))}
@@ -191,7 +190,6 @@ interface MealEditorProps {
 
 function MealEditor({ meal, index, count, errors, onChange, onMove, onRemove }: MealEditorProps) {
   const t = useT(FM)
-  const lang = useLang()
   const name = meal.name.trim() || t('mealN', { n: index + 1 })
   const mealErrors = errors?.meals[meal.id]
   const err = (k: MealField) => {
@@ -209,7 +207,7 @@ function MealEditor({ meal, index, count, errors, onChange, onMove, onRemove }: 
       el?.select()
     })
   }
-  const pick = (food: Food) => addFood(foodDraftOf(food, foodName(food, lang), uuid()))
+  const pick = (food: Food) => addFood(foodDraftOf(food, foodName(food), uuid()))
   const custom = (text: string) => addFood(customFoodDraft(text, uuid()))
   const setFood = (i: number, f: FoodDraft) => onChange({ foods: meal.foods.map((x, j) => (j === i ? f : x)) })
 

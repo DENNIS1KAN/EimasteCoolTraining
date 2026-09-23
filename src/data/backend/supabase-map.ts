@@ -2,7 +2,7 @@
  * Pure mapping between the app's domain rows and the Supabase tables (see supabase/schema.sql),
  * plus translation of Supabase / fetch errors into BackendError codes. No network here.
  */
-import type { ChangeEvent, Cheer, LoginProfile, Member, MemberColor, Program, Role, TableName, Tables, WeightEntry, WorkoutLog } from '../types'
+import type { ChangeEvent, Cheer, LoginProfile, Member, MemberColor, Post, Program, Role, TableName, Tables, WeightEntry, WorkoutLog } from '../types'
 import { MEMBER_COLORS, TABLES } from '../types'
 import { DEFAULT_PROGRAM_ID } from '../programs'
 import type { BackendErrorCode } from './types'
@@ -26,6 +26,7 @@ export const SQL_TABLE: Record<TableName, string> = {
   mealPlans: 'meal_plans',
   checkins: 'checkins',
   cheers: 'cheers',
+  posts: 'posts',
 }
 
 export const tableFromSql = (sqlTable: string): TableName | null => TABLES.find((t) => SQL_TABLE[t] === sqlTable) ?? null
@@ -54,8 +55,6 @@ export function defaultMemberProfile(_role: Role, slug: string): MemberProfile {
     heightCm: null,
     programId: DEFAULT_PROGRAM_ID,
     programStart: null,
-    coachNote: '',
-    coachNoteAt: null,
     settings: { unit: 'kg', machines: {}, weightVisibility: 'exact' },
   }
 }
@@ -135,6 +134,10 @@ export function toRow<T extends TableName>(table: T, row: Tables[T]): Json {
     case 'cheers': {
       const c = row as Cheer
       return { ...base, from_id: c.fromId, to_id: c.toId, created_at: c.createdAt }
+    }
+    case 'posts': {
+      const p = row as Post
+      return { ...base, member_id: p.memberId, created_at: p.createdAt }
     }
   }
 }

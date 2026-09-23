@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { setLang } from '../../../i18n'
+
 import { durationParts, fmtRange, fmtRestShort, fmtRpe, fmtTypedWeight, swapCount, textLang, upperText } from './format'
 
 describe('prescription formatting', () => {
@@ -27,13 +27,10 @@ describe('prescription formatting', () => {
     expect(fmtRestShort('')).toBe('—')
   })
 
-  it('shows typed weights in the current locale', () => {
-    setLang('en')
+  it('normalises a typed weight to a decimal point', () => {
     expect(fmtTypedWeight('57,5')).toBe('57.5')
+    expect(fmtTypedWeight('57.5')).toBe('57.5')
     expect(fmtTypedWeight('')).toBe('')
-    setLang('el')
-    expect(fmtTypedWeight('57.5')).toBe('57,5')
-    setLang('en')
   })
 
   it('counts swaps', () => {

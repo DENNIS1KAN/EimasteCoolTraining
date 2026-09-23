@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Night Session v2 Mockups</title>
+<meta name="description" content="Eimaste Cool Training, design refinement 'Night Session v2': a light theme that keeps the brand accent, designed first-run states, a rationed accent and charts that carry their weight.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Sofia+Sans+Extra+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   NIGHT SESSION v2 - tokens
+   Changes vs v1 are marked [v2]. Everything else is inherited.
+   ========================================================= */
+:root{
+  color-scheme: light;
+  --f-ui:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:"Sofia Sans Extra Condensed","Manrope",system-ui,sans-serif;
+
+  --page:#E3E7EE; --page-2:#D8DDE6; --page-ink:#0B1020; --page-ink-2:#566074;
+  --bezel:#0E1116; --bezel-edge:#2B3039;
+
+  --bg:#EDF0F5;              /* [v2] was #F3F5F8 - deeper, so white cards separate */
+  --bg-glow:rgba(42,120,214,0);
+  --surface-1:#FFFFFF;
+  --surface-2:#F0F2F6;
+  --surface-3:#E4E8EE;
+  --hairline:#E5E8EE;
+  --hairline-strong:#D3D9E2;
+  --grid:#E8EBF0;
+  --ink-1:#0B1020;
+  --ink-2:#4A5467;
+  --ink-3:#737D91;
+  --ink-ph:#8A93A3;
+
+  /* --- brand accent --------------------------------------------------- */
+  --accent:#D4FF3F;              /* volt fill (unchanged) */
+  --accent-ink:#0B1020;          /* text on a volt fill */
+  --accent-text:#4D6B00;         /* [v2] NEW - brand as readable text/stroke. 6.1:1 on white */
+  --accent-surface:#0B1020;      /* [v2] NEW - accent SURFACE in light is ink... */
+  --accent-on:#D4FF3F;           /* [v2] ...carrying volt text. The inversion. */
+  --accent-soft:rgba(112,150,0,.13); /* [v2] tonal, not highlighter */
+  --accent-glow:rgba(150,200,0,.45);
+
+  --m-stelios:#2a78d6; --m-thanos:#eb6834; --m-dennis:#1baf7a;
+  --good:#4F7F00; --warn:#9C6500; --danger:#D6334F;
+
+  --tabbar:rgba(255,255,255,.93);
+  --card-border:rgba(16,24,40,.09);   /* [v2] was .045 - cards actually read as cards */
+  --card-lift:inset 0 1px 0 #FFFFFF;  /* [v2] NEW - light gets a lit top edge too */
+  --shadow-1:0 1px 2px rgba(16,24,40,.05),0 8px 22px -12px rgba(16,24,40,.18);
+  --shadow-2:0 18px 40px -12px rgba(16,24,40,.28),0 2px 6px rgba(16,24,40,.06);
+  --grain:.035;                        /* [v2] NEW */
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  color-scheme: dark;
+  --page:#030409; --page-2:#0A0D14; --page-ink:#EEF2F8; --page-ink-2:#8A94A8;
+  --bg:#07090F; --bg-glow:rgba(57,135,229,.10);
+  --surface-1:#0E121B; --surface-2:#151A25; --surface-3:#1D2331;
+  --hairline:#1A1F2B; --hairline-strong:#283042; --grid:#171C28;
+  --ink-1:#F3F6FB; --ink-2:#A2ACBE; --ink-3:#6C768A; --ink-ph:#5E6779;
+  --accent-text:#D4FF3F; --accent-surface:#161E04; --accent-on:#D4FF3F;
+  --accent-soft:rgba(212,255,63,.11); --accent-glow:rgba(212,255,63,.28);
+  --tabbar:rgba(9,12,19,.93);
+  --card-border:rgba(140,160,205,.075);
+  --card-lift:inset 0 1px 0 rgba(255,255,255,.035);
+  --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 1px 2px rgba(0,0,0,.5);
+  --shadow-2:0 20px 44px -12px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.06);
+  --grain:.05;
+}}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#030409; --page-2:#0A0D14; --page-ink:#EEF2F8; --page-ink-2:#8A94A8;
+  --bg:#07090F; --bg-glow:rgba(57,135,229,.10);
+  --surface-1:#0E121B; --surface-2:#151A25; --surface-3:#1D2331;
+  --hairline:#1A1F2B; --hairline-strong:#283042; --grid:#171C28;
+  --ink-1:#F3F6FB; --ink-2:#A2ACBE; --ink-3:#6C768A; --ink-ph:#5E6779;
+  --accent-text:#D4FF3F; --accent-surface:#161E04; --accent-on:#D4FF3F;
+  --accent-soft:rgba(212,255,63,.11); --accent-glow:rgba(212,255,63,.28);
+  --tabbar:rgba(9,12,19,.93);
+  --card-border:rgba(140,160,205,.075);
+  --card-lift:inset 0 1px 0 rgba(255,255,255,.035);
+  --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 1px 2px rgba(0,0,0,.5);
+  --shadow-2:0 20px 44px -12px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.06);
+  --grain:.05;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--page-ink);font-family:var(--f-ui);
+     -webkit-font-smoothing:antialiased;padding:40px 24px 80px}
+h1,h2,h3,p,ul,ol{margin:0}
+ul{list-style:none;padding:0}
+.ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- page chrome ---------- */
+.page-head{max-width:2110px;margin:0 auto 44px;display:flex;justify-content:space-between;
+           align-items:flex-start;gap:28px;flex-wrap:wrap}
+.brand{display:flex;gap:16px;align-items:flex-start;max-width:720px}
+.brand-mark{width:46px;height:46px;border-radius:13px;background:var(--bezel);display:grid;
+            place-items:center;flex:none}
+.brand-mark svg{width:28px;height:28px}
+.dir{font:800 12px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--page-ink-2);
+     display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.dir i{width:7px;height:7px;border-radius:50%;background:#D4FF3F;display:block}
+.brand h1{font:800 27px var(--f-ui);letter-spacing:-.02em;margin-bottom:7px}
+.brand h1 em{font-style:normal;color:var(--page-ink-2);font-weight:700}
+.brand>div>p:last-child{color:var(--page-ink-2);font:600 14px/1.55 var(--f-ui);max-width:640px}
+.head-r{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.key{display:flex;gap:14px;flex-wrap:wrap;font:700 12px var(--f-ui);color:var(--page-ink-2)}
+.key span{display:flex;align-items:center;gap:6px}
+.key i{width:10px;height:10px;border-radius:50%;display:block}
+.key i.acc{background:#D4FF3F}
+.theme-switch{display:flex;background:var(--page-2);border-radius:11px;padding:4px;gap:3px}
+.theme-switch button{border:0;background:none;color:var(--page-ink-2);font:800 13px var(--f-ui);
+      padding:8px 14px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:7px}
+.theme-switch button .ic{width:15px;height:15px}
+.theme-switch button[aria-pressed="true"]{background:var(--bezel);color:#fff}
+
+.frames{display:flex;flex-wrap:wrap;justify-content:center;gap:48px 40px;max-width:2540px;margin:0 auto}
+.shot{width:390px}
+.cap{display:flex;align-items:baseline;gap:10px;margin:0 0 16px 4px;flex-wrap:wrap}
+.cap-k{font:800 12px var(--f-ui);letter-spacing:.1em;color:var(--page-ink-2)}
+.cap b{font:800 17px var(--f-ui);letter-spacing:-.01em}
+.cap span{color:var(--page-ink-2);font-weight:600;font-size:12.5px}
+.tagv2{font:800 10px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;
+       background:#D4FF3F;color:#0B1020;border-radius:5px;padding:3px 7px}
+
+.phone{position:relative;border-radius:46px;background:var(--bezel);padding:11px;
+       box-shadow:0 30px 70px -26px rgba(5,10,25,.6),0 0 0 1px var(--bezel-edge)}
+.screen{position:relative;border-radius:36px;overflow:hidden;background:var(--bg);color:var(--ink-1);
+        height:768px;display:flex;flex-direction:column}
+/* [v2] grain + hero glow */
+.screen::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+.scr-body{flex:1;overflow:hidden;padding:0 15px 8px;display:flex;flex-direction:column;gap:11px}
+
+/* ---------- app furniture ---------- */
+.topbar{padding:16px 16px 11px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.eyebrow{font:800 10.5px var(--f-ui);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.title{font:800 31px/1 var(--f-num);letter-spacing:.004em;text-transform:uppercase;margin-top:4px}
+.title.mixed{text-transform:none;font-family:var(--f-ui);font-size:23px;letter-spacing:-.02em}
+.tb-r{display:flex;gap:8px;align-items:center}
+.iconbtn{width:37px;height:37px;border-radius:12px;background:var(--surface-1);border:1px solid var(--card-border);
+         box-shadow:var(--card-lift);display:grid;place-items:center;color:var(--ink-2)}
+.iconbtn .ic{width:18px;height:18px}
+.av{width:37px;height:37px;border-radius:50%;display:grid;place-items:center;color:#fff;
+    font:800 14px var(--f-ui);flex:none}
+.av.s{background:var(--m-stelios)} .av.t{background:var(--m-thanos)} .av.d{background:var(--m-dennis)}
+.av.sm{width:27px;height:27px;font-size:11px}
+
+.card{background:var(--surface-1);border:1px solid var(--card-border);border-radius:19px;
+      padding:14px;box-shadow:var(--shadow-1),var(--card-lift)}
+.card.flush{padding:0;overflow:hidden}
+.sub{font:800 13.5px var(--f-ui);letter-spacing:-.01em}
+.mut{color:var(--ink-3);font:700 11.5px var(--f-ui)}
+.mut2{color:var(--ink-2);font:600 12px/1.5 var(--f-ui)}
+
+/* [v2] ONE accent surface per screen - the inversion */
+.hero{position:relative;border-radius:22px;padding:16px;overflow:hidden;
+      background:var(--accent-surface);color:#F3F6FB;box-shadow:var(--shadow-2)}
+.hero::before{content:"";position:absolute;width:260px;height:190px;right:-70px;top:-80px;border-radius:50%;
+      background:radial-gradient(circle,var(--accent-glow),transparent 70%);opacity:.5;pointer-events:none}
+.hero .eyebrow{color:rgba(243,246,251,.62)}
+.hero-title{font:900 46px/.92 var(--f-num);text-transform:uppercase;letter-spacing:.008em;
+      margin:7px 0 3px;color:var(--accent-on)}
+.hero-sub{color:rgba(243,246,251,.74);font:700 12.5px var(--f-ui);display:flex;align-items:center;gap:6px}
+.btn-volt{margin-top:13px;width:100%;border:0;border-radius:13px;background:var(--accent);color:var(--accent-ink);
+      font:800 15px var(--f-ui);padding:12px;display:flex;align-items:center;justify-content:center;gap:8px;
+      box-shadow:0 10px 24px -10px var(--accent-glow)}
+.btn-volt .ic{width:17px;height:17px;stroke-width:2.2}
+.btn-ghost{width:100%;border:1px solid var(--hairline-strong);border-radius:13px;background:transparent;
+      color:var(--ink-1);font:800 14px var(--f-ui);padding:11px;display:flex;align-items:center;
+      justify-content:center;gap:8px}
+.btn-ghost .ic{width:16px;height:16px}
+
+/* [v2] accent as TEXT - works in both themes now */
+.acc-t{color:var(--accent-text);font-weight:800}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 9px;
+      font:800 11px var(--f-ui);background:var(--surface-2);color:var(--ink-2)}
+.pill.acc{background:var(--accent-soft);color:var(--accent-text)}
+.pill .ic{width:12px;height:12px;stroke-width:2.2}
+
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.tile{background:var(--surface-1);border:1px solid var(--card-border);border-radius:16px;padding:11px 10px;
+      box-shadow:var(--card-lift)}
+.tile .n{font:800 27px/1 var(--f-num);letter-spacing:.01em}
+.tile .n s{text-decoration:none;font-size:13px;color:var(--ink-3);margin-left:1px}
+.tile .l{margin-top:4px;font:700 10.5px var(--f-ui);color:var(--ink-3)}
+.tile.empty .n{color:var(--ink-ph)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+/* ---------- tab bar (6 tabs, Train demoted but volt-marked) ---------- */
+.tabbar{display:grid;grid-template-columns:repeat(6,1fr);background:var(--tabbar);
+        border-top:1px solid var(--hairline);padding:7px 4px 13px;backdrop-filter:blur(22px) saturate(1.5)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-3);
+     font:700 9.5px var(--f-ui);position:relative}
+.tab .ic{width:21px;height:21px}
+.tab.on{color:var(--ink-1)}
+.tab.train .ic{color:var(--accent-text)}
+.tab .dot{position:absolute;top:-1px;right:50%;margin-right:-15px;width:8px;height:8px;border-radius:50%;
+     background:var(--m-thanos);border:2px solid var(--tabbar)}
+
+/* ---------- first-run ---------- */
+.step{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--hairline)}
+.step:last-child{border-bottom:0}
+.step-n{width:24px;height:24px;border-radius:50%;flex:none;display:grid;place-items:center;
+        font:800 11px var(--f-ui);border:1.5px solid var(--hairline-strong);color:var(--ink-3)}
+.step.done .step-n{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.step.now .step-n{border-color:var(--accent-text);color:var(--accent-text);border-width:2px}
+.step b{font:800 13.5px var(--f-ui);display:block}
+.step p{font:600 11.5px/1.45 var(--f-ui);color:var(--ink-3);margin-top:2px}
+.emptybox{border:1.5px dashed var(--hairline-strong);border-radius:16px;padding:18px 14px;text-align:center;
+          background:transparent}
+.emptybox .ic{width:24px;height:24px;color:var(--ink-ph);stroke-width:1.5}
+.emptybox b{display:block;font:800 13px var(--f-ui);margin-top:7px}
+.emptybox p{font:600 11.5px/1.45 var(--f-ui);color:var(--ink-3);margin-top:3px}
+.ghostline{height:5px;border-radius:3px;background:var(--surface-3);opacity:.7}
+
+/* ---------- charts ---------- */
+.chartwrap{position:relative;margin-top:9px}
+.chartwrap svg{display:block;width:100%;height:auto;overflow:visible}
+.ann{font:800 9px var(--f-ui);fill:var(--ink-3)}
+.ann.goal{fill:var(--accent-text)}
+
+/* ---------- diverging head-to-head ---------- */
+.dv{padding:9px 0;border-bottom:1px solid var(--hairline)}
+.dv:last-child{border-bottom:0}
+.dv-top{display:flex;justify-content:space-between;align-items:baseline;font:800 12px var(--f-ui);margin-bottom:5px}
+.dv-top .lab{color:var(--ink-3);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase}
+.dv-bar{position:relative;height:13px;border-radius:7px;background:var(--surface-2);overflow:hidden}
+.dv-bar i{position:absolute;top:0;bottom:0;display:block;border-radius:7px}
+.dv-bar .mid{position:absolute;left:50%;top:-3px;bottom:-3px;width:1.5px;background:var(--hairline-strong);
+             transform:translateX(-50%);border-radius:1px;z-index:2}
+.dv-s{background:var(--m-stelios)} .dv-t{background:var(--m-thanos)}
+.dv-win{font-size:10.5px;color:var(--ink-3);font-weight:700}
+
+.meal{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--hairline)}
+.meal:last-child{border-bottom:0}
+.tick{width:21px;height:21px;border-radius:7px;border:1.5px solid var(--hairline-strong);flex:none;
+      display:grid;place-items:center;color:transparent}
+.meal.next .tick{border-color:var(--accent-text);border-width:2px}
+.meal.on .tick{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.meal .tick .ic{width:13px;height:13px;stroke-width:2.6}
+.meal b{font:800 12.5px var(--f-ui)}
+.meal p{font:600 11px/1.4 var(--f-ui);color:var(--ink-3);margin-top:2px}
+.kcal{font:800 12px var(--f-num);color:var(--ink-2);white-space:nowrap}
+.ring{--p:0;width:52px;height:52px;border-radius:50%;flex:none;display:grid;place-items:center;
+      background:conic-gradient(var(--accent-text) calc(var(--p)*1%),var(--surface-3) 0)}
+.ring i{width:42px;height:42px;border-radius:50%;background:var(--surface-1);display:grid;place-items:center;
+      font:800 9px var(--f-ui);color:var(--ink-2);font-style:normal}
+.legend{display:flex;gap:11px;font:700 10px var(--f-ui);color:var(--ink-3)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:9px;height:3px;border-radius:2px;display:block}
+
+.note{max-width:2110px;margin:52px auto 0;padding:22px 24px;background:var(--page-2);border-radius:18px;
+      font:600 13.5px/1.6 var(--f-ui);color:var(--page-ink-2)}
+.note b{color:var(--page-ink)}
+.note ul{margin-top:10px;display:grid;gap:7px}
+.note li{padding-left:16px;position:relative}
+.note li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:#D4FF3F}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.2 12 4l8 6.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-5.5H9v5.5H5.5A1.5 1.5 0 0 1 4 19z"/></symbol>
+<symbol id="i-train" viewBox="0 0 24 24"><rect x="5.2" y="6.5" width="3.3" height="11" rx="1.3"/><rect x="15.5" y="6.5" width="3.3" height="11" rx="1.3"/><path d="M2.5 9.5v5M21.5 9.5v5M8.5 12h7"/></symbol>
+<symbol id="i-body" viewBox="0 0 24 24"><rect x="3.8" y="3.8" width="16.4" height="16.4" rx="4.5"/><path d="M8.2 10.4a5 5 0 0 1 7.6 0"/><path d="M12 10.8l1.6-2.1"/></symbol>
+<symbol id="i-fuel" viewBox="0 0 24 24"><path d="M6.5 3.5v6.2a2 2 0 0 0 4 0V3.5M8.5 3.5v17"/><path d="M17.5 20.5v-17c-2.2 1.3-3.3 3.8-3.3 7v3.3h3.3"/></symbol>
+<symbol id="i-squad" viewBox="0 0 24 24"><circle cx="9" cy="8.2" r="3.4"/><path d="M3 19.5c.6-3.4 3-5.4 6-5.4s5.4 2 6 5.4"/><path d="M15.5 5a3.3 3.3 0 0 1 0 6.3M17.4 14.4c2 .6 3.2 2.3 3.6 5.1"/></symbol>
+<symbol id="i-msg" viewBox="0 0 24 24"><path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 17h-8.2L6.5 20.3V17H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 5z"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.5-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2z" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.3 4.3L19 7.2"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.8h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><path d="M4 18.5h16M6.5 18.5V11M12 18.5V6M17.5 18.5v-9"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.6"/><path d="M12 12h.1" stroke-width="3"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.8v2M12 19.2v2M2.8 12h2M19.2 12h2M5.5 5.5l1.4 1.4M17.1 17.1l1.4 1.4M5.5 18.5l1.4-1.4M17.1 6.9l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.2A7.8 7.8 0 0 1 9.8 4.5a7.8 7.8 0 1 0 9.7 9.7z"/></symbol>
+<symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21a6.5 6.5 0 0 0 6.5-6.5c0-4.3-3.2-6.4-4.4-10.5-1.7 1.9-3.1 3.8-3.1 6.4-1.1-.5-1.9-1.6-2.1-3-1.7 1.7-3.4 4.2-3.4 7.1A6.5 6.5 0 0 0 12 21z"/></symbol>
+<symbol id="i-cam" viewBox="0 0 24 24"><path d="M3.5 8.5A2 2 0 0 1 5.5 6.5h2L9 4.5h6l1.5 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.4"/></symbol>
+</defs></svg>
+
+<header class="page-head">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 30 30"><path d="M6 21.5 12 9l4.2 8.4L19 12l5 9.5" fill="none" stroke="#D4FF3F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div>
+      <p class="dir"><i></i>Refinement · Night Session v2</p>
+      <h1>Eimaste Cool Training</h1>
+      <p>Same bones as Night Session. Four changes: the light theme keeps the brand accent instead of falling back to ink, first-run gets designed instead of inheriting full-data layouts, the accent is rationed to one moment per screen, and the charts carry their weight. <b>Toggle the theme</b> &mdash; light is where the difference lives.</p>
+    </div>
+  </div>
+  <div class="head-r">
+    <div class="key" aria-label="Color key">
+      <span><i style="background:var(--m-stelios)"></i>Stelios</span>
+      <span><i style="background:var(--m-thanos)"></i>Thanos</span>
+      <span><i style="background:var(--m-dennis)"></i>Dennis (coach)</span>
+      <span><i class="acc"></i>Volt accent</span>
+    </div>
+    <div class="theme-switch" role="group" aria-label="Theme">
+      <button type="button" data-set-theme="light" aria-pressed="false"><svg class="ic"><use href="#i-sun"/></svg>Light</button>
+      <button type="button" data-set-theme="dark" aria-pressed="false"><svg class="ic"><use href="#i-moon"/></svg>Dark</button>
+    </div>
+  </div>
+</header>
+
+<main class="frames">
+
+<!-- ============================ 1. DAY ONE ============================ -->
+<section class="shot">
+  <div class="cap"><span class="cap-k">01</span><b>Day one</b><span class="tagv2">new</span><span>&mdash; a clean install</span></div>
+  <div class="phone"><div class="screen">
+    <div class="topbar">
+      <div><p class="eyebrow">Wed 23 Sep</p><h1 class="title mixed">Good morning, Stelios</h1></div>
+      <div class="tb-r"><span class="av s">S</span></div>
+    </div>
+    <div class="scr-body">
+
+      <div class="hero">
+        <p class="eyebrow">Getting started</p>
+        <h2 class="hero-title">1 of 3</h2>
+        <p class="hero-sub">Three things and you are training</p>
+        <button class="btn-volt"><svg class="ic"><use href="#i-scale"/></svg>Log your first weigh-in</button>
+      </div>
+
+      <div class="card">
+        <ul>
+          <li class="step done"><span class="step-n"><svg class="ic" style="width:12px;height:12px;stroke-width:2.6"><use href="#i-check"/></svg></span>
+            <div><b>Join the squad</b><p>Dennis added you on Monday.</p></div></li>
+          <li class="step now"><span class="step-n">2</span>
+            <div><b>Log your weight</b><p>One number today. The trend line needs a starting point.</p></div></li>
+          <li class="step"><span class="step-n">3</span>
+            <div><b>Start Week 1 · Upper</b><p>Five exercises, about 50 minutes.</p></div></li>
+        </ul>
+      </div>
+
+      <div class="tiles">
+        <div class="tile empty"><p class="n">&ndash;</p><p class="l">Week streak</p></div>
+        <div class="tile empty"><p class="n">&ndash;</p><p class="l">On schedule</p></div>
+        <div class="tile empty"><p class="n">&ndash;</p><p class="l">PRs in Sep</p></div>
+      </div>
+
+      <div class="emptybox">
+        <svg class="ic"><use href="#i-scale"/></svg>
+        <b>No weigh-ins yet</b>
+        <p>Your trend line and goal ETA appear after the second one.</p>
+      </div>
+
+      <div class="card">
+        <div class="row"><p class="sub">Squad</p><span class="mut">3 members</span></div>
+        <div style="display:flex;gap:9px;margin-top:11px;align-items:center">
+          <span class="av sm d">D</span><span class="av sm s">S</span><span class="av sm t">T</span>
+          <p class="mut2" style="margin-left:2px">Nobody has trained yet.<br>Coach Dennis competes too.</p>
+        </div>
+      </div>
+
+    </div>
+    <nav class="tabbar">
+      <span class="tab on"><svg class="ic"><use href="#i-home"/></svg>Home</span>
+      <span class="tab"><svg class="ic"><use href="#i-body"/></svg>Body</span>
+      <span class="tab train"><svg class="ic"><use href="#i-train"/></svg>Train</span>
+      <span class="tab"><svg class="ic"><use href="#i-fuel"/></svg>Fuel</span>
+      <span class="tab"><svg class="ic"><use href="#i-squad"/></svg>Squad</span>
+      <span class="tab"><svg class="ic"><use href="#i-msg"/></svg>Chat</span>
+    </nav>
+  </div></div>
+</section>
+
+<!-- ============================ 2. HOME ============================ -->
+<section class="shot">
+  <div class="cap"><span class="cap-k">02</span><b>Home</b><span>&mdash; one volt moment, one hero</span></div>
+  <div class="phone"><div class="screen">
+    <div class="topbar">
+      <div><p class="eyebrow">Wed 23 Sep · Week 3 of 12</p><h1 class="title mixed">Good evening, Stelios</h1></div>
+      <div class="tb-r"><span class="iconbtn"><svg class="ic"><use href="#i-bell"/></svg></span><span class="av s">S</span></div>
+    </div>
+    <div class="scr-body">
+
+      <div class="hero">
+        <p class="eyebrow">Today · Rest day</p>
+        <h2 class="hero-title">Rest</h2>
+        <p class="hero-sub">Next up · Pull, tomorrow</p>
+        <button class="btn-volt"><svg class="ic"><use href="#i-play"/></svg>Train anyway</button>
+      </div>
+
+      <div class="tiles">
+        <div class="tile"><p class="n">2<s>wk</s></p><p class="l">Week streak</p></div>
+        <div class="tile"><p class="n">100<s>%</s></p><p class="l">On schedule</p></div>
+        <div class="tile"><p class="n">13</p><p class="l">PRs in Sep</p></div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <p class="mut">Weight</p>
+          <p style="font:800 25px/1 var(--f-num);margin:5px 0 2px">83.1<s style="font-size:12px;color:var(--ink-3);text-decoration:none"> kg</s></p>
+          <p class="pill" style="margin-bottom:7px">↓ 1.1 kg</p>
+          <svg viewBox="0 0 120 34" style="width:100%;height:34px;overflow:visible">
+            <defs><linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stop-color="var(--m-stelios)" stop-opacity=".28"/>
+              <stop offset="1" stop-color="var(--m-stelios)" stop-opacity="0"/></linearGradient></defs>
+            <path d="M2 7 L26 11 L50 14 L74 19 L98 24 L118 27 L118 34 L2 34 Z" fill="url(#g1)"/>
+            <path d="M2 7 L26 11 L50 14 L74 19 L98 24 L118 27" fill="none" stroke="var(--m-stelios)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="118" cy="27" r="6" fill="var(--m-stelios)" opacity=".2"/>
+            <circle cx="118" cy="27" r="2.8" fill="var(--m-stelios)"/>
+          </svg>
+        </div>
+        <div class="card">
+          <p class="mut">Fuel today</p>
+          <div style="display:flex;align-items:center;gap:9px;margin-top:8px">
+            <span class="ring" style="--p:20"><i>1/5</i></span>
+            <div><p style="font:800 19px/1 var(--f-num)">480</p><p class="mut" style="margin-top:2px">of 2,400 kcal</p></div>
+          </div>
+          <p class="mut2" style="margin-top:9px">Snack at 11:00 is next.</p>
+        </div>
+      </div>
+
+      <div class="card flush">
+        <div class="row" style="padding:12px 13px 9px"><p class="sub">League · this week</p><span class="mut">All 3 compete <svg class="ic" style="width:12px;height:12px;vertical-align:-1px"><use href="#i-chev-r"/></svg></span></div>
+        <div style="padding:0 13px 12px;display:grid;gap:9px">
+          <div class="row"><span style="display:flex;align-items:center;gap:8px"><span class="mut">1</span><span class="av sm t">T</span><b style="font:800 12.5px var(--f-ui)">Thanos</b></span>
+            <span class="mut">2/5 · <b style="color:var(--ink-1)">55</b> pts</span></div>
+          <div class="row"><span style="display:flex;align-items:center;gap:8px"><span class="mut">2</span><span class="av sm d">D</span><b style="font:800 12.5px var(--f-ui)">Dennis <span class="mut">coach</span></b></span>
+            <span class="mut">3/5 · <b style="color:var(--ink-1)">47</b> pts</span></div>
+          <div class="row"><span style="display:flex;align-items:center;gap:8px"><span class="mut">3</span><span class="av sm s">S</span><b style="font:800 12.5px var(--f-ui)">You</b></span>
+            <span class="mut">2/5 · <b style="color:var(--ink-1)">41</b> pts</span></div>
+        </div>
+      </div>
+
+    </div>
+    <nav class="tabbar">
+      <span class="tab on"><svg class="ic"><use href="#i-home"/></svg>Home</span>
+      <span class="tab"><svg class="ic"><use href="#i-body"/></svg>Body</span>
+      <span class="tab train"><svg class="ic"><use href="#i-train"/></svg>Train</span>
+      <span class="tab"><svg class="ic"><use href="#i-fuel"/></svg>Fuel</span>
+      <span class="tab"><svg class="ic"><use href="#i-squad"/></svg>Squad</span>
+      <span class="tab"><svg class="ic"><use href="#i-msg"/></svg>Chat<i class="dot"></i></span>
+    </nav>
+  </div></div>
+</section>
+
+<!-- ============================ 3. BODY ============================ -->
+<section class="shot">
+  <div class="cap"><span class="cap-k">03</span><b>Body</b><span>&mdash; the chart matches the number above it</span></div>
+  <div class="phone"><div class="screen">
+    <div class="topbar">
+      <div><p class="eyebrow">Stelios · Cut phase</p><h1 class="title">Body</h1></div>
+      <div class="tb-r"><span class="pill">1M</span><span class="mut">3M</span><span class="mut">All</span></div>
+    </div>
+    <div class="scr-body">
+
+      <div class="card">
+        <p class="eyebrow">Trend weight</p>
+        <div class="row" style="align-items:flex-end;margin-top:2px">
+          <p style="font:900 58px/.88 var(--f-num);letter-spacing:.005em">83.1<s style="font-size:19px;color:var(--ink-3);text-decoration:none;font-weight:800"> kg</s></p>
+          <div style="text-align:right">
+            <p class="pill">↓ 1.1 kg</p>
+            <p style="font:800 15px var(--f-num);margin-top:5px">&minus;0.7 <s style="font-size:10px;color:var(--ink-3);text-decoration:none">kg/wk</s></p>
+          </div>
+        </div>
+        <div class="row" style="margin-top:9px">
+          <span class="mut">Last weigh-in 82.7 kg · Yesterday</span>
+          <span class="pill acc"><svg class="ic"><use href="#i-flame"/></svg>6-day streak</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row"><p class="sub">Last 30 days</p>
+          <div class="legend">
+            <span><i style="background:var(--m-stelios)"></i>Trend</span>
+            <span><i style="background:var(--accent-text)"></i>Goal</span>
+          </div>
+        </div>
+        <div class="chartwrap">
+          <svg viewBox="0 0 320 150" role="img" aria-label="Weight trending down from 84.2 to 83.1 kg, goal 79.0">
+            <defs>
+              <linearGradient id="area" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="var(--m-stelios)" stop-opacity=".30"/>
+                <stop offset="1" stop-color="var(--m-stelios)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- gridlines -->
+            <g stroke="var(--grid)" stroke-width="1">
+              <line x1="26" y1="18" x2="314" y2="18"/><line x1="26" y1="56" x2="314" y2="56"/>
+              <line x1="26" y1="94" x2="314" y2="94"/>
+            </g>
+            <g class="ann" text-anchor="end">
+              <text x="20" y="22">85</text><text x="20" y="60">82.5</text><text x="20" y="98">80</text>
+            </g>
+            <!-- goal reference -->
+            <line x1="26" y1="122" x2="314" y2="122" stroke="var(--accent-text)" stroke-width="1.6"
+                  stroke-dasharray="5 4" opacity=".85"/>
+            <text class="ann goal" x="30" y="117">GOAL 79.0 kg · ETA 5 Nov</text>
+            <!-- daily scatter -->
+            <g fill="var(--m-stelios)" opacity=".34">
+              <circle cx="40" cy="26" r="2.1"/><circle cx="58" cy="31" r="2.1"/><circle cx="76" cy="27" r="2.1"/>
+              <circle cx="94" cy="36" r="2.1"/><circle cx="112" cy="33" r="2.1"/><circle cx="130" cy="41" r="2.1"/>
+              <circle cx="148" cy="38" r="2.1"/><circle cx="166" cy="46" r="2.1"/><circle cx="184" cy="43" r="2.1"/>
+              <circle cx="202" cy="51" r="2.1"/><circle cx="220" cy="49" r="2.1"/><circle cx="238" cy="56" r="2.1"/>
+              <circle cx="256" cy="53" r="2.1"/><circle cx="274" cy="61" r="2.1"/><circle cx="292" cy="58" r="2.1"/>
+            </g>
+            <!-- trend area + line -->
+            <path d="M40 28 C 90 34, 140 42, 190 48 S 260 58, 300 62 L300 110 L40 110 Z" fill="url(#area)"/>
+            <path d="M40 28 C 90 34, 140 42, 190 48 S 260 58, 300 62" fill="none"
+                  stroke="var(--m-stelios)" stroke-width="3" stroke-linecap="round"/>
+            <!-- projection -->
+            <path d="M300 62 L314 66" fill="none" stroke="var(--m-stelios)" stroke-width="2.4"
+                  stroke-dasharray="3 3" opacity=".5" stroke-linecap="round"/>
+            <!-- today -->
+            <circle cx="300" cy="62" r="9.5" fill="var(--m-stelios)" opacity=".16"/>
+            <circle cx="300" cy="62" r="4.4" fill="var(--m-stelios)" stroke="var(--surface-1)" stroke-width="2"/>
+            <g class="ann" text-anchor="middle" fill="var(--ink-3)">
+              <text x="40" y="145">31 Aug</text><text x="130" y="145">7 Sep</text>
+              <text x="220" y="145">14 Sep</text><text x="300" y="145">21 Sep</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row"><p class="sub">Log today</p><span class="mut">Wed 23 Sep</span></div>
+        <div class="row" style="margin-top:10px;gap:8px">
+          <span class="btn-ghost" style="width:44px;padding:9px">&minus;</span>
+          <p style="font:800 25px/1 var(--f-num);flex:1;text-align:center">82.7<s style="font-size:12px;color:var(--ink-3);text-decoration:none"> kg</s></p>
+          <span class="btn-ghost" style="width:44px;padding:9px">+</span>
+          <button class="btn-volt" style="width:56px;margin:0;padding:10px"><svg class="ic"><use href="#i-check"/></svg></button>
+        </div>
+      </div>
+
+    </div>
+    <nav class="tabbar">
+      <span class="tab"><svg class="ic"><use href="#i-home"/></svg>Home</span>
+      <span class="tab on"><svg class="ic"><use href="#i-body"/></svg>Body</span>
+      <span class="tab train"><svg class="ic"><use href="#i-train"/></svg>Train</span>
+      <span class="tab"><svg class="ic"><use href="#i-fuel"/></svg>Fuel</span>
+      <span class="tab"><svg class="ic"><use href="#i-squad"/></svg>Squad</span>
+      <span class="tab"><svg class="ic"><use href="#i-msg"/></svg>Chat</span>
+    </nav>
+  </div></div>
+</section>
+
+<!-- ============================ 4. HEAD-TO-HEAD ============================ -->
+<section class="shot">
+  <div class="cap"><span class="cap-k">04</span><b>Head-to-head</b><span>&mdash; who is winning, in one glance</span></div>
+  <div class="phone"><div class="screen">
+    <div class="topbar">
+      <div><p class="eyebrow">Tale of the tape</p><h1 class="title">Head-to-head</h1></div>
+    </div>
+    <div class="scr-body">
+
+      <div class="hero" style="padding:15px">
+        <div class="row">
+          <div style="text-align:center"><span class="av t" style="margin:0 auto">T</span>
+            <p style="font:800 12px var(--f-ui);margin-top:6px;color:#F3F6FB">Thanos</p>
+            <p class="hero-sub" style="justify-content:center;font-size:11px;margin-top:1px">+0.8 kg</p></div>
+          <div style="text-align:center">
+            <p style="font:900 42px/1 var(--f-num);color:var(--accent-on)">5&ndash;3</p>
+            <p class="eyebrow" style="margin-top:2px">Thanos leads</p>
+          </div>
+          <div style="text-align:center"><span class="av s" style="margin:0 auto">S</span>
+            <p style="font:800 12px var(--f-ui);margin-top:6px;color:#F3F6FB">Stelios</p>
+            <p class="hero-sub" style="justify-content:center;font-size:11px;margin-top:1px">83.1 kg</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="margin-bottom:3px">
+          <span class="legend"><span><i style="background:var(--m-thanos)"></i>Thanos</span></span>
+          <span class="mut">margin</span>
+          <span class="legend"><span><i style="background:var(--m-stelios)"></i>Stelios</span></span>
+        </div>
+
+        <div class="dv">
+          <div class="dv-top"><span>55</span><span class="lab">League points</span><span>41</span></div>
+          <div class="dv-bar"><span class="mid"></span><i class="dv-t" style="right:50%;width:15%"></i></div>
+        </div>
+        <div class="dv">
+          <div class="dv-top"><span>10</span><span class="lab">Workouts done</span><span>12</span></div>
+          <div class="dv-bar"><span class="mid"></span><i class="dv-s" style="left:50%;width:9%"></i></div>
+        </div>
+        <div class="dv">
+          <div class="dv-top"><span>83%</span><span class="lab">On schedule</span><span>100%</span></div>
+          <div class="dv-bar"><span class="mid"></span><i class="dv-s" style="left:50%;width:17%"></i></div>
+        </div>
+        <div class="dv">
+          <div class="dv-top"><span>11.8 t</span><span class="lab">Volume this week</span><span>11.8 t</span></div>
+          <div class="dv-bar"><span class="mid"></span></div>
+          <p class="dv-win" style="text-align:center;margin-top:4px">Dead even</p>
+        </div>
+        <div class="dv">
+          <div class="dv-top"><span>18</span><span class="lab">PRs set</span><span>13</span></div>
+          <div class="dv-bar"><span class="mid"></span><i class="dv-t" style="right:50%;width:16%"></i></div>
+        </div>
+        <div class="dv">
+          <div class="dv-top"><span>+7.9%</span><span class="lab">Strength gain</span><span>+1.7%</span></div>
+          <div class="dv-bar"><span class="mid"></span><i class="dv-t" style="right:50%;width:38%"></i></div>
+        </div>
+        <div class="dv">
+          <div class="dv-top"><span>68%</span><span class="lab">Nutrition, 14 days</span><span>87%</span></div>
+          <div class="dv-bar"><span class="mid"></span><i class="dv-s" style="left:50%;width:22%"></i></div>
+        </div>
+      </div>
+
+      <div class="card" style="background:var(--accent-soft);border-color:transparent">
+        <p style="font:700 12px/1.5 var(--f-ui);color:var(--accent-text)">
+          <b>Thanos out-lifts you on legs;</b> you out-lift Thanos on pulling lifts.</p>
+      </div>
+
+    </div>
+    <nav class="tabbar">
+      <span class="tab"><svg class="ic"><use href="#i-home"/></svg>Home</span>
+      <span class="tab"><svg class="ic"><use href="#i-body"/></svg>Body</span>
+      <span class="tab train"><svg class="ic"><use href="#i-train"/></svg>Train</span>
+      <span class="tab"><svg class="ic"><use href="#i-fuel"/></svg>Fuel</span>
+      <span class="tab on"><svg class="ic"><use href="#i-squad"/></svg>Squad</span>
+      <span class="tab"><svg class="ic"><use href="#i-msg"/></svg>Chat</span>
+    </nav>
+  </div></div>
+</section>
+
+<!-- ============================ 5. FUEL ============================ -->
+<section class="shot">
+  <div class="cap"><span class="cap-k">05</span><b>Fuel</b><span>&mdash; tonal tints instead of highlighter</span></div>
+  <div class="phone"><div class="screen">
+    <div class="topbar">
+      <div><p class="eyebrow">Wed 23 Sep</p><h1 class="title">Fuel</h1></div>
+      <div class="tb-r"><span class="av s">S</span></div>
+    </div>
+    <div class="scr-body">
+
+      <div class="card">
+        <div class="row">
+          <div style="display:flex;gap:10px;align-items:center">
+            <span class="av sm d">D</span>
+            <div><p class="sub">Cut phase · v2</p><p class="mut">From Coach Dennis · 3 wk ago</p></div>
+          </div>
+          <span class="pill acc"><svg class="ic"><use href="#i-check"/></svg>Active</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row"><p class="eyebrow">Today</p><span class="mut">1 of 5 meals</span></div>
+        <div style="display:flex;gap:13px;align-items:center;margin-top:11px">
+          <span class="ring" style="--p:20;width:64px;height:64px"><i style="width:52px;height:52px;font-size:10px">20%</i></span>
+          <div style="flex:1;display:grid;gap:7px">
+            <div><div class="row"><span class="mut">Protein</span><span class="kcal">42 / 180 g</span></div><div class="ghostline" style="margin-top:3px;background:linear-gradient(90deg,var(--ink-2) 23%,var(--surface-3) 23%)"></div></div>
+            <div><div class="row"><span class="mut">Carbs</span><span class="kcal">55 / 250 g</span></div><div class="ghostline" style="margin-top:3px;background:linear-gradient(90deg,var(--ink-2) 22%,var(--surface-3) 22%)"></div></div>
+            <div><div class="row"><span class="mut">Fat</span><span class="kcal">18 / 70 g</span></div><div class="ghostline" style="margin-top:3px;background:linear-gradient(90deg,var(--ink-2) 26%,var(--surface-3) 26%)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="margin-bottom:3px"><p class="sub">Today's meals</p><span class="mut">1/5</span></div>
+        <div class="meal on">
+          <span class="tick"><svg class="ic"><use href="#i-check"/></svg></span>
+          <div style="flex:1"><b>Post-workout breakfast</b>
+            <p>Greek yogurt 2% (300 g), Oats (50 g), Honey…</p></div>
+          <span class="kcal">480</span>
+        </div>
+        <div class="meal next">
+          <span class="tick"><svg class="ic"><use href="#i-check"/></svg></span>
+          <div style="flex:1"><b>Snack <span class="acc-t" style="font-size:10px;letter-spacing:.06em">· NEXT</span></b><p>Whey shake (30 g) with water, Apple, Almonds…</p></div>
+          <span class="kcal">290</span>
+        </div>
+        <div class="meal">
+          <span class="tick"><svg class="ic"><use href="#i-check"/></svg></span>
+          <div style="flex:1"><b>Lunch <span class="mut">14:30</span></b><p>Chicken souvlaki (200 g), Rice (80 g)…</p></div>
+          <span class="kcal">690</span>
+        </div>
+        <div class="meal">
+          <span class="tick"><svg class="ic"><use href="#i-check"/></svg></span>
+          <div style="flex:1"><b>Dinner <span class="mut">21:00</span></b><p>Salmon (180 g), Potatoes, Salad…</p></div>
+          <span class="kcal">640</span>
+        </div>
+      </div>
+
+    </div>
+    <nav class="tabbar">
+      <span class="tab"><svg class="ic"><use href="#i-home"/></svg>Home</span>
+      <span class="tab"><svg class="ic"><use href="#i-body"/></svg>Body</span>
+      <span class="tab train"><svg class="ic"><use href="#i-train"/></svg>Train</span>
+      <span class="tab on"><svg class="ic"><use href="#i-fuel"/></svg>Fuel</span>
+      <span class="tab"><svg class="ic"><use href="#i-squad"/></svg>Squad</span>
+      <span class="tab"><svg class="ic"><use href="#i-msg"/></svg>Chat</span>
+    </nav>
+  </div></div>
+</section>
+
+<!-- ============================ 6. CHAT ============================ -->
+<section class="shot">
+  <div class="cap"><span class="cap-k">06</span><b>Chat</b><span class="tagv2">new</span><span>&mdash; the merged stream, for reference</span></div>
+  <div class="phone"><div class="screen">
+    <div class="topbar">
+      <div><p class="eyebrow">3 members · Week 3</p><h1 class="title">Squad chat</h1></div>
+      <div class="tb-r"><span class="iconbtn"><svg class="ic"><use href="#i-cam"/></svg></span></div>
+    </div>
+    <div class="scr-body">
+
+      <p class="eyebrow" style="text-align:center;padding:2px 0">Today</p>
+
+      <div class="card" style="padding:11px 12px">
+        <div style="display:flex;gap:9px;align-items:flex-start">
+          <span class="av sm t">T</span>
+          <div style="flex:1"><div class="row"><b style="font:800 12.5px var(--f-ui)">Thanos</b><span class="mut">08:12</span></div>
+            <p class="mut2" style="margin-top:3px">Leg day done ☠️ who is coming tonight</p></div>
+        </div>
+      </div>
+
+      <!-- auto activity item, visually distinct from chat -->
+      <div class="card" style="padding:11px 12px;background:var(--surface-2);box-shadow:none">
+        <div style="display:flex;gap:9px;align-items:flex-start">
+          <span class="av sm t">T</span>
+          <div style="flex:1">
+            <p style="font:700 12px/1.45 var(--f-ui);color:var(--ink-2)"><b style="color:var(--ink-1)">Thanos</b> finished <b style="color:var(--ink-1)">Week 3 · Legs</b></p>
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+              <span class="pill">11.8 t volume</span><span class="pill acc">2 PRs</span>
+            </div>
+          </div>
+          <span class="mut">08:10</span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:11px 12px">
+        <div style="display:flex;gap:9px;align-items:flex-start">
+          <span class="av sm d">D</span>
+          <div style="flex:1"><div class="row"><b style="font:800 12.5px var(--f-ui)">Dennis <span class="mut">coach</span></b><span class="mut">09:40</span></div>
+            <p class="mut2" style="margin-top:3px">Two perfect weeks, Stelio. Keep protein at 180 g on rest days too.</p>
+            <div style="margin-top:8px;border-radius:12px;height:104px;border:1px solid var(--card-border);
+                        background:linear-gradient(135deg,var(--surface-3),var(--surface-2));display:grid;place-items:center">
+              <svg class="ic" style="width:26px;height:26px;color:var(--ink-ph)"><use href="#i-cam"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:11px 12px">
+        <div style="display:flex;gap:9px;align-items:flex-start">
+          <span class="av sm s">S</span>
+          <div style="flex:1"><div class="row"><b style="font:800 12.5px var(--f-ui)">You</b><span class="mut">09:44</span></div>
+            <p class="mut2" style="margin-top:3px">On it 💪</p></div>
+        </div>
+      </div>
+
+      <div style="margin-top:auto;padding-bottom:4px">
+        <div class="card" style="padding:7px 8px;display:flex;align-items:center;gap:8px;border-radius:15px">
+          <svg class="ic" style="width:19px;height:19px;color:var(--ink-3)"><use href="#i-cam"/></svg>
+          <span class="mut" style="flex:1">Message the squad…</span>
+          <span style="width:31px;height:31px;border-radius:10px;background:var(--accent);color:var(--accent-ink);
+                display:grid;place-items:center"><svg class="ic" style="width:15px;height:15px;stroke-width:2.4"><use href="#i-chev-r"/></svg></span>
+        </div>
+      </div>
+
+    </div>
+    <nav class="tabbar">
+      <span class="tab"><svg class="ic"><use href="#i-home"/></svg>Home</span>
+      <span class="tab"><svg class="ic"><use href="#i-body"/></svg>Body</span>
+      <span class="tab train"><svg class="ic"><use href="#i-train"/></svg>Train</span>
+      <span class="tab"><svg class="ic"><use href="#i-fuel"/></svg>Fuel</span>
+      <span class="tab"><svg class="ic"><use href="#i-squad"/></svg>Squad</span>
+      <span class="tab on"><svg class="ic"><use href="#i-msg"/></svg>Chat</span>
+    </nav>
+  </div></div>
+</section>
+
+</main>
+
+<div class="note">
+  <b>What changed, and why.</b>
+  <ul>
+    <li><b>Light theme keeps the brand.</b> v1 documents that volt on white is 1.1:1, so every accent <em>text</em> token fell back to ink-black and light mode lost its accent. v2 adds <code>--accent-text</code> (<b>#4D6B00</b>, 6.1:1 on white) for text and strokes, and inverts accent <em>surfaces</em> to ink carrying volt &mdash; the trick the v1 REST card already used.</li>
+    <li><b>Cards read as cards.</b> <code>--bg</code> goes #F3F5F8 &rarr; <b>#EDF0F5</b>, the card border from 4.5% to 9%, and light gains the lit top edge (<code>--card-lift</code>) that dark already had.</li>
+    <li><b>One volt moment per screen.</b> Volt is now reserved for the single primary action. Streaks, tags and active states use the tonal <code>--accent-soft</code> plus <code>--accent-text</code>.</li>
+    <li><b>Day one is designed.</b> Once demo data stops shipping, the empty app is the first impression: a 1-of-3 hero, dashed empty boxes that say what will appear, and stat tiles that hold their shape.</li>
+    <li><b>The weight chart carries its weight.</b> Gradient area, 3px trend, faded daily scatter, an annotated goal reference with ETA, a dashed projection and a haloed today marker.</li>
+    <li><b>Head-to-head diverges from a centre line.</b> Seven paired bars became one axis: left is Thanos, right is you, bar length is the margin. Ties read as empty.</li>
+    <li><b>Grain and hero glow.</b> A 3.5&ndash;5% noise overlay and a radial accent glow behind each hero.</li>
+  </ul>
+</div>
+
+<script>
+(function(){
+  var r=document.documentElement, mq=window.matchMedia('(prefers-color-scheme: dark)');
+  var btns=[].slice.call(document.querySelectorAll('[data-set-theme]'));
+  function sync(){var cur=r.getAttribute('data-theme')||(mq.matches?'dark':'light');
+    btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.setTheme===cur));});}
+  btns.forEach(function(b){b.addEventListener('click',function(){r.setAttribute('data-theme',b.dataset.setTheme);sync();});});
+  mq.addEventListener&&mq.addEventListener('change',sync); sync();
+})();
+</script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { setLang } from '../i18n'
+
 import { NumberField, Stepper, canonicalDecimal, decimalsOf, displayDecimal, matchesAccept, parseDecimal, sanitizeDecimalDraft } from './fields'
 
 afterEach(cleanup)
@@ -47,11 +47,10 @@ describe('decimal helpers', () => {
     expect(canonicalDecimal(',5')).toBe('0.5')
   })
 
-  it('displayDecimal uses the Greek comma on screen', () => {
-    expect(displayDecimal('67.5', 'el')).toBe('67,5')
-    expect(displayDecimal('67.5', 'en')).toBe('67.5')
-    expect(displayDecimal(3.5, 'el')).toBe('3,5')
-    expect(displayDecimal(null, 'el')).toBe('')
+  it('displayDecimal writes decimals with a point', () => {
+    expect(displayDecimal('67.5')).toBe('67.5')
+    expect(displayDecimal(3.5)).toBe('3.5')
+    expect(displayDecimal(null)).toBe('')
   })
 
   it('decimalsOf reads the step precision', () => {
@@ -130,20 +129,13 @@ describe('NumberField', () => {
     expect(input.getAttribute('aria-invalid')).toBeNull()
   })
 
-  it('shows a prefilled decimal with the Greek comma and still reports a dot', () => {
-    setLang('el')
-    try {
-      const onValue = vi.fn()
-      render(<ControlledNumber onValue={onValue} initial="3.5" />)
-      const input = screen.getByLabelText('Weight') as HTMLInputElement
-      expect(input.value).toBe('3,5')
-      fireEvent.change(input, { target: { value: '3,8' } })
-      expect(onValue).toHaveBeenLastCalledWith('3.8')
-      fireEvent.blur(input)
-      expect(input.value).toBe('3,8')
-    } finally {
-      setLang('en')
-    }
+  it('shows a prefilled decimal with a point and accepts a typed comma', () => {
+    const onValue = vi.fn()
+    render(<ControlledNumber onValue={onValue} initial="3.5" />)
+    const input = screen.getByLabelText('Weight') as HTMLInputElement
+    expect(input.value).toBe('3.5')
+    fireEvent.change(input, { target: { value: '3,8' } })
+    expect(onValue).toHaveBeenLastCalledWith('3.8')
   })
 
   it('uses a numeric keyboard and refuses a separator when decimals is 0', () => {

@@ -1,7 +1,7 @@
 /** Short prescription text for the spec strip and captions. Program content stays as written (English). */
 import { parseNum } from '../../../lib/units'
 import { fmtNum } from '../../../lib/format'
-import { getLang, localeOf } from '../../../i18n'
+import { LOCALE } from '../../../i18n'
 
 /** "8-10" -> "8–10" (en dash between numbers). */
 export const fmtRange = (s: string): string => s.trim().replace(/(\d)\s*-\s*(\d)/g, '$1–$2')
@@ -39,10 +39,10 @@ export const swapCount = (e: { s1?: string; s2?: string }): number => (e.s1 ? 1 
 
 /** Clock time in the current locale: "07:40". */
 export const fmtTime = (ms: number): string =>
-  new Intl.DateTimeFormat(localeOf(getLang()), { hour: '2-digit', minute: '2-digit' }).format(ms)
+  new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit' }).format(ms)
 
-/** Separator between sets in "55 × 10, 55 × 9". Greek writes decimals with a comma, so it uses a middle dot. */
-export const setSeparator = (): string => (getLang() === 'el' ? ' · ' : ', ')
+/** Separator between sets in "55 × 10, 55 × 9". */
+export const setSeparator = (): string => ', '
 
 /** A duration split for compact stat tiles ("48′", "1h 10′"): whole minutes, at least one. */
 export function durationParts(ms: number): { h: number; m: number } {

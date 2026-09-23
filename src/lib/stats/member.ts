@@ -1,4 +1,4 @@
-import type { Cheer, MealPlan, Member, NutritionCheckin, Program, WeightEntry, WorkoutLog } from '../../data/types'
+import type { Cheer, MealPlan, Member, NutritionCheckin, Post, Program, WeightEntry, WorkoutLog } from '../../data/types'
 import type { ISODate } from '../dates'
 import { addDays, isoFromMs, startOfWeek } from '../dates'
 import { totalWorkouts } from '../../data/programs'
@@ -16,6 +16,7 @@ export interface SquadData {
   mealPlans: Record<string, MealPlan>
   checkins: Record<string, NutritionCheckin>
   cheers: Record<string, Cheer>
+  posts: Record<string, Post>
 }
 
 export const logsOf = (d: SquadData, memberId: string, programId?: string): WorkoutLog[] =>

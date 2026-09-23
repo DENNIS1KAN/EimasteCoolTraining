@@ -28,6 +28,7 @@ function squad(s: Snapshot): SquadData {
     programs: { [BTS_PROGRAM.id]: BTS_PROGRAM, ...byId(s.programs) },
     logs: byId(s.logs),
     weights: byId(s.weights),
+    posts: byId(s.posts),
     mealPlans: byId(s.mealPlans),
     checkins: byId(s.checkins),
     cheers: byId(s.cheers),
@@ -48,7 +49,6 @@ function timestamps(s: Snapshot): [string, number][] {
   }
   for (const m of s.members) {
     add(`member ${m.id} updatedAt`, m.updatedAt)
-    add(`member ${m.id} coachNoteAt`, m.coachNoteAt)
   }
   for (const l of s.logs) {
     add(`log ${l.id} startedAt`, l.startedAt)

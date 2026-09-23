@@ -1,19 +1,19 @@
 /*
  * Design tokens: the ONLY place raw colors live. Everything else uses these names.
- * Direction: "Night Session" (design/mockups/night-session/SPEC.md).
+ * Direction: "Night Session" v2 (design/mockups/night-session-v2/SPEC.md).
  * Light = "daylight gym", dark = "night session" (primary). `.night` forces the dark island in both themes.
  */
 :root {
   color-scheme: light;
 
   /* ---------------------------------------------------------------- page + surfaces */
-  --bg: #f3f5f8;
+  --bg: #edf0f5;
   --bg-glow: rgba(42, 120, 214, 0); /* top-right radial glow; the shell tints it with the viewer's color */
   --surface: #ffffff; /* cards, tiles, sheets */
   --surface-2: #f0f2f6; /* inputs, chips, segmented track, spec strip */
   --surface-3: #e4e8ee; /* progress tracks, pressed, leader pill */
   --seg-on: #ffffff; /* selected segment */
-  --card-border: rgba(16, 24, 40, 0.045);
+  --card-border: rgba(16, 24, 40, 0.09);
   --tabbar: rgba(255, 255, 255, 0.93); /* tab bar / sidebar, with backdrop blur */
   --tabbar-solid: #ffffff; /* opaque twin of --tabbar: the notch ring around the raised Train button */
   /* Installed iPhone app: band behind the (always white) status-bar clock, so it stays readable in light mode. */
@@ -34,11 +34,15 @@
   /* ---------------------------------------------------------------- accent: volt (one accent only) */
   --accent: #d4ff3f; /* fills only: primary button, current week, active tab pill, done checks, PR badge */
   --on-accent: #0b1020; /* text and icons on volt */
-  --accent-strong: #0b1020; /* volt as a stroke/text on a surface (ink-black in light: volt on white is 1.1:1) */
-  --accent-ink: #0b1020; /* legacy alias of --accent-strong (accent used as text/icons on a surface) */
-  --accent-soft: rgba(212, 255, 63, 0.34); /* highlighter band */
+  /* The brand as text/stroke. Volt on white is 1.1:1, so light uses a deep olive of the same hue (6.1:1). */
+  --accent-strong: #4d6b00;
+  --accent-ink: #4d6b00; /* legacy alias of --accent-strong (accent used as text/icons on a surface) */
+  /* An accent SURFACE: ink in light carrying volt text, volt-tinted near-black in dark. */
+  --accent-surface: #0b1020;
+  --on-accent-surface: #d4ff3f;
+  --accent-soft: rgba(112, 150, 0, 0.13); /* tonal state tint (a band, not a highlighter) */
   --accent-glow: rgba(150, 200, 0, 0.45); /* colored shadow under volt fills */
-  --heat: #0b1020; /* adherence heatmap ink (= accent-strong) */
+  --heat: #4d6b00; /* adherence heatmap ink (= accent-strong) */
 
   /* ---------------------------------------------------------------- status (always paired with an icon or label) */
   /* Text-strength status inks: >= 4.5:1 on their own -soft band over white (Delta pills, tags, banners). */
@@ -87,7 +91,10 @@
   --r-pill: 999px;
 
   /* ---------------------------------------------------------------- elevation */
-  --shadow-1: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 22px -12px rgba(16, 24, 40, 0.16);
+  --shadow-1: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 22px -12px rgba(16, 24, 40, 0.18);
+  /* The lit top edge that separates a card from the page. Dark had this inside --shadow-1; light had none. */
+  --card-lift: inset 0 1px 0 #ffffff;
+  --grain: 0.035; /* opacity of the noise overlay */
   --shadow-2: 0 18px 40px -12px rgba(16, 24, 40, 0.28), 0 2px 6px rgba(16, 24, 40, 0.06);
   --shadow-accent: 0 10px 26px -10px rgba(150, 200, 0, 0.45);
   --shadow-hero: 0 22px 44px -18px rgba(5, 10, 25, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.07),
@@ -162,6 +169,10 @@
     --on-accent: #0a0e02;
     --accent-strong: #d4ff3f;
     --accent-ink: #d4ff3f;
+    --accent-surface: #161e04;
+    --on-accent-surface: #d4ff3f;
+    --card-lift: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    --grain: 0.05;
     --accent-soft: rgba(212, 255, 63, 0.11);
     --accent-glow: rgba(212, 255, 63, 0.28);
     --heat: #d4ff3f;
@@ -213,6 +224,10 @@
   --on-accent: #0a0e02;
   --accent-strong: #d4ff3f;
   --accent-ink: #d4ff3f;
+  --accent-surface: #161e04;
+  --on-accent-surface: #d4ff3f;
+  --card-lift: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  --grain: 0.05;
   --accent-soft: rgba(212, 255, 63, 0.11);
   --accent-glow: rgba(212, 255, 63, 0.28);
   --heat: #d4ff3f;
@@ -260,6 +275,10 @@
   --on-accent: #0a0e02;
   --accent-strong: #d4ff3f;
   --accent-ink: #d4ff3f;
+  --accent-surface: #161e04;
+  --on-accent-surface: #d4ff3f;
+  --card-lift: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  --grain: 0.05;
   --accent-soft: rgba(212, 255, 63, 0.12);
   --accent-glow: rgba(212, 255, 63, 0.28);
   --heat: #d4ff3f;

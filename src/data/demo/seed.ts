@@ -102,13 +102,6 @@ const parityOf = (off: number) => ((Math.floor(off / 7) % 2) + 2) % 2
 
 /* ------------------------------------------------------------------ members */
 
-const COACH_NOTES = {
-  stelios:
-    'Two perfect weeks and the scale is moving at exactly the right pace 👌 Keep protein at 180 g on rest days too. On a cut we add reps before load, so the bench will come.',
-  thanos:
-    'Your legs are carrying this squad 🔥 Now bring the upper body along: slow negatives on bench and rows. And eat all 6 meals, the scale should creep up ~0.25 kg a week.',
-}
-
 function member(p: Partial<Member> & Pick<Member, 'id' | 'slug' | 'name' | 'role' | 'color'>): Member {
   return {
     competes: true,
@@ -117,8 +110,6 @@ function member(p: Partial<Member> & Pick<Member, 'id' | 'slug' | 'name' | 'role
     heightCm: null,
     programId: BTS_PROGRAM.id,
     programStart: null,
-    coachNote: '',
-    coachNoteAt: null,
     settings: { unit: 'kg', machines: {}, weightVisibility: 'exact' },
     joined: true,
     updatedAt: 1,
@@ -127,7 +118,8 @@ function member(p: Partial<Member> & Pick<Member, 'id' | 'slug' | 'name' | 'role
 }
 
 function members(start: ISODate): Member[] {
-  const noteAt = at(addDays(start, 13), hm(18, 20))
+  // when the coach last touched the athletes' profiles
+  const profileAt = at(addDays(start, 13), hm(18, 20))
   return [
     member({
       id: DEMO_IDS.dennis,
@@ -151,10 +143,8 @@ function members(start: ISODate): Member[] {
       goalWeightKg: 79,
       heightCm: 183,
       programStart: start,
-      coachNote: COACH_NOTES.stelios,
-      coachNoteAt: noteAt,
       settings: { unit: 'kg', machines: STELIOS.machines, weightVisibility: 'exact' },
-      updatedAt: noteAt,
+      updatedAt: profileAt,
     }),
     member({
       id: DEMO_IDS.thanos,
@@ -166,10 +156,8 @@ function members(start: ISODate): Member[] {
       goalWeightKg: 75,
       heightCm: 176,
       programStart: start,
-      coachNote: COACH_NOTES.thanos,
-      coachNoteAt: noteAt + 4 * MIN,
       settings: { unit: 'kg', machines: THANOS.machines, weightVisibility: 'exact' },
-      updatedAt: noteAt + 4 * MIN,
+      updatedAt: profileAt + 4 * MIN,
     }),
   ]
 }
@@ -621,7 +609,7 @@ function mealFood(key: string, [ref, grams, pieces]: FoodSpec): MealFood {
 function plan(
   key: string,
   memberId: string,
-  p: Pick<MealPlan, 'title' | 'notes' | 'startDate' | 'kcal' | 'protein' | 'carbs' | 'fat' | 'waterL' | 'active' | 'createdAt' | 'updatedAt'>,
+  p: Pick<MealPlan, 'title' | 'notes' | 'startDate' | 'kcal' | 'protein' | 'carbs' | 'fat' | 'active' | 'createdAt' | 'updatedAt'>,
   meals: MealSpec[],
   createdBy: string = DEMO_IDS.dennis,
 ): MealPlan {
@@ -655,7 +643,6 @@ function mealPlans(start: ISODate): MealPlan[] {
         protein: 170,
         carbs: 280,
         fat: 75,
-        waterL: 2.5,
         active: false,
         createdAt: at(addDays(start, -22), hm(20, 15)),
         updatedAt: v2At,
@@ -694,7 +681,6 @@ function mealPlans(start: ISODate): MealPlan[] {
         protein: 180,
         carbs: 250,
         fat: 70,
-        waterL: 3,
         active: true,
         createdAt: v2At,
         updatedAt: v2At,
@@ -736,7 +722,6 @@ function mealPlans(start: ISODate): MealPlan[] {
         protein: 160,
         carbs: 400,
         fat: 85,
-        waterL: 3.5,
         active: true,
         createdAt: bulkAt,
         updatedAt: bulkAt,
@@ -771,7 +756,6 @@ function mealPlans(start: ISODate): MealPlan[] {
         protein: 170,
         carbs: 300,
         fat: 85,
-        waterL: 3,
         active: true,
         createdAt: dennisAt,
         updatedAt: dennisAt,
@@ -852,14 +836,13 @@ function checkins(plans: MealPlan[], start: ISODate, today: ISODate): NutritionC
   const sV1 = plans.find((p) => p.memberId === DEMO_IDS.stelios && !p.active)!
   const tPlan = active(DEMO_IDS.thanos)
   const dPlan = active(DEMO_IDS.dennis)
-  const row = (p: MealPlan, date: ISODate, food: DayFood, waterL: number, updatedAt: number): NutritionCheckin => ({
+  const row = (p: MealPlan, date: ISODate, food: DayFood, updatedAt: number): NutritionCheckin => ({
     id: dailyId(p.memberId, date),
     memberId: p.memberId,
     date,
     planId: p.id,
     meals: (food.eaten ?? []).map((i) => p.meals[i].id),
     rating: food.rating,
-    waterL,
     note: food.note ?? '',
     updatedAt,
   })
@@ -871,22 +854,22 @@ function checkins(plans: MealPlan[], start: ISODate, today: ISODate): NutritionC
     if (!s) continue
     const v1 = date < sPlan.startDate
     const food = v1 && s.eaten ? { ...s, eaten: s.eaten.flatMap((i) => V2_TO_V1[i] ?? []) } : s
-    out.push(row(v1 ? sV1 : sPlan, date, food, round1(rs.range(2.5, 3.5)), at(date, hm(21, 40) + rs.int(0, 45))))
+    out.push(row(v1 ? sV1 : sPlan, date, food, at(date, hm(21, 40) + rs.int(0, 45))))
   }
   for (const date of dateRange(tPlan.startDate, yesterday)) {
     const off = diffDays(start, date)
     const rt = rng(`thanos:food:${off}`)
     const t = THANOS_FORTNIGHT[((off % 14) + 14) % 14]
-    if (t) out.push(row(tPlan, date, t, round1(rt.range(1.5, 3)), at(date, hm(23, 5) + rt.int(0, 40))))
+    if (t) out.push(row(tPlan, date, t, at(date, hm(23, 5) + rt.int(0, 40))))
   }
   for (const date of dateRange(dPlan.startDate, yesterday)) {
     const off = diffDays(start, date)
     const rd = rng(`dennis:food:${off}`)
     const d = dennisDay(off)
-    if (d) out.push(row(dPlan, date, d, round1(rd.range(2, 3)), at(date, hm(22, 10) + rd.int(0, 30))))
+    if (d) out.push(row(dPlan, date, d, at(date, hm(22, 10) + rd.int(0, 30))))
   }
   // today so far: Stelios ticks meals as he goes, Thanos logs at night
-  out.push({ ...row(sPlan, today, { eaten: [0, 1], rating: 'on' }, 1.2, at(today, hm(11, 20))), rating: null })
+  out.push({ ...row(sPlan, today, { eaten: [0, 1], rating: 'on' }, at(today, hm(11, 20))), rating: null })
   return out
 }
 
@@ -1014,6 +997,8 @@ export function createDemoSnapshot(today: ISODate, now?: number): Snapshot {
   return {
     members: members(start),
     programs: [],
+    // the squad's own chat: nothing to invent, they write it themselves
+    posts: [],
     logs,
     weights: past([...steliosWeights(start, today), ...thanosWeights(start, today), ...dennisWeights(start, today)]),
     mealPlans: plans,

@@ -1,4 +1,4 @@
-# Eimaste Cool Training · Είμαστε Cool
+# Eimaste Cool Training
 
 A training app for a small squad of friends, meant to be opened from a link.
 Log workouts from the 12-week program, track body weight with charts, follow the meal plans the coach uploads, and see everyone's progress.

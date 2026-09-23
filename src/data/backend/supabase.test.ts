@@ -158,7 +158,7 @@ describe('loadAll', () => {
       [2 * PAGE_SIZE, 3 * PAGE_SIZE - 1],
     ])
     const tables = new Set(sb.queries.map((q) => q.table))
-    expect([...tables].sort()).toEqual(['checkins', 'cheers', 'meal_plans', 'members', 'programs', 'weights', 'workout_logs'])
+    expect([...tables].sort()).toEqual(['checkins', 'cheers', 'meal_plans', 'members', 'posts', 'programs', 'weights', 'workout_logs'])
   })
 
   it('asks for one more page after a full one', async () => {
@@ -471,11 +471,11 @@ describe('writes', () => {
 })
 
 describe('realtime', () => {
-  it('listens to the 7 tables on one channel and maps events', async () => {
+  it('listens to the 8 tables on one channel and maps events', async () => {
     const events: unknown[] = []
     const off = backend.subscribe((e) => events.push(e))
     expect(sb.client.channel).toHaveBeenCalledTimes(1)
-    expect(sb.realtime.map((r) => r.table).sort()).toEqual(['checkins', 'cheers', 'meal_plans', 'members', 'programs', 'weights', 'workout_logs'])
+    expect(sb.realtime.map((r) => r.table).sort()).toEqual(['checkins', 'cheers', 'meal_plans', 'members', 'posts', 'programs', 'weights', 'workout_logs'])
     expect(sb.channel.subscribe).toHaveBeenCalled()
 
     const logs = sb.realtime.find((r) => r.table === 'workout_logs')!

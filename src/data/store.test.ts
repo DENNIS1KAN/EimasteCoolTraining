@@ -9,7 +9,7 @@ import { __resetForTests, boot, flushNow, getState, put, refresh, signIn, signOu
 
 const ME = 'm1'
 type Server = { [T in TableName]: Record<string, Tables[T]> }
-const emptyServer = (): Server => ({ members: {}, programs: {}, logs: {}, weights: {}, mealPlans: {}, checkins: {}, cheers: {} })
+const emptyServer = (): Server => ({ members: {}, programs: {}, logs: {}, weights: {}, mealPlans: {}, checkins: {}, cheers: {}, posts: {} })
 
 const member = (patch: Partial<Member> = {}): Member => ({
   id: ME,
@@ -23,8 +23,6 @@ const member = (patch: Partial<Member> = {}): Member => ({
   heightCm: null,
   programId: 'bts-12',
   programStart: null,
-  coachNote: '',
-  coachNoteAt: null,
   settings: { unit: 'kg', machines: {}, weightVisibility: 'change' },
   joined: true,
   updatedAt: 100,

@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { __resetForTests, getState, setState } from '../../data/store'
 import type { MealPlan, Member, NutritionCheckin } from '../../data/types'
-import { setLang } from '../../i18n'
+
 import { addDays, todayISO } from '../../lib/dates'
 import { dailyId } from '../../lib/ids'
 import { mkCheckin, mkMember, mkPlan } from '../../lib/testing/fixtures'
@@ -29,7 +29,6 @@ const cut = mkPlan({
   protein: 150,
   carbs: 200,
   fat: 60,
-  waterL: 2,
   active: true,
   meals: [meal('b', 'Breakfast', 500, 40), meal('l', 'Lunch', 800, 60), meal('d', 'Dinner', 700, 50)],
 })
@@ -49,7 +48,6 @@ const todayRow = (memberId = 'stelios') => getState().checkins[dailyId(memberId,
 
 beforeEach(() => {
   __resetForTests()
-  setLang('en')
 })
 afterEach(cleanup)
 
@@ -71,16 +69,14 @@ describe('FuelPage', () => {
     expect(todayRow()).toBeUndefined()
   })
 
-  it('rates the day, logs water and toggles a rating off', () => {
+  it('rates the day, and toggling the rating off drops the empty row', () => {
     seed({ plans: [cut] })
     ui(<FuelPage />)
     fireEvent.click(screen.getByRole('button', { name: 'Mostly' }))
     expect(todayRow()?.rating).toBe('mostly')
-    fireEvent.click(screen.getByRole('button', { name: 'Glass 4' }))
-    expect(todayRow()?.waterL).toBe(1)
-    expect(screen.getByText('1 of 2 L')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Mostly' }))
-    expect(todayRow()?.rating).toBeNull()
+    // nothing meaningful is left (no meals, no rating, no note), so the row is deleted rather than stored empty
+    expect(todayRow()).toBeUndefined()
   })
 
   it('fills in an earlier day from the day strip', () => {

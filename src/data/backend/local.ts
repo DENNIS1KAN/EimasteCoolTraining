@@ -8,7 +8,9 @@ import { BackendError } from './types'
 import { idbDelete, idbGet, idbPut } from './idb'
 import { defaultMemberProfile } from './supabase-map'
 
-const DB_KEY = 'ect-demo-db-v1'
+/* v2: the app no longer opens with sample data, so anyone who used v1 gets a clean slate rather than
+   their cached demo squad. Bumping the key is what makes that happen on an already-installed device. */
+const DB_KEY = 'ect-demo-db-v2'
 const ME_KEY = 'ect-demo-me'
 const MAX_FILE = 15 * 1024 * 1024
 
@@ -25,7 +27,9 @@ export class LocalBackend implements Backend {
   private objectUrls = new Map<string, string>()
 
   constructor() {
-    this.db = this.read() ?? this.seed()
+    // A first open is a clean app, not a demo: the squad sees their own empty log, not three fake histories.
+    // Sample data is still one tap away in Settings, for showing the app off before anyone has trained.
+    this.db = this.read() ?? this.seedEmpty()
   }
 
   private read(): Db | null {
@@ -62,25 +66,30 @@ export class LocalBackend implements Backend {
   }
 
   /**
-   * Wipe demo data and start again (from Settings). Without demo data the squad looks like a fresh setup:
-   * the same people, with the profile a new member gets (no goals, start date, notes or remembered machines).
+   * The squad as it looks before anyone has used the app: the same people, each with the profile a new
+   * member gets (no goals, start date or remembered machines), and every other table empty. The training
+   * program is not data — it lives in code — so it survives untouched.
    */
+  private seedEmpty(): Db {
+    const db = this.seed()
+    for (const t of TABLES) if (t !== 'members') (db as unknown as Record<string, object>)[t] = {}
+    const now = Date.now()
+    for (const m of Object.values(db.members)) {
+      const { name: _name, color: _color, competes: _competes, ...fresh } = defaultMemberProfile(m.role, m.slug)
+      Object.assign(m, fresh, { updatedAt: now })
+    }
+    this.write()
+    return db
+  }
+
+  /** Start again (from Settings): with the sample squad to show the app off, or empty to begin for real. */
   reset(withDemoData = true): void {
     try {
       localStorage.removeItem(DB_KEY)
     } catch {
       /* ignore */
     }
-    this.db = this.seed()
-    if (!withDemoData) {
-      for (const t of TABLES) if (t !== 'members') (this.db as unknown as Record<string, object>)[t] = {}
-      const now = Date.now()
-      for (const m of Object.values(this.db.members)) {
-        const { name: _name, color: _color, competes: _competes, ...fresh } = defaultMemberProfile(m.role, m.slug)
-        Object.assign(m, fresh, { updatedAt: now })
-      }
-      this.write()
-    }
+    this.db = withDemoData ? this.seed() : this.seedEmpty()
   }
 
   async init(): Promise<string | null> {
@@ -136,6 +145,7 @@ export class LocalBackend implements Backend {
       weights: clone(this.db.weights),
       mealPlans: clone(this.db.mealPlans),
       checkins: clone(this.db.checkins),
+      posts: clone(this.db.posts),
       cheers: clone(this.db.cheers),
     }
   }
@@ -155,7 +165,7 @@ export class LocalBackend implements Backend {
     return () => this.listeners.delete(cb)
   }
 
-  async uploadFile(memberId: string, file: File): Promise<FileRef> {
+  async uploadFile(memberId: string, file: File, bucket?: string): Promise<FileRef> {
     if (file.size > MAX_FILE) throw new BackendError('too_large', 'File is larger than 15 MB')
     const path = `${memberId}/${uuid()}-${file.name.replace(/[^\w.-]+/g, '_')}`
     try {
@@ -163,7 +173,7 @@ export class LocalBackend implements Backend {
     } catch {
       throw new BackendError('unknown', 'This browser blocked file storage')
     }
-    return { path, name: file.name, type: file.type || 'application/octet-stream', size: file.size }
+    return { path, name: file.name, type: file.type || 'application/octet-stream', size: file.size, ...(bucket ? { bucket } : {}) }
   }
 
   async fileUrl(ref: FileRef): Promise<string> {

@@ -9,6 +9,7 @@ import type {
   MealPlan,
   Member,
   NutritionCheckin,
+  Post,
   Program,
   ProgramExercise,
   Unit,
@@ -123,8 +124,6 @@ export function mkMember(p: Partial<Member> & Pick<Member, 'id'>): Member {
     heightCm: null,
     programId: MINI.id,
     programStart: null,
-    coachNote: '',
-    coachNoteAt: null,
     settings: { unit: 'kg', machines: {}, weightVisibility: 'exact' },
     joined: true,
     updatedAt: 1,
@@ -144,7 +143,6 @@ export function mkPlan(p: Partial<MealPlan> & Pick<MealPlan, 'id' | 'memberId' |
     protein: null,
     carbs: null,
     fat: null,
-    waterL: null,
     meals: [],
     files: [],
     active: false,
@@ -170,7 +168,6 @@ export function mkCheckin(
     planId: p.planId ?? null,
     meals: p.meals ?? [],
     rating: p.rating ?? null,
-    waterL: null,
     note: '',
     updatedAt: at(date, 21),
   }
@@ -192,6 +189,7 @@ export function squad(p: {
   mealPlans?: MealPlan[]
   checkins?: NutritionCheckin[]
   cheers?: Cheer[]
+  posts?: Post[]
 }): SquadData {
   return {
     members: byId(p.members),
@@ -201,5 +199,6 @@ export function squad(p: {
     mealPlans: byId(p.mealPlans),
     checkins: byId(p.checkins),
     cheers: byId(p.cheers),
+    posts: byId(p.posts),
   }
 }

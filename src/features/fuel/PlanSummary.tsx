@@ -1,5 +1,5 @@
 import type { MealPlan } from '../../data/types'
-import { useLang, useT } from '../../i18n'
+import { useT } from '../../i18n'
 import { fmtNum } from '../../lib/format'
 import { Chip } from '../../ui'
 import { PlanFiles } from './PlanFiles'
@@ -16,7 +16,6 @@ export function TargetChips({ plan }: { plan: MealPlan }) {
   if (plan.protein != null) chips.push(`${t('proteinShort')} ${fmtNum(plan.protein, 0)} g`)
   if (plan.carbs != null) chips.push(`${t('carbsShort')} ${fmtNum(plan.carbs, 0)} g`)
   if (plan.fat != null) chips.push(`${t('fatShort')} ${fmtNum(plan.fat, 0)} g`)
-  if (plan.waterL != null) chips.push(`${fmtNum(plan.waterL, 2)} L`)
   if (!chips.length) return null
   return (
     <div className="fu-chips">
@@ -31,7 +30,6 @@ export function TargetChips({ plan }: { plan: MealPlan }) {
 
 /** Read-only view of a whole plan (used for earlier plans). */
 export function PlanSummary({ plan }: { plan: MealPlan }) {
-  const lang = useLang()
   return (
     <div className="fu-summary">
       <TargetChips plan={plan} />
@@ -39,7 +37,7 @@ export function PlanSummary({ plan }: { plan: MealPlan }) {
         <ol className="fu-summary__meals">
           {plan.meals.map((m) => {
             const kcal = mealTotals(m).kcal
-            const foods = hasFoods(m) ? m.foods.map((f) => displayFoodName(f, lang)) : m.items.split('\n').filter((l) => l.trim())
+            const foods = hasFoods(m) ? m.foods.map((f) => displayFoodName(f)) : m.items.split('\n').filter((l) => l.trim())
             return (
               <li key={m.id}>
                 <div className="fu-summary__meal">

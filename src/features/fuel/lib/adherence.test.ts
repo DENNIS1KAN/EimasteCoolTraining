@@ -13,7 +13,6 @@ const plan = (id: string, startDate: string, meals: string[], active = true): Me
   protein: null,
   carbs: null,
   fat: null,
-  waterL: null,
   meals: meals.map(meal),
   files: [],
   active,
@@ -28,7 +27,6 @@ const ci = (date: string, meals: string[], rating: NutritionCheckin['rating'] = 
   planId,
   meals,
   rating,
-  waterL: null,
   note: '',
   updatedAt: 0,
 })

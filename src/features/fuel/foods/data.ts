@@ -11,9 +11,13 @@ type M = [kcal: number, protein: number, carbs: number, fat: number]
 
 const u = (kind: UnitKind, g: number): FoodUnit => ({ kind, g })
 
+/**
+ * The app is English-only, so `el` is not a second display name: it is folded into the search aliases,
+ * which keeps every food findable by its Greek name without ever showing it.
+ */
 function f(id: string, en: string, el: string, m: M, extra: { aliases?: string[]; unit?: FoodUnit } = {}): Food {
   const [kcal, protein, carbs, fat] = m
-  return { id, en, el, kcal, protein, carbs, fat, ...extra }
+  return { id, en, kcal, protein, carbs, fat, ...extra, aliases: [el, ...(extra.aliases ?? [])] }
 }
 
 export const FOODS: Food[] = [

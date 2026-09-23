@@ -75,11 +75,10 @@ describe('checkPassword', () => {
   })
 
   it('puts the minimum into every password message', () => {
-    for (const lang of ['en', 'el'] as const)
-      for (const k of ['ruleLength', 'errWeakPassword', 'errPasswordRejected'] as const) {
-        expect(AUTH[lang][k], `${lang}.${k}`).toContain('{min}')
-        expect(translate(AUTH, k, PASSWORD_VARS, lang)).toContain('8')
-      }
+    for (const k of ['ruleLength', 'errWeakPassword', 'errPasswordRejected'] as const) {
+      expect(AUTH.en[k], k).toContain('{min}')
+      expect(translate(AUTH, k, PASSWORD_VARS)).toContain('8')
+    }
   })
 })
 

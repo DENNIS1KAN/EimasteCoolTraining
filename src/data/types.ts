@@ -20,6 +20,8 @@ export type WeightVisibility = 'exact' | 'change' | 'private'
 
 export interface MemberSettings {
   unit: Unit
+  /** Newest squad post this member has seen (drives the unread count). Null until they open the chat. */
+  lastSeenPostAt?: number | null
   /** Remembered machine / brand per exercise name, e.g. { "Leg Press": "Hammer Strength" }. */
   machines: Record<string, string>
   /** How the member's body weight appears to the rest of the squad. */
@@ -43,8 +45,6 @@ export interface Member {
   /** First day of week 1 of the assigned program (YYYY-MM-DD). null = not started yet. */
   programStart: string | null
   /** A note from the coach shown on the member's home screen. Only the coach may change it. */
-  coachNote: string
-  coachNoteAt: number | null
   settings: MemberSettings
   /** True once the member has claimed their login (Supabase: members.user_id is set). Read-only. */
   joined: boolean
@@ -165,6 +165,8 @@ export interface WeightEntry {
 export interface FileRef {
   /** Storage path (Supabase storage key, or IndexedDB key in demo mode). */
   path: string
+  /** Which bucket it lives in. Absent means the meal-plan bucket, where every file lived before chat. */
+  bucket?: string
   name: string
   type: string
   size: number
@@ -219,7 +221,6 @@ export interface MealPlan {
   protein: number | null
   carbs: number | null
   fat: number | null
-  waterL: number | null
   meals: Meal[]
   files: FileRef[]
   /** The plan currently in force for the member (at most one active plan per member). */
@@ -240,8 +241,22 @@ export interface NutritionCheckin {
   /** Ids of the plan's meals that were eaten as planned. */
   meals: string[]
   rating: CheckinRating | null
-  waterL: number | null
   note: string
+  updatedAt: number
+}
+
+/**
+ * A message in the squad chat. Activity (workouts, weigh-ins, PRs) is NOT stored here: it stays derived by
+ * buildFeed and is merged with these at render time, so there is exactly one source of truth for each.
+ */
+export interface Post {
+  id: string
+  memberId: string
+  /** May be empty when the post is only photos. */
+  text: string
+  photos: FileRef[]
+  createdAt: number
+  editedAt: number | null
   updatedAt: number
 }
 
@@ -269,6 +284,7 @@ export interface Snapshot {
   mealPlans: MealPlan[]
   checkins: NutritionCheckin[]
   cheers: Cheer[]
+  posts: Post[]
 }
 
 export interface Tables {
@@ -279,9 +295,10 @@ export interface Tables {
   mealPlans: MealPlan
   checkins: NutritionCheckin
   cheers: Cheer
+  posts: Post
 }
 export type TableName = keyof Tables
-export const TABLES: TableName[] = ['members', 'programs', 'logs', 'weights', 'mealPlans', 'checkins', 'cheers']
+export const TABLES: TableName[] = ['members', 'programs', 'logs', 'weights', 'mealPlans', 'checkins', 'cheers', 'posts']
 
 /** What the login screen may know about a member before anyone is signed in. */
 export interface LoginProfile {

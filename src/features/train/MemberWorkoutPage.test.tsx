@@ -3,7 +3,7 @@ import { MemoryRouter, Route, Routes } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { __resetForTests, setState } from '../../data/store'
 import type { Program } from '../../data/types'
-import { setLang } from '../../i18n'
+
 import { MINI, at, mkLog, mkMember } from '../../lib/testing/fixtures'
 import MemberWorkoutPage from '../squad/MemberWorkoutPage'
 
@@ -27,7 +27,6 @@ const open = (path: string) =>
 
 beforeEach(() => {
   __resetForTests()
-  setLang('en')
   seed()
 })
 afterEach(cleanup)

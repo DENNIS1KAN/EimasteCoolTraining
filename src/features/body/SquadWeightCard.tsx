@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useMe, useStore } from '../../data/store'
-import { useLang, useT } from '../../i18n'
+import { useT } from '../../i18n'
 import { fromISODate, isoFromMs } from '../../lib/dates'
 import { fmtDate, fmtDayLabel, fmtSigned } from '../../lib/format'
 import { Card, CardHeader, EmptyState, Icon, memberColorVar } from '../../ui'
@@ -20,7 +20,6 @@ export function SquadWeightCard({ range, today, height = 176 }: { range: Range; 
   const weights = useStore((s) => s.weights)
   const from = rangeFrom(range, today)
   // The end labels ("Thanos −2.1%") are formatted for the current language.
-  const lang = useLang()
 
   const data = useMemo(() => {
     const list = Object.values(members)
@@ -46,7 +45,7 @@ export function SquadWeightCard({ range, today, height = 176 }: { range: Range; 
       ends.push(`${m.name} ${pctSigned(pts[pts.length - 1].pct)}`)
     }
     return { series, hidden, ends }
-  }, [members, weights, me, from, lang])
+  }, [members, weights, me, from])
   const aria = t('squadAria', { list: data.ends.join(', ') })
 
   return (

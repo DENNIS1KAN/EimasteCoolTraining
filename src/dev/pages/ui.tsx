@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { setThemePref, useThemePref, type ThemePref } from '../../app/theme'
-import { setLang, useLang, type Lang } from '../../i18n'
+
 import {
   Avatar,
   AvatarStack,
@@ -225,7 +225,6 @@ function HomeComposition() {
 
 export default function UIPlayground() {
   const theme = useThemePref()
-  const lang = useLang()
   const [seg, setSeg] = useState('h2h')
   const [range, setRange] = useState('1m')
   const [day, setDay] = useState('pull')
@@ -264,16 +263,6 @@ export default function UIPlayground() {
                   { value: 'system', label: null, icon: 'monitor', ariaLabel: 'System' },
                   { value: 'light', label: null, icon: 'sun', ariaLabel: 'Light' },
                   { value: 'dark', label: null, icon: 'moon', ariaLabel: 'Dark' },
-                ]}
-              />
-              <Segmented<Lang>
-                size="sm"
-                ariaLabel="Language"
-                value={lang}
-                onChange={setLang}
-                options={[
-                  { value: 'en', label: 'EN' },
-                  { value: 'el', label: 'ΕΛ' },
                 ]}
               />
             </>

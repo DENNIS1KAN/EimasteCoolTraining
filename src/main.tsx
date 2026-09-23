@@ -7,14 +7,14 @@ import { applyTheme } from './app/theme'
 import { readConfig } from './config'
 import { createBackend } from './data/backend'
 import { boot } from './data/store'
-import { getLang } from './i18n'
+
 // Registers the beforeinstallprompt listener before the browser fires it (Settings offers an Install button).
 import './features/auth/install'
 
 applyTheme()
 // A new deploy's service worker takes over the open app: reload so old code never asks for deleted chunks.
 watchServiceWorkerUpdates()
-document.documentElement.lang = getLang()
+document.documentElement.lang = 'en'
 window.matchMedia?.('(prefers-color-scheme: dark)').addEventListener?.('change', () => applyTheme())
 
 createRoot(document.getElementById('root')!).render(

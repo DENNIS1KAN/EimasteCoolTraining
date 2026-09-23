@@ -1,4 +1,3 @@
-import type { Lang } from '../../../i18n'
 import { FOODS } from './data'
 import type { Food, Macros, UnitKind } from './types'
 
@@ -49,6 +48,8 @@ export function greeklish(folded: string): string[] {
   return [...new Set([base, alt, alt.replace(/ch/g, 'x'), alt.replace(/ch/g, 'h')])]
 }
 
+const GREEK = /[\u0370-\u03ff\u1f00-\u1fff]/
+
 const words = (s: string): string[] => s.split(/[^\p{L}\p{N}%]+/u).filter(Boolean)
 
 interface Indexed {
@@ -63,11 +64,13 @@ let INDEX: Indexed[] | null = null
 function index(): Indexed[] {
   INDEX ??= FOODS.map((food) => {
     const en = fold(food.en)
-    const el = fold(food.el)
-    // Latin aliases in both common spellings of υ (tyri / tiri)
-    const alias = (food.aliases ?? []).map(fold).flatMap((a) => [a, a.replace(/y/g, 'i')])
-    const all = [en, el, ...greeklish(el), ...alias]
-    return { food, names: [en, el], words: [...new Set(all.flatMap(words))] }
+    // Greek aliases (the food's Greek name) also index their Greeklish spellings;
+    // Latin ones index both common spellings of υ (tyri / tiri)
+    const alias = (food.aliases ?? [])
+      .map(fold)
+      .flatMap((a) => (GREEK.test(a) ? [a, ...greeklish(a)] : [a, a.replace(/y/g, 'i')]))
+    const all = [en, ...alias]
+    return { food, names: [en], words: [...new Set(all.flatMap(words))] }
   })
   return INDEX
 }
@@ -77,7 +80,7 @@ function index(): Indexed[] {
  * must start a word of the food (names or aliases); names that start with the query rank first, then the viewer's
  * language, then shorter names.
  */
-export function searchFoods(query: string, lang: Lang = 'en', limit = 8): Food[] {
+export function searchFoods(query: string, limit = 8): Food[] {
   const q = fold(query).trim()
   if (!q) return []
   const qWords = words(q)
@@ -85,7 +88,7 @@ export function searchFoods(query: string, lang: Lang = 'en', limit = 8): Food[]
   const scored: { food: Food; score: number; len: number }[] = []
   for (const it of index()) {
     if (!qWords.every((w) => it.words.some((x) => x.startsWith(w)))) continue
-    const own = fold(lang === 'el' ? it.food.el : it.food.en)
+    const own = fold(it.food.en)
     let score = 0
     if (it.names.includes(q)) score += 100
     if (own.startsWith(q)) score += 60
@@ -111,31 +114,32 @@ export function macrosFor(food: Pick<Food, 'kcal' | 'protein' | 'carbs' | 'fat'>
   return { kcal: r0(food.kcal * k), protein: r1(food.protein * k), carbs: r1(food.carbs * k), fat: r1(food.fat * k) }
 }
 
-/** The food's name in a language (database foods only). */
-export const foodName = (food: Food, lang: Lang): string => (lang === 'el' ? food.el : food.en)
+/** The food's name (database foods only). */
+export const foodName = (food: Food): string => food.en
 
 /**
- * The name to show for a food of a meal: a database food whose name was left as picked follows the viewer's
- * language; a renamed or custom food shows what the coach typed.
+ * The name to show for a food of a meal: a database food whose name was left as picked shows the database
+ * name; a renamed or custom food shows what the coach typed. A name matching an alias (e.g. a plan written
+ * when the app still showed Greek names) counts as "left as picked".
  */
-export function displayFoodName(item: { name: string; ref?: string | null }, lang: Lang): string {
+export function displayFoodName(item: { name: string; ref?: string | null }): string {
   const food = foodById(item.ref)
-  if (food && (item.name === food.en || item.name === food.el || !item.name.trim())) return foodName(food, lang)
+  if (food && (item.name === food.en || food.aliases?.includes(item.name) || !item.name.trim())) return foodName(food)
   return item.name
 }
 
-const UNIT_LABELS: Record<UnitKind, { en: [string, string]; el: [string, string] }> = {
-  piece: { en: ['pc', 'pcs'], el: ['τεμ.', 'τεμ.'] },
-  slice: { en: ['slice', 'slices'], el: ['φέτα', 'φέτες'] },
-  tbsp: { en: ['tbsp', 'tbsp'], el: ['κ.σ.', 'κ.σ.'] },
-  tsp: { en: ['tsp', 'tsp'], el: ['κ.γ.', 'κ.γ.'] },
-  scoop: { en: ['scoop', 'scoops'], el: ['μεζούρα', 'μεζούρες'] },
-  skewer: { en: ['skewer', 'skewers'], el: ['καλαμάκι', 'καλαμάκια'] },
-  cup: { en: ['cup', 'cups'], el: ['φλιτζάνι', 'φλιτζάνια'] },
+const UNIT_LABELS: Record<UnitKind, [string, string]> = {
+  piece: ['pc', 'pcs'],
+  slice: ['slice', 'slices'],
+  tbsp: ['tbsp', 'tbsp'],
+  tsp: ['tsp', 'tsp'],
+  scoop: ['scoop', 'scoops'],
+  skewer: ['skewer', 'skewers'],
+  cup: ['cup', 'cups'],
 }
 
-/** "2 pcs", "1 tbsp", "3 φέτες". */
-export function unitLabel(kind: UnitKind, n: number, lang: Lang): string {
-  const [one, other] = UNIT_LABELS[kind][lang]
+/** "2 pcs", "1 tbsp", "3 slices". */
+export function unitLabel(kind: UnitKind, n: number): string {
+  const [one, other] = UNIT_LABELS[kind]
   return n === 1 ? one : other
 }

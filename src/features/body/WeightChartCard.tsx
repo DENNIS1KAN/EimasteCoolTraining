@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import type { Member, Program } from '../../data/types'
-import { useLang, useT } from '../../i18n'
+import { useT } from '../../i18n'
 import { fromISODate, isoFromMs } from '../../lib/dates'
 import { fmtDate, fmtDayLabel, fmtNum } from '../../lib/format'
 import { kgToUnit } from '../../lib/units'
@@ -34,7 +34,6 @@ export function WeightChartCard({
   const unit = member.settings.unit
   const color = memberColorVar(member.color)
   const from = rangeFrom(range, model.today)
-  const lang = useLang()
 
   const chart = useMemo(() => {
     const pts = clipSeries(model.series, from)
@@ -66,12 +65,12 @@ export function WeightChartCard({
       t('chartAria', { range: t(`chart_${range}`), n: pts.length, from: wText(first.trendKg, unit), to: wText(last.trendKg, unit) }) +
       (showGoal && member.goalWeightKg != null ? t('chartAriaGoal', { goal: wText(member.goalWeightKg, unit) }) : '')
     return { series, refLines, markers, showGoal, aria, count: pts.length }
-  }, [model.series, model.today, from, unit, color, member.goalWeightKg, member.programStart, program, range, lang])
+  }, [model.series, model.today, from, unit, color, member.goalWeightKg, member.programStart, program, range])
 
   const legend: LegendItem[] = [
     { label: t('daily'), color, kind: 'ring' },
     { label: t('trend'), color, kind: 'line' },
-    ...(chart?.showGoal ? [{ label: t('goal'), color: 'var(--ink-2)', kind: 'line' as const }] : []),
+    ...(chart?.showGoal ? [{ label: t('goal'), color: 'var(--accent-strong)', kind: 'line' as const }] : []),
   ]
   const total = model.series.length
 

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { localeOf, useLang, useT } from '../../i18n'
+import { useT, LOCALE } from '../../i18n'
 import { addDays, fromISODate } from '../../lib/dates'
 import { fmtDate } from '../../lib/format'
 import { ChartTable, type TableMode } from './ChartTable'
@@ -97,11 +97,10 @@ function layoutHeat(days: HeatDay[], W: number, maxCell: number): Layout | null 
 
 export function Heatmap(props: HeatmapProps) {
   const t = useT(M)
-  const lang = useLang()
   const [boxRef, width] = useWidth<HTMLDivElement>()
   const maxCell = props.maxCell ?? 26
   // `lang` re-runs the layout so the month labels follow a language switch.
-  const L = useMemo(() => (width ? layoutHeat(props.days, width, maxCell) : null), [props.days, width, maxCell, lang])
+  const L = useMemo(() => (width ? layoutHeat(props.days, width, maxCell) : null), [props.days, width, maxCell])
   const max = props.max ?? Math.max(0, ...props.days.map((d) => d.value ?? 0))
   const step = (L?.cell ?? 0) + GAP
   const scrub = useScrub({
@@ -123,9 +122,9 @@ export function Heatmap(props: HeatmapProps) {
       return L.index.get((c.col + d[0]) * 7 + row) ?? i
     },
   })
-  const weekday = new Intl.DateTimeFormat(localeOf(lang), { weekday: 'narrow' })
+  const weekday = new Intl.DateTimeFormat(LOCALE, { weekday: 'narrow' })
   const fmtDay = props.formatDate ?? ((d: string) => fmtDate(d, 'weekdayDayMonth'))
-  const fmtValue = props.formatValue ?? ((n: number) => new Intl.NumberFormat(localeOf(lang), { maximumFractionDigits: 1 }).format(n))
+  const fmtValue = props.formatValue ?? ((n: number) => new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 1 }).format(n))
   const active = L && scrub.active != null && scrub.active < L.cells.length ? L.cells[scrub.active] : null
   const tip = active ? props.formatTooltip({ date: active.date, value: active.value }) : ''
   const tableMode = props.table ?? 'details'

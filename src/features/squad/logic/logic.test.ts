@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { MINI, at, mkCheer, mkLog, mkMember, mkWeight, squad } from '../../../lib/testing/fixtures'
-import { setLang } from '../../../i18n'
+
 import { memberStats } from '../../../lib/stats'
 import { weightAccess, visibleStats } from './visibility'
 import { NUDGE_COOLDOWN_MS, NUDGE_MAX, charCount, cheerLine, cleanNudgeText, lastNudgeAt, makeCheerBack, makeNudge, nudgeState } from './nudges'
@@ -233,7 +233,7 @@ describe('feed helpers', () => {
       ['2026-03-31', ['a', 'b']],
       ['2026-03-30', ['c']],
     ])
-    expect(matchesFilter(items[0], 'cheers')).toBe(true)
+    expect(matchesFilter(items[0], 'chat')).toBe(true)
     expect(matchesFilter(items[0], 'workouts')).toBe(false)
     expect(kudosOwner(items[0])).toBe(S)
     expect(kudosOwner({ kind: 'plan', id: 'p', memberId: S, at: 1, planId: 'p', title: '', byId: D })).toBe(D)
@@ -256,7 +256,6 @@ describe('topLifts / recentWorkouts', () => {
 
 describe('fmtMetric', () => {
   it('formats each metric and dashes missing values', () => {
-    setLang('en')
     expect(fmtMetric('consistency', 0.92)).toBe('92%')
     expect(fmtMetric('strength', 0.082)).toBe('+8.2%')
     expect(fmtMetric('volumeWeek', 18400)).toBe('18.4 t')

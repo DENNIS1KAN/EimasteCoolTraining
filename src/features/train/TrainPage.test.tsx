@@ -3,7 +3,7 @@ import { MemoryRouter, Route, Routes } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { __resetForTests, getState, setState } from '../../data/store'
 import type { Member, WorkoutLog } from '../../data/types'
-import { setLang } from '../../i18n'
+
 import { MINI, at, mkLog, mkMember } from '../../lib/testing/fixtures'
 import TrainPage from './TrainPage'
 import { TodayWorkoutCard } from './TodayWorkoutCard'
@@ -36,7 +36,6 @@ const at2 = (path: string) =>
 
 beforeEach(() => {
   __resetForTests()
-  setLang('en')
 })
 afterEach(() => {
   stopRest()
@@ -71,18 +70,16 @@ describe('TrainPage', () => {
     expect(screen.getByRole('timer', { name: /Rest timer/ })).toBeTruthy()
   })
 
-  it('shows weights with the Greek decimal comma but stores them canonical', () => {
+  it('accepts a typed decimal comma but stores the weight canonical', () => {
     const halves = mkLog({ week: 1, day: 0, doneAt: at('2026-01-05'), ex: { 0: { sets: [['52.5', '10'], ['52.5', '9']] } } })
     seed({ logs: [halves] })
-    setLang('el')
     at2('/train/2/0')
     const [w1, , w2] = document.getElementById('ex-0')!.querySelectorAll<HTMLInputElement>('.tr-fld input')
-    expect(w1.placeholder).toBe('52,5')
+    expect(w1.placeholder).toBe('52.5')
     act(() => {
       fireEvent.change(w2, { target: { value: '55,5' } })
     })
     expect(getState().logs[W2_UPPER].ex['0'].sets[1].w).toBe('55.5')
-    expect(w2.value).toBe('55,5')
   })
 
   it("stops the rest timer when someone else signs in (it never shows another member's rest)", () => {

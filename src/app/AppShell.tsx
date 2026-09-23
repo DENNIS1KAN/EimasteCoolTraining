@@ -5,6 +5,7 @@ import type { Member } from '../data/types'
 import { defineMessages, useT } from '../i18n'
 import { COMMON } from '../i18n/common'
 import { unseenCheers } from '../lib/stats'
+import { unreadPosts } from '../features/squad/chat/unread'
 import { stopRest } from '../features/train/logic/restTimer'
 import { liveLog } from '../features/train/logic/today'
 import { Avatar, Banner, Icon, Toaster, cx, openAccountSheet, type IconName } from '../ui'
@@ -18,32 +19,18 @@ import './AppShell.css'
 // The rest timer keeps running (and stays visible) on every screen once a set is ticked.
 const RestTimerHost = lazy(() => import('../features/train/RestTimer').then((m) => ({ default: m.RestTimerHost })))
 
-const M = defineMessages(
-  {
-    mainNav: 'Main',
-    moreNav: 'More',
-    skip: 'Skip to content',
-    newActivity: 'new messages',
-    pendingOne: '1 change waiting.',
-    pendingMany: '{n} changes waiting.',
-    dismiss: 'Dismiss',
-    account: 'Account: {name}',
-    home: 'Eimaste Cool Training, home',
-    live: 'workout in progress',
-  },
-  {
-    mainNav: 'Κύρια πλοήγηση',
-    moreNav: 'Περισσότερα',
-    skip: 'Μετάβαση στο περιεχόμενο',
-    newActivity: 'νέα μηνύματα',
-    pendingOne: '1 αλλαγή σε αναμονή.',
-    pendingMany: '{n} αλλαγές σε αναμονή.',
-    dismiss: 'Απόκρυψη',
-    account: 'Λογαριασμός: {name}',
-    home: 'Eimaste Cool Training, αρχική',
-    live: 'προπόνηση σε εξέλιξη',
-  },
-)
+const M = defineMessages({
+  mainNav: 'Main',
+  moreNav: 'More',
+  skip: 'Skip to content',
+  newActivity: 'new messages',
+  pendingOne: '1 change waiting.',
+  pendingMany: '{n} changes waiting.',
+  dismiss: 'Dismiss',
+  account: 'Account: {name}',
+  home: 'Eimaste Cool Training, home',
+  live: 'workout in progress',
+})
 
 type NavKey = 'home' | 'train' | 'body' | 'fuel' | 'squad' | 'coach' | 'settings'
 
@@ -107,7 +94,8 @@ export function AppShell() {
   const me = useMe()
   const { pathname } = useLocation()
   const active = navKeyFor(pathname)
-  const unseen = useStore((s) => (s.meId ? unseenCheers(s.cheers, s.meId).length : 0))
+  // the Squad dot covers both kinds of "someone is talking to you": nudges, and unread chat
+  const unseen = useStore((s) => (s.meId ? unseenCheers(s.cheers, s.meId).length + unreadPosts(s.posts, s.members[s.meId] ?? null) : 0))
   const live = useStore(hasLiveWorkout)
   const pageRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)

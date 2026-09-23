@@ -4,7 +4,7 @@ import { useT } from '../../../i18n'
 import { fmtRelative } from '../../../lib/format'
 import { buildFeed } from '../../../lib/stats'
 import { Card, CardHeader, CardLink } from '../../../ui'
-import { FeedItemView } from '../feed/FeedItemView'
+import { FeedItemView } from '../chat/FeedItemView'
 import { useSquadDataWithCheers } from '../hooks'
 import { SQ } from '../messages'
 

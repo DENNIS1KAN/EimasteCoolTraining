@@ -1,7 +1,7 @@
 import { useMemo, type ReactNode } from 'react'
 import { setThemePref, useThemePref, type ThemePref } from '../../app/theme'
 import type { WeightEntry } from '../../data/types'
-import { setLang, useLang, type Lang } from '../../i18n'
+
 import { addDays, dateRange, diffDays, fromISODate, isoFromMs, startOfWeek, todayISO, type ISODate } from '../../lib/dates'
 import { fmtDate, fmtDayLabel, fmtNum, fmtPct, fmtSigned, fmtVolume } from '../../lib/format'
 import { weightSeries } from '../../lib/stats'
@@ -90,7 +90,6 @@ const dayLabel = (x: number) => fmtDayLabel(isoFromMs(x))
 const kg1 = (n: number) => `${fmtNum(n, 1)} kg`
 
 export default function ChartsPlayground() {
-  const lang = useLang()
   const theme = useThemePref()
   const today = todayISO()
   const start = addDays(startOfWeek(today), -28)
@@ -111,11 +110,11 @@ export default function ChartsPlayground() {
 
   const last = <T,>(a: T[]) => a[a.length - 1]
   const weightSeriesProps: LineSeries[] = [
-    { id: 'raw', label: lang === 'el' ? 'Ζύγιση' : 'Daily weigh-in', color: BLUE, points: d.weight.raw, line: false },
-    { id: 'trend', label: lang === 'el' ? 'Τάση' : 'Trend', color: BLUE, points: d.weight.trend, area: true },
+    { id: 'raw', label: 'Daily weigh-in', color: BLUE, points: d.weight.raw, line: false },
+    { id: 'trend', label: 'Trend', color: BLUE, points: d.weight.trend, area: true },
   ]
   const weeks = ['W1', 'W2', 'W3', 'W4', 'W5']
-  const weekTitles = weeks.map((_, i) => `${lang === 'el' ? 'Εβδομάδα' : 'Week'} ${i + 1} · ${fmtDate(addDays(start, i * 7), 'dayMonth')}`)
+  const weekTitles = weeks.map((_, i) => `Week ${i + 1} · ${fmtDate(addDays(start, i * 7), 'dayMonth')}`)
 
   return (
     <div className="pg">
@@ -127,7 +126,6 @@ export default function ChartsPlayground() {
         </div>
         <div className="pg-controls">
           <Segmented<ThemePref> value={theme} options={['system', 'light', 'dark']} onChange={setThemePref} />
-          <Segmented<Lang> value={lang} options={['en', 'el']} onChange={setLang} />
         </div>
       </header>
 
@@ -147,8 +145,8 @@ export default function ChartsPlayground() {
         <Card eyebrow="Body · Stelios" title="Weight trend, 5 weeks">
           <LineChart
             series={weightSeriesProps}
-            refLines={[{ y: 78, label: `${lang === 'el' ? 'Στόχος' : 'Goal'} ${kg1(78)}` }]}
-            markers={[{ x: ms(start), label: lang === 'el' ? 'Έναρξη' : 'Program start' }]}
+            refLines={[{ y: 78, label: `Goal ${kg1(78)}` }]}
+            markers={[{ x: ms(start), label: 'Program start' }]}
             formatY={(n) => fmtNum(n, 1)}
             formatTooltipY={kg1}
             formatX={dayMonth}
@@ -211,8 +209,8 @@ export default function ChartsPlayground() {
             height={200}
             formatY={(n) => `${fmtNum(n, 0)}%`}
             formatX={(n) => `W${n}`}
-            formatTooltipX={(n) => `${lang === 'el' ? 'Εβδομάδα' : 'Week'} ${n}`}
-            xLabel={lang === 'el' ? 'Εβδομάδα' : 'Week'}
+            formatTooltipX={(n) => `Week ${n}`}
+            xLabel="Week"
             ariaLabel="Share of scheduled sessions done per week"
           />
         </Card>

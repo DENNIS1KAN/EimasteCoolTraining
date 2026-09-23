@@ -1,44 +1,26 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import { getState, signOut, useMe, useStore } from '../data/store'
-import { defineMessages, setLang, useLang, useT, type Lang } from '../i18n'
+import { defineMessages, useT } from '../i18n'
 import { COMMON } from '../i18n/common'
 import { Avatar, ConfirmSheet, Icon, Segmented, Sheet, Tag, onAccountSheet, toast, type IconName } from '../ui'
 import { setThemePref, useThemePref, type ThemePref } from './theme'
 import './AppShell.css'
 
-const M = defineMessages(
-  {
-    account: 'Account',
-    switchProfile: 'Switch profile',
-    appearance: 'Appearance',
-    system: 'System',
-    light: 'Light',
-    dark: 'Dark',
-    language: 'Language',
-    signOutTitle: 'Sign out?',
-    signOutBody: "You'll need your password to sign back in.",
-    signOutBodyDemo: 'Your demo data stays on this device.',
-    signOutPending: '{n} changes have not reached the server yet. Signing out now will lose them.',
-    signOutPendingOne: '1 change has not reached the server yet. Signing out now will lose it.',
-    signOutFailed: 'Could not sign out. Try again.',
-  },
-  {
-    account: 'Λογαριασμός',
-    switchProfile: 'Αλλαγή προφίλ',
-    appearance: 'Εμφάνιση',
-    system: 'Σύστημα',
-    light: 'Φωτεινό',
-    dark: 'Σκοτεινό',
-    language: 'Γλώσσα',
-    signOutTitle: 'Αποσύνδεση;',
-    signOutBody: 'Θα χρειαστείς τον κωδικό σου για να ξανασυνδεθείς.',
-    signOutBodyDemo: 'Τα δεδομένα επίδειξης μένουν σε αυτή τη συσκευή.',
-    signOutPending: '{n} αλλαγές δεν έχουν φτάσει ακόμη στον διακομιστή. Αν αποσυνδεθείς τώρα, θα χαθούν.',
-    signOutPendingOne: '1 αλλαγή δεν έχει φτάσει ακόμη στον διακομιστή. Αν αποσυνδεθείς τώρα, θα χαθεί.',
-    signOutFailed: 'Η αποσύνδεση απέτυχε. Ξαναδοκίμασε.',
-  },
-)
+const M = defineMessages({
+  account: 'Account',
+  switchProfile: 'Switch profile',
+  appearance: 'Appearance',
+  system: 'System',
+  light: 'Light',
+  dark: 'Dark',
+  signOutTitle: 'Sign out?',
+  signOutBody: "You'll need your password to sign back in.",
+  signOutBodyDemo: 'Your demo data stays on this device.',
+  signOutPending: '{n} changes have not reached the server yet. Signing out now will lose them.',
+  signOutPendingOne: '1 change has not reached the server yet. Signing out now will lose it.',
+  signOutFailed: 'Could not sign out. Try again.',
+})
 
 /*
  * Open state lives at module level so the sheet survives a remount of the shell. A language switch no longer
@@ -56,7 +38,6 @@ export function AccountSheet() {
   const backend = useStore((s) => s.backend)
   const pending = useStore((s) => s.sync.pending)
   const theme = useThemePref()
-  const lang = useLang()
   const [mode, setMode] = useState<Mode>(() => (keepOpen ? 'account' : 'closed'))
   const [busy, setBusy] = useState(false)
   const signingOut = useRef(false)
@@ -145,20 +126,6 @@ export function AccountSheet() {
                 { value: 'system', label: t('system'), icon: 'monitor' },
                 { value: 'light', label: t('light'), icon: 'sun' },
                 { value: 'dark', label: t('dark'), icon: 'moon' },
-              ]}
-            />
-          </div>
-
-          <div className="acct__field">
-            <span className="acct__label">{t('language')}</span>
-            <Segmented<Lang>
-              ariaLabel={t('language')}
-              block
-              value={lang}
-              onChange={(v) => setLang(v)}
-              options={[
-                { value: 'en', label: 'EN', ariaLabel: 'English' },
-                { value: 'el', label: 'ΕΛ', ariaLabel: 'Ελληνικά' },
               ]}
             />
           </div>

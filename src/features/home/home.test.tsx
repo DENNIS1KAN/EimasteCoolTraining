@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { __resetForTests, getState, setState } from '../../data/store'
 import { BTS_PROGRAM } from '../../data/programs'
 import type { Cheer, Member } from '../../data/types'
-import { setLang } from '../../i18n'
+
 import { addDays, todayISO } from '../../lib/dates'
 import { mkCheckin, mkMember, mkPlan, mkWeight } from '../../lib/testing/fixtures'
 import { setPref } from '../../lib/prefs'
@@ -21,13 +21,12 @@ const ui = () => render(<MemoryRouter>{<HomePage />}</MemoryRouter>)
 
 beforeEach(() => {
   __resetForTests()
-  setLang('en')
   setPref('dismissed', {})
 })
 afterEach(cleanup)
 
 describe('HomePage (athlete)', () => {
-  it('guides a fresh account with the checklist instead of empty tiles', () => {
+  it('guides a fresh account with the checklist, and the tiles read "not yet"', () => {
     seed([athlete('stelios'), coach], 'stelios')
     ui()
     const list = screen.getByRole('region', { name: 'Three steps to week 1' })
@@ -35,7 +34,10 @@ describe('HomePage (athlete)', () => {
     expect(within(list).getByText('Set your start date')).toBeTruthy()
     // no meal plan yet: the last step waits on the coach, by name
     expect(within(list).getByText('Dennis hasn’t uploaded it yet')).toBeTruthy()
-    expect(screen.queryByText('Week streak')).toBeNull()
+    // the tiles keep their shape rather than vanishing, so the layout never reflows once training starts
+    const tiles = screen.getByRole('list', { name: 'Your numbers' })
+    expect(within(tiles).getByText('Week streak')).toBeTruthy()
+    expect(within(tiles).getAllByText('not yet').length).toBe(3)
     expect(screen.getByRole('heading', { level: 1 }).textContent).toMatch(/, Stelios$/)
   })
 
@@ -47,9 +49,9 @@ describe('HomePage (athlete)', () => {
     expect(getState().meId).toBe('stelios')
   })
 
-  it('shows the coach note, the week in the eyebrow, the tiles and the unseen cheers on the bell', () => {
+  it('shows the week in the eyebrow, the tiles and the unseen cheers on the bell', () => {
     const start = addDays(today, -15)
-    const me = athlete('stelios', { programStart: start, coachNote: 'Protein at 180 g!', coachNoteAt: Date.now() - 3600_000 })
+    const me = athlete('stelios', { programStart: start })
     const nudge: Cheer = {
       id: 'c1',
       fromId: 'thanos',
@@ -69,8 +71,6 @@ describe('HomePage (athlete)', () => {
       checkins: Object.fromEntries([mkCheckin('stelios', addDays(today, -1), { rating: 'on' })].map((c) => [c.id, c])),
     })
     ui()
-    expect(screen.getByText('Protein at 180 g!')).toBeTruthy()
-    expect(screen.getByText('Coach Dennis')).toBeTruthy()
     expect(screen.getByText(/Week 3 of 12/)).toBeTruthy()
     expect(screen.getByText('Week streak')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Notifications, 1 unread' })).toBeTruthy()

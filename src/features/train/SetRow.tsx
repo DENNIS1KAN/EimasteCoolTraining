@@ -1,6 +1,6 @@
 import { memo, useRef, type KeyboardEvent } from 'react'
 import type { SetLog, Unit } from '../../data/types'
-import { useLang, useT, type Lang } from '../../i18n'
+import { useT } from '../../i18n'
 import { Icon, PRBadge, cx, displayDecimal, sanitizeDecimalDraft } from '../../ui'
 import type { Placeholder, TickResult } from './logic/log'
 import { M } from './messages'
@@ -29,12 +29,11 @@ interface Props {
 const REPS = /^\d{0,3}$/
 
 /** A stored weight (canonical "67.5"; older logs may hold a typed "67,5") as the input shows it: "67,5" in Greek. */
-const shown = (w: string | undefined, lang: Lang): string => displayDecimal((w ?? '').replace(',', '.'), lang)
+const shown = (w: string | undefined): string => displayDecimal((w ?? '').replace(',', '.'))
 
 /** One set: number (+ PR badge or technique tag), weight, reps and the 52 px done check. */
 export const SetRow = memo(function SetRow({ exercise, index, set, placeholder, unit, extra, tag, pr, caption, actions }: Props) {
   const t = useT(M)
-  const lang = useLang()
   const repsRef = useRef<HTMLInputElement>(null)
   const n = index + 1
 
@@ -73,8 +72,8 @@ export const SetRow = memo(function SetRow({ exercise, index, set, placeholder, 
       </div>
       <div className="tr-fld">
         <input
-          value={shown(set.w, lang)}
-          placeholder={shown(placeholder?.w, lang)}
+          value={shown(set.w)}
+          placeholder={shown(placeholder?.w)}
           inputMode="decimal"
           enterKeyHint="next"
           autoComplete="off"

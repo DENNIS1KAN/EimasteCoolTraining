@@ -38,7 +38,7 @@ export interface Backend {
   /** Live changes made by others (and echoes of our own writes, which the store ignores by LWW). */
   subscribe(cb: (e: ChangeEvent) => void): () => void
 
-  uploadFile(memberId: string, file: File): Promise<FileRef>
+  uploadFile(memberId: string, file: File, bucket?: string): Promise<FileRef>
   /** A URL the browser can open/embed (signed or object URL). */
   fileUrl(ref: FileRef): Promise<string>
   deleteFile(ref: FileRef): Promise<void>

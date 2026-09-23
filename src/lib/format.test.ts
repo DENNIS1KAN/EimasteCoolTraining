@@ -1,6 +1,6 @@
-import { afterAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { DST_SPRING, at } from './testing/fixtures'
-import { getLang, setLang } from '../i18n'
+
 import {
   fmtClock,
   fmtCompact,
@@ -16,12 +16,8 @@ import {
 } from './format'
 
 const MINUS = '−'
-const initialLang = getLang()
-afterAll(() => setLang(initialLang))
 
-describe('in English', () => {
-  beforeEach(() => setLang('en'))
-
+describe('formatting', () => {
   it('fmtNum rounds to the requested digits with a decimal point', () => {
     expect(fmtNum(80.94)).toBe('80.9')
     expect(fmtNum(80)).toBe('80')
@@ -141,41 +137,5 @@ describe('in English', () => {
     expect(fmtDuration(1000)).toBe('1 min')
     expect(fmtDuration(20_000)).toBe('1 min')
     expect(fmtDuration(-5000)).toBe('0 min')
-  })
-})
-
-describe('in Greek', () => {
-  beforeEach(() => setLang('el'))
-
-  it('uses a decimal comma and dot thousands', () => {
-    expect(fmtNum(80.94)).toBe('80,9')
-    expect(fmtNum(12345.6)).toBe('12.345,6')
-    expect(fmtSigned(-0.8)).toBe(`${MINUS}0,8`)
-    expect(fmtSigned(1.25, 2)).toBe('+1,25')
-    expect(fmtPct(0.456, 1)).toBe('45,6%')
-    expect(fmtWeight(80.94, 'kg')).toBe('80,9 kg')
-    expect(fmtVolume(18_400, 'kg')).toBe('18,4 t')
-  })
-
-  it('translates day labels and dates', () => {
-    const now = new Date(2026, 8, 22, 9)
-    expect(fmtDayLabel('2026-09-22', now)).toBe('Σήμερα')
-    expect(fmtDayLabel('2026-09-21', now)).toBe('Χθες')
-    expect(fmtDate('2026-09-22', 'long')).toBe('Τρίτη 22 Σεπτεμβρίου')
-    expect(fmtDate('2026-09-22', 'short')).toBe('22/9')
-    expect(fmtDate('2026-09-22')).toBe('22 Σεπ')
-  })
-
-  it('fmtDuration in Greek', () => {
-    expect(fmtDuration(72 * 60_000)).toBe('1 ώ. 12 λεπ.')
-    expect(fmtDuration(12 * 60_000)).toBe('12 λεπ.')
-    expect(fmtDuration(120 * 60_000)).toBe('2 ώ.')
-    expect(fmtDuration(10_000)).toBe('1 λεπ.')
-  })
-
-  it('relative times', () => {
-    const now = at('2026-09-22', 12)
-    expect(fmtRelative(now - 86400 * 1000, now)).toBe('χθες')
-    expect(fmtRelative(now, now)).toBe('τώρα')
   })
 })

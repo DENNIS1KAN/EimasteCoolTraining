@@ -23,7 +23,7 @@ import './fuel.css'
 
 const DAYS_BACK = 6
 
-/** Fuel: the viewer's meal plan and today's nutrition check-in (meals, rating, water), plus adherence. */
+/** Fuel: the viewer's meal plan and today's nutrition check-in (meals, rating), plus adherence. */
 export default function FuelPage() {
   const t = useT(FM)
   const me = useMe()
@@ -71,7 +71,6 @@ export default function FuelPage() {
     }
   }
   const onRate = (r: CheckinRating) => write((c) => ({ ...c, planId: c.planId ?? plan?.id ?? null, rating: nextRating(c.rating, r) }))
-  const onWater = (l: number) => write((c) => ({ ...c, waterL: l > 0 ? l : null }))
   const onNote = (text: string) => write((c) => ({ ...c, note: text }), { debounceMs: 600 })
 
   const canEdit = canEditPlans(me, me.id)
@@ -161,12 +160,9 @@ export default function FuelPage() {
       key="checkin"
       isToday={isToday}
       rating={checkin?.rating ?? null}
-      waterL={checkin?.waterL ?? null}
-      waterTargetL={plan?.waterL ?? null}
       note={checkin?.note ?? ''}
       coachSelf={me.role === 'coach'}
       onRate={onRate}
-      onWater={onWater}
       onNote={onNote}
     />,
   ]

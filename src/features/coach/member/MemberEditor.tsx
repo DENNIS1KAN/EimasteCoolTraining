@@ -16,7 +16,6 @@ import { useLeaveGuard } from '../hooks/useLeaveGuard'
 import { useProgramName } from '../../train/programText'
 import { M } from '../messages'
 import { ProgramSection } from './ProgramSection'
-import { CoachNoteCard } from './CoachNoteCard'
 import { LoginCard } from './LoginCard'
 import './member.css'
 
@@ -139,7 +138,6 @@ export function MemberEditor({ member, viewer }: MemberEditorProps) {
         </div>
 
         <div className="member-col">
-          <CoachNoteCard member={member} />
           <LoginCard member={member} isMe={isMe} />
         </div>
       </div>

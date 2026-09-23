@@ -1,14 +1,13 @@
-import { setLang, useLang, useT, type Lang } from '../../i18n'
+import { useT } from '../../i18n'
 import { setThemePref, useThemePref, type ThemePref } from '../../app/theme'
 import { Segmented } from '../../ui'
 import { SETTINGS } from './messages'
 import { Section } from './Section'
 
-/** Theme (System / Light / Dark) and language (English / Ελληνικά). Both are per device. */
+/** Theme (System / Light / Dark). Per device. */
 export function AppearanceSection() {
   const t = useT(SETTINGS)
   const theme = useThemePref()
-  const lang = useLang()
   return (
     <Section id="appearance" icon="sun" title={t('appearance')}>
       <div className="set-field">
@@ -24,19 +23,6 @@ export function AppearanceSection() {
             { value: 'system', label: t('system'), icon: 'monitor' },
             { value: 'light', label: t('light'), icon: 'sun' },
             { value: 'dark', label: t('dark'), icon: 'moon' },
-          ]}
-        />
-      </div>
-      <div className="set-field">
-        <p className="set-label">{t('language')}</p>
-        <Segmented<Lang>
-          block
-          ariaLabel={t('language')}
-          value={lang}
-          onChange={setLang}
-          options={[
-            { value: 'en', label: 'English' },
-            { value: 'el', label: 'Ελληνικά' },
           ]}
         />
       </div>

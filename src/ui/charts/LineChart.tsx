@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useId, useMemo } from 'react'
 import { useT } from '../../i18n'
 import { ChartTable, type TableMode } from './ChartTable'
 import { useScrub, useWidth } from './hooks'
@@ -269,6 +269,7 @@ function readingsAt(L: Layout, i: number) {
 
 export function LineChart(props: LineChartProps) {
   const t = useT(M)
+  const gid = useId().replace(/:/g, '')
   const [boxRef, width] = useWidth<HTMLDivElement>()
   const L = useMemo(() => (width ? layoutLine(props, width) : null), [props, width])
   const scrub = useScrub({
@@ -303,11 +304,18 @@ export function LineChart(props: LineChartProps) {
         {L && (
           <div className="ch-plot" role="img" aria-label={props.ariaLabel} {...scrub.bind} style={{ touchAction: 'pan-y' }}>
             <svg className="ch-svg" width={L.W} height={L.H} viewBox={`0 0 ${L.W} ${L.H}`} aria-hidden="true" focusable="false">
+              <defs>
+                {/* The area fades out downwards. currentColor picks up each series' own color. */}
+                <linearGradient id={`${gid}-area`} x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stopColor="currentColor" stopOpacity="0.3" />
+                  <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+                </linearGradient>
+              </defs>
               <Axes L={L} />
               <Markers L={L} markers={props.markers ?? []} />
               <RefLines L={L} refLines={props.refLines ?? []} />
               <g className="ch-anim-wipe">
-                {L.series.map((s) => (s.area && s.points.length > 1 ? <AreaMark key={s.id} L={L} s={s} dim={hasEmphasis && !s.emphasis} /> : null))}
+                {L.series.map((s) => (s.area && s.points.length > 1 ? <AreaMark key={s.id} L={L} s={s} gid={gid} dim={hasEmphasis && !s.emphasis} /> : null))}
                 {[...L.series]
                   .sort((a, b) => Number(!!a.emphasis) - Number(!!b.emphasis))
                   .map((s) => (
@@ -427,9 +435,15 @@ function RefLines({ L, refLines }: { L: Layout; refLines: RefLine[] }) {
 
 const screen = (L: Layout, s: Prepared): [number, number][] => s.points.map((q) => [L.x(q.x), L.y(q.y)])
 
-function AreaMark({ L, s, dim }: { L: Layout; s: Prepared; dim: boolean }) {
+function AreaMark({ L, s, gid, dim }: { L: Layout; s: Prepared; gid: string; dim: boolean }) {
   const base = L.y(clamp(0, L.yDom[0], L.yDom[1]))
-  return <path className={`ch-area${dim ? ' is-dim' : ''}`} d={areaPath(screen(L, s), base, s.curve)} style={{ fill: s.color }} />
+  return (
+    <path
+      className={`ch-area ch-area--grad${dim ? ' is-dim' : ''}`}
+      d={areaPath(screen(L, s), base, s.curve)}
+      style={{ color: s.color, fill: `url(#${gid}-area)` }}
+    />
+  )
 }
 
 function SeriesMarks({ L, s, dim }: { L: Layout; s: Prepared; dim: boolean }) {
@@ -442,9 +456,12 @@ function SeriesMarks({ L, s, dim }: { L: Layout; s: Prepared; dim: boolean }) {
       {lined && pts.length > 1 && <path className="ch-line" d={curvePath(pts, s.curve)} style={{ stroke: s.color }} />}
       {dotPts.map(([cx, cy], i) =>
         lined ? (
-          <circle key={i} className="ch-dot" cx={r2(cx)} cy={r2(cy)} r={DOT_R} style={{ fill: s.color }} />
+          <g key={i}>
+            {dots === 'end' && <circle className="ch-dot__halo" cx={r2(cx)} cy={r2(cy)} r={9.5} style={{ fill: s.color }} />}
+            <circle className="ch-dot" cx={r2(cx)} cy={r2(cy)} r={DOT_R} style={{ fill: s.color }} />
+          </g>
         ) : (
-          <circle key={i} className="ch-dot--hollow" cx={r2(cx)} cy={r2(cy)} r={3.5} style={{ stroke: s.color }} />
+          <circle key={i} className="ch-dot--scatter" cx={r2(cx)} cy={r2(cy)} r={2.1} style={{ fill: s.color }} />
         ),
       )}
     </g>

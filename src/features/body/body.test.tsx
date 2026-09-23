@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { __resetForTests, getState, setState } from '../../data/store'
 import type { Member, WeightVisibility } from '../../data/types'
-import { setLang } from '../../i18n'
+
 import { addDays, todayISO } from '../../lib/dates'
 import { mkMember, mkWeight } from '../../lib/testing/fixtures'
 import BodyPage from './BodyPage'
@@ -30,7 +30,6 @@ const ui = (node: React.ReactNode) => render(<MemoryRouter>{node}</MemoryRouter>
 
 beforeEach(() => {
   __resetForTests()
-  setLang('en')
 })
 afterEach(cleanup)
 

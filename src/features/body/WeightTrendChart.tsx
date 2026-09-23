@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useMe, useStore } from '../../data/store'
-import { useLang, useT } from '../../i18n'
+import { useT } from '../../i18n'
 import { addDays, fromISODate, isoFromMs, todayISO } from '../../lib/dates'
 import { fmtDate, fmtDayLabel, fmtNum } from '../../lib/format'
 import { weightSeries } from '../../lib/stats'
@@ -21,7 +21,6 @@ const ms = (d: string) => fromISODate(d).getTime()
  */
 export function WeightTrendChart({ memberId, days = 90, height = 200 }: { memberId: string; days?: number; height?: number }) {
   const t = useT(M)
-  const lang = useLang()
   const me = useMe()
   const members = useStore((s) => s.members)
   const member = members[memberId] ?? null
@@ -79,7 +78,7 @@ export function WeightTrendChart({ memberId, days = 90, height = 200 }: { member
       refLines: [{ y: 0, label: '' }] as RefLine[],
       aria: t('trendAriaChange', { name: member.name, n: days, value: wSigned(last.trendKg, unit) }),
     }
-  }, [member, mode, entries, unit, days, today, lang])
+  }, [member, mode, entries, unit, days, today])
 
   if (!member) return null
   if (mode === 'hidden') {

@@ -8,8 +8,8 @@ import { TodayWorkoutCard } from '../train/TodayWorkoutCard'
 import { WeightMiniCard } from '../body/WeightMiniCard'
 import { TodayNutritionCard } from '../fuel/TodayNutritionCard'
 import { SquadPulseCard } from '../squad/SquadPulseCard'
+import { SquadChatCard } from './SquadChatCard'
 import { AthleteOnboarding } from './AthleteOnboarding'
-import { CoachNote } from './CoachNote'
 import { CoachSetup } from './CoachSetup'
 import { HomeHeader } from './HomeHeader'
 import { SquadTodayCard } from './SquadTodayCard'
@@ -18,7 +18,6 @@ import { WeighInPrompt } from './WeighInPrompt'
 import { fmtEyebrowDate } from './format'
 import { useCoach, useNow, useSquadData, useToday, useUnseenCount } from './hooks'
 import { useInboxSlot } from './InboxSlot'
-import { hasTrainingStats } from './logic/tiles'
 import { HM } from './messages'
 
 /**
@@ -53,10 +52,9 @@ export function AthleteHome({ me }: { me: Member }) {
         <div className="home-col">
           {me.role === 'coach' ? <CoachSetup /> : null}
           <AthleteOnboarding me={me} coach={coach} />
-          <CoachNote me={me} coach={coach} now={now} />
           {slot}
           <TodayWorkoutCard />
-          {hasTrainingStats(stats) ? <StatTiles me={me} stats={stats} today={today} /> : null}
+          <StatTiles me={me} stats={stats} today={today} />
         </div>
         <div className="home-col">
           <WeighInPrompt me={me} today={today} now={now} />
@@ -65,6 +63,7 @@ export function AthleteHome({ me }: { me: Member }) {
             <TodayNutritionCard memberId={me.id} />
           </div>
           <SquadPulseCard />
+          <SquadChatCard />
           {me.role === 'coach' ? <SquadTodayCard data={data} today={today} meId={me.id} /> : null}
         </div>
       </div>

@@ -1334,7 +1334,23 @@
 
 /* ------------------------------------------------------------------ today hero (Home) */
 .tr-hero {
+  position: relative;
   padding: 14px 14px 14px 16px;
+  overflow: hidden;
+}
+/* A soft accent glow bleeding off the top-right corner: the hero is the one card per screen that
+   carries the brand, so it gets depth the plain cards do not. Decorative. */
+.tr-hero::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  right: -70px;
+  width: 260px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+  opacity: 0.5;
+  pointer-events: none;
 }
 .tr-hero > * {
   position: relative;
@@ -1385,7 +1401,7 @@
   font: 900 clamp(52px, 17vw, 72px) / 0.78 var(--font-display);
   letter-spacing: -0.01em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--accent-strong);
 }
 .tr-hero__title--sm {
   margin: 12px 0 8px;
