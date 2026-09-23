@@ -10,6 +10,7 @@ import { e1rm, exerciseHistory, personalRecords, type ExercisePoint } from '../.
 import { kgToUnit } from '../../lib/units'
 import { Avatar, BigNumber, ButtonLink, Card, CardHeader, Chip, Delta, EmptyState, Icon, PRBadge, PageHeader, memberColorVar } from '../../ui'
 import { LineChart, type LineSeries } from '../../ui/charts'
+import { memberWorkoutHref } from '../squad/format'
 import { setSeparator, textLang } from './logic/format'
 import { LIFT } from './messages'
 import './train.css'
@@ -50,11 +51,12 @@ function LiftHistory({ me, member, name }: { me: Member; member: Member; name: s
   const logs = useStore((s) => Object.values(s.logs).filter((l) => l.memberId === member.id))
   const history = useMemo(() => exerciseHistory(logs, programs, name), [logs, programs, name])
   const prLogIds = useMemo(() => new Set(personalRecords(logs, programs).filter((p) => p.exercise === name).map((p) => p.logId)), [logs, programs, name])
-  const dayNames = useMemo(() => {
-    const out: Record<string, string> = {}
+  /** Per log: the day's short name and the program it belongs to (a session can be from an earlier program). */
+  const sessions = useMemo(() => {
+    const out: Record<string, { day: string; programId: string }> = {}
     for (const l of logs) {
       const d = programs[l.programId]?.weeks[l.week - 1]?.days[l.day]
-      out[l.id] = d ? dayShortName(d) : ''
+      out[l.id] = { day: d ? dayShortName(d) : '', programId: l.programId }
     }
     return out
   }, [logs, programs])
@@ -121,18 +123,20 @@ function LiftHistory({ me, member, name }: { me: Member; member: Member; name: s
                       '—'
                     )}
                   </dd>
-                  {best ? <span className="lf-sub">{fmtDate(isoFromMs(best.at), 'medium')}</span> : null}
+                  {best ? <dd className="lf-sub">{fmtDate(isoFromMs(best.at), 'medium')}</dd> : null}
                 </div>
                 <div>
                   <dt>{t('sessions')}</dt>
                   <dd className="num">{history.length}</dd>
-                  <span className="lf-sub">{fmtDate(history[0].date)} – {fmtDate(history[history.length - 1].date)}</span>
+                  <dd className="lf-sub">
+                    {fmtDate(history[0].date)} – {fmtDate(history[history.length - 1].date)}
+                  </dd>
                 </div>
               </dl>
             </Card>
             <ProgressChart member={member} me={me} name={name} history={history} unit={unit} />
           </div>
-          <SessionList member={member} history={history} unit={unit} prLogIds={prLogIds} dayNames={dayNames} />
+          <SessionList member={member} history={history} unit={unit} prLogIds={prLogIds} sessions={sessions} />
         </div>
       )}
     </div>
@@ -209,8 +213,8 @@ function ProgressChart({ me, member, name, history, unit }: { me: Member; member
   )
 }
 
-function SessionList(p: { member: Member; history: ExercisePoint[]; unit: Unit; prLogIds: Set<string>; dayNames: Record<string, string> }) {
-  const { member, history, unit, prLogIds, dayNames } = p
+function SessionList(p: { member: Member; history: ExercisePoint[]; unit: Unit; prLogIds: Set<string>; sessions: Record<string, { day: string; programId: string }> }) {
+  const { member, history, unit, prLogIds, sessions } = p
   const t = useT(LIFT)
   const rows = [...history].reverse()
   return (
@@ -222,10 +226,10 @@ function SessionList(p: { member: Member; history: ExercisePoint[]; unit: Unit; 
         {rows.map((p) => {
           return (
             <li key={p.logId}>
-              <Link to={`/member/${member.slug}/workout/${p.week}/${p.day}`} className="lf-row">
+              <Link to={memberWorkoutHref(member, p.week, p.day, sessions[p.logId]?.programId)} className="lf-row">
                 <span className="lf-row__when">
                   <b>{fmtDayLabel(p.date)}</b>
-                  <span>{t('weekDay', { week: p.week, day: dayNames[p.logId] ?? '' })}</span>
+                  <span>{t('weekDay', { week: p.week, day: sessions[p.logId]?.day ?? '' })}</span>
                 </span>
                 <span className="lf-row__sets num">
                   {p.sets.map((s, i) => (

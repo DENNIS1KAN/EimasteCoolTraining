@@ -154,6 +154,7 @@ export const SQ = defineMessages(
     sendNudge: 'Send nudge',
     nudgeSent: 'Nudge sent to {name}',
     nudgedAgo: 'Nudged {time}',
+    nudgedDone: 'Nudged',
     nudgeAgainAt: 'You can nudge again {time}',
     chars: '{n}/{max}',
 
@@ -435,6 +436,7 @@ export const SQ = defineMessages(
     sendNudge: 'Στείλε σκούντημα',
     nudgeSent: 'Το σκούντημα έφυγε για {name}',
     nudgedAgo: 'Σκούντηξες {time}',
+    nudgedDone: 'Σκούντηξες',
     nudgeAgainAt: 'Μπορείς ξανά {time}',
     chars: '{n}/{max}',
 

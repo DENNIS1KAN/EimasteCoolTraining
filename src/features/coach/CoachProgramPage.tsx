@@ -4,6 +4,7 @@ import { ButtonLink, EmptyState, IconButton, PageHeader, toast } from '../../ui'
 import { useT } from '../../i18n'
 import { useStore } from '../../data/store'
 import { programToCSV } from '../../lib/import/program'
+import { useProgramName } from '../train/programText'
 import { M } from './messages'
 import { downloadText } from './lib/download'
 import { toHandle } from './lib/handle'
@@ -19,6 +20,7 @@ export default function CoachProgramPage() {
   const { id = '' } = useParams()
   const program = useStore((s) => s.programs[id] ?? null)
   const membersById = useStore((s) => s.members)
+  const programName = useProgramName(program ?? { name: '' })
   const members = useMemo(
     () => (program ? membersOnProgram(Object.values(membersById), program.id).sort((a, b) => a.name.localeCompare(b.name)) : []),
     [membersById, program],
@@ -53,7 +55,7 @@ export default function CoachProgramPage() {
       <PageHeader
         back="/coach?tab=programs"
         eyebrow={`${t('programEyebrow')} · ${program.builtIn ? t('builtIn') : t('imported')}`}
-        title={program.name}
+        title={programName}
         actions={<IconButton icon="download" label={t('exportCsv')} onClick={exportCsv} />}
       />
       <div className="program-layout">

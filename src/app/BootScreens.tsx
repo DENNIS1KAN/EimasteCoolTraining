@@ -12,6 +12,8 @@ const M = defineMessages(
     body: 'Something went wrong while opening the app. Check your connection and try again. If it keeps happening, tell your coach.',
     retry: 'Try again',
     details: 'Details',
+    configTitle: 'Setup problem',
+    configHint: 'Fix public/config.js (see docs/SETUP.md).',
   },
   {
     loading: 'Φόρτωση του Eimaste Cool Training',
@@ -20,6 +22,8 @@ const M = defineMessages(
     body: 'Κάτι πήγε στραβά στο άνοιγμα της εφαρμογής. Έλεγξε τη σύνδεσή σου και ξαναδοκίμασε. Αν συνεχίσει, ενημέρωσε τον προπονητή σου.',
     retry: 'Ξαναδοκίμασε',
     details: 'Λεπτομέρειες',
+    configTitle: 'Πρόβλημα ρύθμισης',
+    configHint: 'Διόρθωσε το public/config.js (δες το docs/SETUP.md).',
   },
 )
 
@@ -62,22 +66,36 @@ export function PageFallback() {
   )
 }
 
-/** Boot failed (e.g. no network on first launch, bad config). Shows state.bootError and offers a reload. */
+/**
+ * Boot failed (e.g. no network on first launch, bad config). Shows state.bootError and offers a reload.
+ * A configuration problem (the secret key in config.js, a rejected e-mail domain) is not the connection: it shows
+ * the explanation and where to fix it instead.
+ */
 export function ErrorScreen() {
   const t = useT(M)
   const err = useStore((s) => s.bootError)
+  const config = useStore((s) => s.bootErrorCode) === 'config'
   return (
     <div className="boot boot--error" role="alert">
       <div className="boot__card">
         <BrandMark size={56} />
-        <h1 className="boot__title">{t('title')}</h1>
-        <p className="boot__body">{t('body')}</p>
-        {err ? (
-          <p className="boot__detail">
-            <span className="visually-hidden">{t('details')}: </span>
-            {err}
-          </p>
-        ) : null}
+        <h1 className="boot__title">{config ? t('configTitle') : t('title')}</h1>
+        {config ? (
+          <>
+            {err ? <p className="boot__body">{err}</p> : null}
+            <p className="boot__detail">{t('configHint')}</p>
+          </>
+        ) : (
+          <>
+            <p className="boot__body">{t('body')}</p>
+            {err ? (
+              <p className="boot__detail">
+                <span className="visually-hidden">{t('details')}: </span>
+                {err}
+              </p>
+            ) : null}
+          </>
+        )}
         <div className="boot__actions">
           <Button variant="primary" size="lg" icon="refresh" block onClick={() => location.reload()}>
             {t('retry')}

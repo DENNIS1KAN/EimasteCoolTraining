@@ -5,6 +5,7 @@ import type { Member } from '../data/types'
 import { defineMessages, useT } from '../i18n'
 import { COMMON } from '../i18n/common'
 import { unseenCheers } from '../lib/stats'
+import { stopRest } from '../features/train/logic/restTimer'
 import { liveLog } from '../features/train/logic/today'
 import { Avatar, Banner, Icon, Toaster, cx, openAccountSheet, type IconName } from '../ui'
 import { memberColorVar } from '../ui/member'
@@ -129,6 +130,10 @@ export function AppShell() {
       { duration: 160, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
     )
   }, [pathname])
+
+  // The shell unmounts when the session ends (sign out, expired login): stop a running rest timer with it, so its
+  // alarm never goes off on the login screen.
+  useEffect(() => () => stopRest(), [])
 
   const skipToContent = () => mainRef.current?.focus()
 

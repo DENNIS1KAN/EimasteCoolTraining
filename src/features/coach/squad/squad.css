@@ -99,6 +99,13 @@
 .glance-row.is-behind + .glance-row {
   border-top-color: transparent;
 }
+/* --muted is ~4.2:1 on the warn tint in dark: secondary text of a highlighted row uses --ink-2 */
+.glance-row.is-behind .glance-row__meta,
+.glance-row.is-behind .micro,
+.glance-row.is-behind .glance-metric__of,
+.glance-row.is-behind .glance-metric__text.is-muted {
+  color: var(--ink-2);
+}
 .glance-row__head {
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr) auto;

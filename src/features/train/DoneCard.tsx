@@ -5,6 +5,7 @@ import { isoFromMs } from '../../lib/dates'
 import { fmtDate, fmtDuration, fmtVolume } from '../../lib/format'
 import { sessionSummary, type WorkoutRef } from '../../lib/stats'
 import { Button, ButtonLink, Card, CardLink, Icon } from '../../ui'
+import { memberWorkoutHref } from '../squad/format'
 import { durationParts, fmtTime } from './logic/format'
 import { setTally, type SetTally } from './logic/log'
 import { M } from './messages'
@@ -62,7 +63,7 @@ export function DoneCard({ log, program, unit, prs, next, slug, onUndo }: Props)
           <Button variant="ghost" size="sm" icon="refresh" onClick={onUndo}>
             {t('markNotDone')}
           </Button>
-          <CardLink to={`/member/${slug}/workout/${log.week}/${log.day}`}>{t('viewShared')}</CardLink>
+          <CardLink to={memberWorkoutHref({ slug }, log.week, log.day, log.programId)}>{t('viewShared')}</CardLink>
         </div>
       </div>
     </Card>

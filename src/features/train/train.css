@@ -225,28 +225,42 @@
   display: flex;
   gap: 3px;
   min-width: 0;
+  /* 44 px tall tap targets that still lay out (and look) like a 5 px bar */
+  height: 44px;
+  margin: -19.5px 0;
 }
 .tr-prog__seg {
   flex: 1;
-  height: 5px;
+  min-width: 0;
+  height: 100%;
   padding: 0;
   border: 0;
-  border-radius: 3px;
-  background: var(--surface-3);
+  background: none;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
-.tr-prog__seg::before {
+/* the visible 5 px track (::before) and its fill (::after), centred in the tap target */
+.tr-prog__seg::before,
+.tr-prog__seg::after {
   content: '';
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 50%;
+  height: 5px;
+  margin-top: -2.5px;
+  border-radius: 3px;
+}
+.tr-prog__seg::before {
+  right: 0;
+  background: var(--surface-3);
+}
+.tr-prog__seg::after {
   width: calc(var(--p, 0) * 100%);
   background: var(--accent-strong);
-  border-radius: 3px;
   transition: width var(--dur-2) var(--ease);
 }
-.tr-prog__seg.is-cur {
+.tr-prog__seg.is-cur::before {
   box-shadow: 0 0 0 1px var(--accent-strong);
 }
 
@@ -453,6 +467,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* on the done set's volt band --muted drops to ~4:1 in dark */
+.tr-set.is-done .tr-set__e1 {
+  color: var(--ink-2);
+}
 .tr-fld {
   position: relative;
   height: 52px;
@@ -601,10 +619,11 @@
   flex: none;
 }
 .tr-xpand__t {
+  /* wraps to a second line rather than cutting "Ζέσταμα, αλλαγές & σημειώσεις" on a 360 px phone */
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  padding: 6px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .tr-xpand__s {
   flex: none;

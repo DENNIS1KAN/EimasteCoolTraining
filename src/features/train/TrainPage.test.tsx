@@ -71,6 +71,20 @@ describe('TrainPage', () => {
     expect(screen.getByRole('timer', { name: /Rest timer/ })).toBeTruthy()
   })
 
+  it('shows weights with the Greek decimal comma but stores them canonical', () => {
+    const halves = mkLog({ week: 1, day: 0, doneAt: at('2026-01-05'), ex: { 0: { sets: [['52.5', '10'], ['52.5', '9']] } } })
+    seed({ logs: [halves] })
+    setLang('el')
+    at2('/train/2/0')
+    const [w1, , w2] = document.getElementById('ex-0')!.querySelectorAll<HTMLInputElement>('.tr-fld input')
+    expect(w1.placeholder).toBe('52,5')
+    act(() => {
+      fireEvent.change(w2, { target: { value: '55,5' } })
+    })
+    expect(getState().logs[W2_UPPER].ex['0'].sets[1].w).toBe('55.5')
+    expect(w2.value).toBe('55,5')
+  })
+
   it("stops the rest timer when someone else signs in (it never shows another member's rest)", () => {
     seed({ logs: [week1] })
     at2('/train/2/0')

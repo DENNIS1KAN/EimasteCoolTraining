@@ -7,6 +7,7 @@ import { dismissHint, usePrefs } from '../../lib/prefs'
 import { Button, Sheet, celebrate } from '../../ui'
 import { LogWeightSheet } from '../body/LogWeightSheet'
 import { StartProgramForm } from '../train/StartProgram'
+import { useProgramName } from '../train/programText'
 import { Checklist, type ChecklistItem } from './Checklist'
 import { HINT_ATHLETE, HINT_PLAN_SEEN, SEEN_SUFFIX, athleteSteps, checklistView, currentStep } from './logic/onboarding'
 import { HM } from './messages'
@@ -20,6 +21,7 @@ export function AthleteOnboarding({ me, coach }: { me: Member; coach: Member | n
   const t = useT(HM)
   const prefs = usePrefs()
   const program = useStore((s) => (me.programId ? (s.programs[me.programId] ?? null) : null))
+  const programName = useProgramName(program ?? { name: '' })
   const weighIns = useStore((s) => {
     let n = 0
     for (const w of Object.values(s.weights)) if (w.memberId === me.id) n++
@@ -112,7 +114,7 @@ export function AthleteOnboarding({ me, coach }: { me: Member; coach: Member | n
         }
       />
       {program ? (
-        <Sheet open={sheet === 'start'} onClose={() => setSheet(null)} title={t('startSheetTitle')} subtitle={program.name}>
+        <Sheet open={sheet === 'start'} onClose={() => setSheet(null)} title={t('startSheetTitle')} subtitle={programName}>
           <StartProgramForm me={me} program={program} onSaved={() => setSheet(null)} />
         </Sheet>
       ) : null}

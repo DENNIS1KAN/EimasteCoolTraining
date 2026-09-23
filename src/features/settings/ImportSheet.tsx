@@ -8,6 +8,7 @@ import type { LogbookImportResult } from '../../lib/import/logbook'
 import { fmtDate, fmtNum } from '../../lib/format'
 import { Banner, Button, celebrate, EmptyState, Icon, Sheet, StatTile, Switch, toast } from '../../ui'
 import { inferProgramStart, logsToWrite, summarizeImport } from './importPlan'
+import { useProgramName } from '../train/programText'
 import { SETTINGS } from './messages'
 
 export interface ImportPreview {
@@ -30,6 +31,7 @@ export function ImportSheet({ preview, me, program, onClose, onChooseAnother }: 
   const t = useT(SETTINGS)
   const c = useT(COMMON)
   const lang = useLang()
+  const programName = useProgramName(program)
   const existing = useStore((s) => s.logs)
   const [overwrite, setOverwrite] = useState(false)
   const [setStart, setSetStart] = useState(true)
@@ -54,7 +56,7 @@ export function ImportSheet({ preview, me, program, onClose, onChooseAnother }: 
       open={!!preview}
       onClose={onClose}
       title={empty ? t('importTitle') : t('importPreview')}
-      subtitle={preview ? `${t('importFile', { file: preview.file })} · ${t('importInto', { program: program.name })}` : undefined}
+      subtitle={preview ? `${t('importFile', { file: preview.file })} · ${t('importInto', { program: programName })}` : undefined}
       size={warnings.length > 6 ? 'full' : 'auto'}
       footer={
         empty ? (

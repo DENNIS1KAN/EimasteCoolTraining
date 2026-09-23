@@ -7,7 +7,7 @@ import { BrandMark } from '../../app/Brand'
 import { Banner, Button, EmptyState, Icon, Skeleton } from '../../ui'
 import { memberColorVar } from '../../ui/member'
 import { AuthScreen } from './AuthScreen'
-import { authErrorKey, type AuthErrorKey } from './errors'
+import { authError, authErrorVars, type AuthError, type AuthErrorKey } from './errors'
 import { getLastProfile, setLastProfile } from './lastProfile'
 import { AUTH, SETUP_GUIDE_URL } from './messages'
 import { PasswordField } from './PasswordField'
@@ -16,6 +16,9 @@ import { ProfileTile } from './ProfileTile'
 import { useLoginProfiles } from './useLoginProfiles'
 import './install'
 
+/** Errors that explain why the squad didn't load (anything else reads as a generic "try again"). */
+const LOAD_ERRORS: AuthErrorKey[] = ['errOffline', 'errRateLimited', 'errUnavailable', 'errConfig']
+
 /** Signed-out start screen: pick your profile, type your password (demo mode: tap and you're in). */
 export default function LoginPage() {
   const t = useT(AUTH)
@@ -23,11 +26,11 @@ export default function LoginPage() {
   const demo = useStore((s) => s.backend) === 'demo'
   const squad = useLoginProfiles()
   const { status, profiles, retry } = squad
-  const loadError = squad.status === 'error' ? authErrorKey(squad.error, 'login') : null
+  const loadError = squad.status === 'error' ? authError(squad.error, 'login') : null
   const [selected, setSelected] = useState<string | null>(null)
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState<string | null>(null)
-  const [error, setError] = useState<AuthErrorKey | null>(null)
+  const [error, setError] = useState<AuthError | null>(null)
   const pwRef = useRef<HTMLInputElement>(null)
   const restored = useRef(false)
 
@@ -47,7 +50,7 @@ export default function LoginPage() {
     try {
       await signIn(p.slug, pw)
     } catch (e) {
-      setError(authErrorKey(e, 'login'))
+      setError(authError(e, 'login'))
       setBusy(null)
       if (!demo) requestAnimationFrame(() => pwRef.current?.select())
     }
@@ -122,7 +125,7 @@ export default function LoginPage() {
                 </Button>
               }
             >
-              {t(loadError === 'errOffline' ? 'errOffline' : 'errGeneric')}
+              {loadError && LOAD_ERRORS.includes(loadError.key) ? t(loadError.key, authErrorVars(loadError)) : t('errGeneric')}
             </Banner>
           ) : null}
 
@@ -167,7 +170,7 @@ export default function LoginPage() {
 
           {demo && error ? (
             <Banner tone="danger" role="alert">
-              {t(error)}
+              {t(error.key, authErrorVars(error))}
             </Banner>
           ) : null}
 
@@ -197,7 +200,7 @@ export default function LoginPage() {
                 error={!!error}
                 describedBy={error ? 'auth-login-error' : undefined}
               />
-              {error ? <FormError id="auth-login-error">{t(error)}</FormError> : null}
+              {error ? <FormError id="auth-login-error">{t(error.key, authErrorVars(error))}</FormError> : null}
               <Button type="submit" variant="primary" size="lg" block loading={!!busy} disabled={!password} iconRight="arrow-right">
                 {busy ? t('signingIn') : t('signIn')}
               </Button>

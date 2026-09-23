@@ -186,6 +186,30 @@ describe.each(TODAYS)('createDemoSnapshot(%s)', (today) => {
     expect(sStats.adherence14).toBeCloseTo(adh(S))
   })
 
+  it('logs food from the first plan on, so the 4-week number tells the same story', () => {
+    const adh28 = (id: string) => recentAdherence(Object.values(d.checkins), currentPlan(Object.values(d.mealPlans), id), today, 28, d.mealPlans)!
+    const s = adh28(S)
+    const t = adh28(T)
+    expect(s.days).toBe(28)
+    expect(s.ratio).toBeGreaterThanOrEqual(0.78)
+    expect(s.ratio).toBeLessThanOrEqual(0.92)
+    // Thanos's plan is only 3-4 weeks old, so his window holds a partial fortnight: a little above his 14-day number.
+    expect(t.ratio).toBeGreaterThanOrEqual(0.55)
+    expect(t.ratio).toBeLessThanOrEqual(0.76)
+    expect(t.ratio).toBeLessThan(s.ratio - 0.1)
+    // days before v2 are logged against v1, with v1's meals
+    const plans = Object.values(d.mealPlans).filter((p) => p.memberId === S)
+    const v1 = plans.find((p) => !p.active)!
+    const v2 = plans.find((p) => p.active)!
+    const first = snap.checkins.filter((c) => c.memberId === S).sort((x, y) => (x.date < y.date ? -1 : 1))[0]
+    expect(first.date).toBe(v1.startDate)
+    expect(first.planId).toBe(v1.id)
+    for (const c of snap.checkins.filter((c) => c.memberId === S && c.date < v2.startDate)) {
+      expect(c.planId).toBe(v1.id)
+      for (const m of c.meals) expect(v1.meals.some((x) => x.id === m)).toBe(true)
+    }
+  })
+
   it('keeps the head-to-head close', () => {
     const h = headToHead(sStats, tStats)
     // each side leads on at least 3 of the 9 metrics, whatever the weekday

@@ -13,6 +13,7 @@ import { programWeekOn } from '../../../lib/stats'
 import { lastActiveAt } from '../lib/glance'
 import { ColorPicker } from '../components/ColorPicker'
 import { useLeaveGuard } from '../hooks/useLeaveGuard'
+import { useProgramName } from '../../train/programText'
 import { M } from '../messages'
 import { ProgramSection } from './ProgramSection'
 import { CoachNoteCard } from './CoachNoteCard'
@@ -75,12 +76,13 @@ export function MemberEditor({ member, viewer }: MemberEditorProps) {
   const isMe = member.id === viewer.id
   const previewName = draft.name.trim() || member.name
   const program = member.programId ? programsById[member.programId] : undefined
+  const programName = useProgramName(program ?? { name: '' })
   const week = program && member.programStart ? programWeekOn(program, member.programStart, todayISO()) : 0
   const programLine = !program
     ? t('noProgram')
     : week > 0
-      ? t('programWeek', { program: program.name, week })
-      : t('programNotStarted', { program: program.name })
+      ? t('programWeek', { program: programName, week })
+      : t('programNotStarted', { program: programName })
 
   return (
     <div className="coach-page coach-member">

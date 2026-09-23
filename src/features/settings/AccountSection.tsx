@@ -4,9 +4,9 @@ import { COMMON } from '../../i18n/common'
 import { getBackend, signOut, useStore, useSync } from '../../data/store'
 import type { Member } from '../../data/types'
 import { Button, ConfirmSheet, Icon, Sheet, toast } from '../../ui'
-import { authErrorKey, type AuthErrorKey } from '../auth/errors'
+import { authError, authErrorVars, type AuthError } from '../auth/errors'
 import { AUTH } from '../auth/messages'
-import { checkPassword, PASSWORD_VARS } from '../auth/password'
+import { checkPassword } from '../auth/password'
 import { PasswordField } from '../auth/PasswordField'
 import { FormError, PasswordRules } from '../auth/PasswordRules'
 import { SETTINGS } from './messages'
@@ -20,7 +20,7 @@ function PasswordSheet({ open, onClose, slug }: { open: boolean; onClose: () => 
   const [confirm, setConfirm] = useState('')
   const [shown, setShown] = useState(false)
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<AuthErrorKey | null>(null)
+  const [error, setError] = useState<AuthError | null>(null)
   const check = checkPassword(pw, confirm)
 
   const close = () => {
@@ -43,7 +43,7 @@ function PasswordSheet({ open, onClose, slug }: { open: boolean; onClose: () => 
       setConfirm('')
       onClose()
     } catch (err) {
-      setError(authErrorKey(err, 'password'))
+      setError(authError(err, 'password'))
       setBusy(false)
     }
   }
@@ -87,7 +87,7 @@ function PasswordSheet({ open, onClose, slug }: { open: boolean; onClose: () => 
           shown={shown}
           onShownChange={setShown}
           data-autofocus
-          error={error === 'errPasswordRejected'}
+          error={error?.key === 'errPasswordRejected'}
           describedBy="set-pw-rules"
         />
         <PasswordField
@@ -104,7 +104,7 @@ function PasswordSheet({ open, onClose, slug }: { open: boolean; onClose: () => 
           describedBy="set-pw-rules"
         />
         <PasswordRules id="set-pw-rules" check={check} />
-        {error ? <FormError>{a(error, PASSWORD_VARS)}</FormError> : null}
+        {error ? <FormError>{a(error.key, authErrorVars(error))}</FormError> : null}
         <button type="submit" hidden tabIndex={-1} />
       </form>
     </Sheet>

@@ -2,6 +2,7 @@ import type { Program, WorkoutLog } from '../../../data/types'
 import { dayShortName } from '../../../data/programs'
 import type { ISODate } from '../../../lib/dates'
 import { programWeekOn, scheduledDate } from '../../../lib/stats'
+import { upperText } from '../../../lib/text'
 import type { SquadData } from '../../../lib/stats'
 
 export type DotState = 'done' | 'today' | 'upcoming' | 'missed'
@@ -34,7 +35,7 @@ export function programWeekDots(program: Program, start: ISODate | null, logs: W
       if (date === today) state = 'today'
       else if (date < today) state = 'missed'
     }
-    return { label: (name.trim()[0] ?? '?').toUpperCase(), name, state, week, day }
+    return { label: upperText(Array.from(name.trim())[0] ?? '?'), name, state, week, day }
   })
 }
 

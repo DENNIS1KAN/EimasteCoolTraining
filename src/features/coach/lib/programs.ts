@@ -3,6 +3,7 @@ import type { Member, Program } from '../../../data/types'
 import type { ISODate } from '../../../lib/dates'
 import { addDays, fromISODate } from '../../../lib/dates'
 import { dayShortName } from '../../../data/programs'
+import { upperText } from '../../../lib/text'
 import { toHandle } from './handle'
 
 export interface ProgramSummary {
@@ -108,7 +109,7 @@ export const techniqueOf = (t: string | undefined): string | null => {
 export function focusAbbr(dayName: string): string {
   const focus = (dayName.match(/\(([^)]+)\)/) || [])[1]?.trim() ?? ''
   const word = focus.split(/\s+/)[0] ?? ''
-  return word.slice(0, 3).toUpperCase()
+  return upperText(Array.from(word).slice(0, 3).join(''))
 }
 
 export interface BlockGroup {

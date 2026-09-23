@@ -12,6 +12,5 @@ export const fmtEyebrowDate = (d: ISODate): string => `${fmtDate(d, 'weekday')} 
 
 /** Short month name for "PRs in Sep". */
 export function fmtMonth(d: ISODate): string {
-  const [y, m] = d.split('-').map(Number)
-  return new Intl.DateTimeFormat(localeOf(getLang()), { month: 'short' }).format(new Date(y, m - 1, 15))
+  return fmtDate(d, 'month')
 }

@@ -6,11 +6,11 @@ import type { LoginProfile } from '../../data/types'
 import { Avatar, Banner, Button, celebrate, Icon, Skeleton, type IconName } from '../../ui'
 import { memberColorVar } from '../../ui/member'
 import { AuthScreen } from './AuthScreen'
-import { authErrorKey, isFatalJoinError, type AuthErrorKey } from './errors'
+import { authError, authErrorVars, isFatalJoinError, type AuthError, type AuthErrorKey } from './errors'
 import { InstallGuide } from './InstallGuide'
 import { setLastProfile } from './lastProfile'
 import { AUTH } from './messages'
-import { checkPassword, PASSWORD_VARS } from './password'
+import { checkPassword } from './password'
 import { PasswordField } from './PasswordField'
 import { FormError, PasswordRules } from './PasswordRules'
 import { useLoginProfiles } from './useLoginProfiles'
@@ -42,7 +42,7 @@ function JoinFlow({ slug, code }: { slug: string; code: string }) {
   const [confirm, setConfirm] = useState('')
   const [shown, setShown] = useState(false)
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<AuthErrorKey | null>(null)
+  const [error, setError] = useState<AuthError | null>(null)
   const [step, setStep] = useState<'form' | 'welcome'>('form')
   const [starting, setStarting] = useState(false)
   const [startError, setStartError] = useState(false)
@@ -52,7 +52,7 @@ function JoinFlow({ slug, code }: { slug: string; code: string }) {
   const name = profile?.name ?? capitalize(slug)
   const check = checkPassword(password, confirm)
   const unknownProfile = status === 'ready' && !profile
-  const fatal: AuthErrorKey | null = !slug || !code || unknownProfile ? 'errInvalidInvite' : error && isFatalJoinError(error) ? error : null
+  const fatal: AuthErrorKey | null = !slug || !code || unknownProfile ? 'errInvalidInvite' : error && isFatalJoinError(error.key) ? error.key : null
 
   const signInInstead = () => {
     setLastProfile(slug)
@@ -70,7 +70,7 @@ function JoinFlow({ slug, code }: { slug: string; code: string }) {
       setStep('welcome')
       celebrate({ intensity: 'big' })
     } catch (err) {
-      setError(authErrorKey(err, 'join'))
+      setError(authError(err, 'join'))
     } finally {
       setBusy(false)
     }
@@ -197,7 +197,7 @@ function JoinFlow({ slug, code }: { slug: string; code: string }) {
             shown={shown}
             onShownChange={setShown}
             describedBy="join-rules"
-            error={error === 'errWeakPassword'}
+            error={error?.key === 'errWeakPassword'}
           />
           <PasswordField
             label={t('confirmPassword')}
@@ -215,7 +215,7 @@ function JoinFlow({ slug, code }: { slug: string; code: string }) {
             error={confirm.length > 0 && password.length > 0 && !check.matches && confirm.length >= password.length}
           />
           <PasswordRules id="join-rules" check={check} />
-          {error ? <FormError>{t(error, PASSWORD_VARS)}</FormError> : null}
+          {error ? <FormError>{t(error.key, authErrorVars(error))}</FormError> : null}
           <Button type="submit" variant="primary" size="lg" block loading={busy} disabled={!check.ok} iconRight="arrow-right">
             {busy ? t('joining') : t('joinCta')}
           </Button>

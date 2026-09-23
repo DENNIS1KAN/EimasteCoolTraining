@@ -94,7 +94,8 @@ export function GlanceRow({ row, isMe }: { row: AthleteGlance; isMe: boolean }) 
           <dt className="micro">{t('colFood')}</dt>
           <dd>
             {row.adherence == null ? (
-              <span className="glance-metric__text is-muted">{t('noPlan')}</span>
+              // A plan without a complete day yet is "new", not missing.
+              <span className="glance-metric__text is-muted">{stats.mealPlan ? t('newPlan') : t('noPlan')}</span>
             ) : (
               <>
                 {lowFood ? <Icon name="alert" size={14} strokeWidth={2.2} /> : null}

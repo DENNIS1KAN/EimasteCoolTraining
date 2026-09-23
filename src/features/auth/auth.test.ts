@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { BackendError } from '../../data/backend/types'
-import { authErrorKey, isFatalJoinError } from './errors'
+import { authError, authErrorKey, isFatalJoinError } from './errors'
 import { translate } from '../../i18n'
 import { AUTH } from './messages'
 import { checkPassword, MIN_PASSWORD, PASSWORD_VARS } from './password'
@@ -41,6 +41,16 @@ describe('authErrorKey', () => {
     expect(authErrorKey(err('auth'), 'password', true)).toBe('errSessionExpired')
     expect(authErrorKey(err('network'), 'password', true)).toBe('errOffline')
     expect(authErrorKey(err('forbidden'), 'password', true)).toBe('errGeneric')
+  })
+
+  it('maps rate limits, a busy server and configuration problems in every form', () => {
+    for (const ctx of ['login', 'join', 'password'] as const) {
+      expect(authErrorKey(err('rate_limited'), ctx, true)).toBe('errRateLimited')
+      expect(authErrorKey(err('unavailable'), ctx, true)).toBe('errUnavailable')
+      expect(authErrorKey(err('config'), ctx, false)).toBe('errConfig')
+    }
+    expect(authError(new BackendError('config', 'Use the anon key in config.js'), 'login', true)).toEqual({ key: 'errConfig', detail: 'Use the anon key in config.js' })
+    expect(authError(err('auth'), 'login', true)).toEqual({ key: 'errWrongPassword' })
   })
 
   it('knows which join errors end the flow', () => {

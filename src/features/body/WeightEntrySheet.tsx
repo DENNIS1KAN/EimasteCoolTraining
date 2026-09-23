@@ -10,7 +10,19 @@ import { parseNum } from '../../lib/units'
 import { Banner, Button, Chip, ConfirmSheet, DateField, Icon, NumberField, Sheet, Stepper, TextField, cx, toast } from '../../ui'
 import { deleteWeighIn, saveWeighIn } from './actions'
 import { useJumpConfirm } from './JumpConfirm'
-import { fromDisplay, nearestEntry, round1, STEPPER_BOUNDS, suggestWeight, toDisplay, validWeight, WEIGHT_LIMITS } from './logic'
+import {
+  BODY_FAT_LIMITS,
+  fromDisplay,
+  nearestEntry,
+  round1,
+  STEPPER_BOUNDS,
+  suggestWeight,
+  toDisplay,
+  validExtra,
+  validWeight,
+  WAIST_LIMITS,
+  WEIGHT_LIMITS,
+} from './logic'
 import { M } from './messages'
 import { wText } from './format'
 
@@ -55,11 +67,14 @@ export function WeightEntrySheet(props: WeightEntrySheetProps) {
   // Re-seed the form every time the sheet opens (derived-state pattern: no effect, no flash of stale values).
   const [wasOpen, setWasOpen] = useState(open)
   const [moreOpen, setMoreOpen] = useState(() => hasExtras(entry))
+  // Set by a save attempt (Enter) with an out-of-range extra: its error then shows without waiting for a blur.
+  const [tried, setTried] = useState(false)
   if (open !== wasOpen) {
     setWasOpen(open)
     if (open) {
       setDraft(draftFor(entry, props.startValue, props.unit))
       setMoreOpen(hasExtras(entry))
+      setTried(false)
     }
   }
 
@@ -76,6 +91,11 @@ export function WeightEntrySheet(props: WeightEntrySheetProps) {
   // The Stepper keeps what was typed (see STEPPER_BOUNDS): out-of-range values are flagged here, never clamped and saved.
   const refEntry = nearestEntry(mine, draft.date, entry?.id)
   const valid = validWeight(draft.value, props.unit)
+  // Body fat and waist fields keep what was typed (and flag it on blur): an out-of-range value blocks saving.
+  const fatOk = validExtra(draft.bodyFat, BODY_FAT_LIMITS)
+  const waistOk = validExtra(draft.waist, WAIST_LIMITS)
+  const canSave = valid && fatOk && waistOk
+  const rangeText = (l: { min: number; max: number }) => t('extraRange', { min: fmtNum(l.min), max: fmtNum(l.max) })
   const suggest = valid ? null : suggestWeight(draft.value, props.unit, refEntry ? toDisplay(refEntry.kg, props.unit) : null)
 
   // A first weigh-in starts from a guess (goal weight or a default): put the cursor in the number so it gets typed.
@@ -88,7 +108,13 @@ export function WeightEntrySheet(props: WeightEntrySheetProps) {
   }, [firstEver])
 
   const save = () => {
-    if (!valid) return
+    if (!canSave) {
+      if (!fatOk || !waistOk) {
+        setTried(true)
+        setMoreOpen(true)
+      }
+      return
+    }
     const kg = fromDisplay(draft.value, props.unit)
     // Re-saving an edited weigh-in without touching the number (a note, the date) never asks again.
     if (entry && kg === entry.kg) persist(kg)
@@ -136,7 +162,7 @@ export function WeightEntrySheet(props: WeightEntrySheetProps) {
                 {tc('delete')}
               </Button>
             )}
-            <Button variant="primary" block icon="check" onClick={save} disabled={!valid}>
+            <Button variant="primary" block icon="check" onClick={save} disabled={!canSave}>
               {entry ? tc('save') : t('saveWeight')}
             </Button>
           </div>
@@ -183,7 +209,7 @@ export function WeightEntrySheet(props: WeightEntrySheetProps) {
               {t('replaceWarn', { value: wText(conflict.kg, props.unit) })}
             </Banner>
           )}
-          <details className="body-entry__more" open={moreOpen || undefined}>
+          <details className="body-entry__more" open={moreOpen || undefined} onToggle={(e) => setMoreOpen(e.currentTarget.open)}>
             <summary>
               <Icon name="plus-circle" size={18} />
               <span>{t('more')}</span>
@@ -196,11 +222,21 @@ export function WeightEntrySheet(props: WeightEntrySheetProps) {
                   value={draft.bodyFat}
                   onChange={(v) => set({ bodyFat: v })}
                   decimals={1}
-                  min={2}
-                  max={70}
+                  min={BODY_FAT_LIMITS.min}
+                  max={BODY_FAT_LIMITS.max}
                   suffix="%"
+                  error={tried && !fatOk ? rangeText(BODY_FAT_LIMITS) : undefined}
                 />
-                <NumberField label={t('waist')} value={draft.waist} onChange={(v) => set({ waist: v })} decimals={1} min={40} max={200} suffix="cm" />
+                <NumberField
+                  label={t('waist')}
+                  value={draft.waist}
+                  onChange={(v) => set({ waist: v })}
+                  decimals={1}
+                  min={WAIST_LIMITS.min}
+                  max={WAIST_LIMITS.max}
+                  suffix="cm"
+                  error={tried && !waistOk ? rangeText(WAIST_LIMITS) : undefined}
+                />
               </div>
               <TextField
                 label={t('note')}

@@ -557,14 +557,14 @@ function mealPlans(start: ISODate): MealPlan[] {
       {
         title: 'Cut phase · v1',
         notes: ['# Targets', '- 2,600 kcal · 170 g protein', '- Weigh in 3 times a week', '# Rules', '- No liquid calories', '- Olive oil: measure it'].join('\n'),
-        startDate: addDays(start, -35),
+        startDate: addDays(start, -21),
         kcal: 2600,
         protein: 170,
         carbs: 280,
         fat: 75,
         waterL: 2.5,
         active: false,
-        createdAt: at(addDays(start, -36), hm(20, 15)),
+        createdAt: at(addDays(start, -22), hm(20, 15)),
         updatedAt: v2At,
       },
       [
@@ -687,10 +687,15 @@ const THANOS_FORTNIGHT: (DayFood | null)[] = [
   { eaten: null, rating: 'mostly' },
 ]
 
+/** Stelios's v2 meal index -> the same meal in v1 (v1 had no 11:00 snack). */
+const V2_TO_V1: (number | null)[] = [0, null, 1, 2, 3]
+
+/** Both athletes log from the day their first plan started (adherence counts from there). */
 function checkins(plans: MealPlan[], start: ISODate, today: ISODate): NutritionCheckin[] {
   const out: NutritionCheckin[] = []
   const active = (memberId: string) => plans.find((p) => p.memberId === memberId && p.active)!
   const sPlan = active(DEMO_IDS.stelios)
+  const sV1 = plans.find((p) => p.memberId === DEMO_IDS.stelios && !p.active)!
   const tPlan = active(DEMO_IDS.thanos)
   const row = (p: MealPlan, date: ISODate, food: DayFood, waterL: number, updatedAt: number): NutritionCheckin => ({
     id: dailyId(p.memberId, date),
@@ -703,11 +708,18 @@ function checkins(plans: MealPlan[], start: ISODate, today: ISODate): NutritionC
     note: food.note ?? '',
     updatedAt,
   })
-  for (const date of dateRange(addDays(today, -20), addDays(today, -1))) {
+  const yesterday = addDays(today, -1)
+  for (const date of dateRange(sV1.startDate, yesterday)) {
     const off = diffDays(start, date)
     const rs = rng(`stelios:food:${off}`)
     const s = steliosDay(off, rs)
-    if (s) out.push(row(sPlan, date, s, round1(rs.range(2.5, 3.5)), at(date, hm(21, 40) + rs.int(0, 45))))
+    if (!s) continue
+    const v1 = date < sPlan.startDate
+    const food = v1 && s.eaten ? { ...s, eaten: s.eaten.flatMap((i) => V2_TO_V1[i] ?? []) } : s
+    out.push(row(v1 ? sV1 : sPlan, date, food, round1(rs.range(2.5, 3.5)), at(date, hm(21, 40) + rs.int(0, 45))))
+  }
+  for (const date of dateRange(tPlan.startDate, yesterday)) {
+    const off = diffDays(start, date)
     const rt = rng(`thanos:food:${off}`)
     const t = THANOS_FORTNIGHT[((off % 14) + 14) % 14]
     if (t) out.push(row(tPlan, date, t, round1(rt.range(1.5, 3)), at(date, hm(23, 5) + rt.int(0, 40))))

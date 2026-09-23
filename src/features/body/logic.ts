@@ -5,7 +5,7 @@
 import type { Member, Unit, WeightEntry } from '../../data/types'
 import { addDays, diffDays, type ISODate } from '../../lib/dates'
 import { weightSeries, weightStats, type TrendPoint } from '../../lib/stats'
-import { kgToUnit, unitToKg } from '../../lib/units'
+import { kgToUnit, parseNum, unitToKg } from '../../lib/units'
 
 /* ------------------------------------------------------------------ phase and tone */
 
@@ -174,6 +174,17 @@ export const STEPPER_BOUNDS = { min: 0, max: 9999.9 } as const
 export function validWeight(v: number | null, unit: Unit): v is number {
   const l = WEIGHT_LIMITS[unit]
   return v != null && Number.isFinite(v) && v >= l.min && v <= l.max
+}
+
+/** Optional weigh-in extras: body fat (%) and waist (cm). */
+export const BODY_FAT_LIMITS = { min: 2, max: 70 } as const
+export const WAIST_LIMITS = { min: 40, max: 200 } as const
+
+/** An optional typed extra ("" or a number within `limits`). The field shows it as typed, so it is checked before saving. */
+export function validExtra(s: string, limits: { min: number; max: number }): boolean {
+  if (!s.trim()) return true
+  const n = parseNum(s)
+  return n != null && n >= limits.min && n <= limits.max
 }
 
 /**

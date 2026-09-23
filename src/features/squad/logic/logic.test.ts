@@ -192,6 +192,10 @@ describe('programWeekDots', () => {
     const later = programWeekDots(MINI, START, logs, '2026-04-04')
     expect(later.map((x) => x.state)).toEqual(['done', 'missed', 'missed'])
   })
+  it('uppercases Greek day names without the tonos', () => {
+    const greek = { ...MINI, weeks: MINI.weeks.map((w) => ({ ...w, days: w.days.map((d, i) => ({ ...d, name: ['ώμοι', 'Άνω (Δύναμη)', 'πόδια'][i] ?? d.name })) })) }
+    expect(programWeekDots(greek, START, [], '2026-03-23').map((x) => x.label)).toEqual(['Ω', 'Α', 'Π'])
+  })
   it('previews week 1 before the start', () => {
     expect(programWeekDots(MINI, null, [], '2026-03-20').map((x) => x.state)).toEqual(['upcoming', 'upcoming', 'upcoming'])
     expect(programWeekDots(MINI, '2026-04-06', [], '2026-03-20').every((x) => x.week === 1 && x.state === 'upcoming')).toBe(true)

@@ -178,7 +178,7 @@ export const FM = defineMessages(
     never: 'never',
     history: 'History',
     noAthletes: 'No athletes yet',
-    noAthletesBody: 'Add squad members from the Members tab.',
+    noAthletesBody: 'Add squad members from the Squad tab.',
     activeTag: 'Active',
 
     // home card
@@ -366,7 +366,7 @@ export const FM = defineMessages(
     never: 'ποτέ',
     history: 'Ιστορικό',
     noAthletes: 'Δεν υπάρχουν αθλητές ακόμη',
-    noAthletesBody: 'Πρόσθεσε μέλη από την καρτέλα Μέλη.',
+    noAthletesBody: 'Πρόσθεσε μέλη από την καρτέλα Ομάδα.',
     activeTag: 'Ενεργό',
 
     // home card

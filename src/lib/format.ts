@@ -40,22 +40,28 @@ export function fmtVolume(kg: number, unit: Unit): string {
   return Math.round(kg) >= 1000 ? `${fmtNum(kg / 1000, 1)} t` : `${fmtNum(kg, 0)} kg`
 }
 
-type DateStyle = 'short' | 'medium' | 'long' | 'weekday' | 'dayMonth'
-/** Format an ISO date: short "22/9", dayMonth "22 Sep", medium "22 Sep 2026", long "Tuesday 22 September", weekday "Tue". */
+/** Every date formatter goes through here: CLDR's en-GB short month for September is "Sept"; keep all at three letters. */
+function fmtDateParts(date: Date, opts: Intl.DateTimeFormatOptions): string {
+  return new Intl.DateTimeFormat(localeOf(getLang()), opts).format(date).replace(/\bSept\b/g, 'Sep')
+}
+
+const DATE_STYLES = {
+  short: { day: 'numeric', month: 'numeric' },
+  dayMonth: { day: 'numeric', month: 'short' },
+  medium: { day: 'numeric', month: 'short', year: 'numeric' },
+  long: { weekday: 'long', day: 'numeric', month: 'long' },
+  weekday: { weekday: 'short' },
+  weekdayDayMonth: { weekday: 'short', day: 'numeric', month: 'short' },
+  month: { month: 'short' },
+} satisfies Record<string, Intl.DateTimeFormatOptions>
+type DateStyle = keyof typeof DATE_STYLES
+
+/**
+ * Format an ISO date: short "22/9", dayMonth "22 Sep", medium "22 Sep 2026", long "Tuesday 22 September",
+ * weekday "Tue", weekdayDayMonth "Tue 22 Sep", month "Sep".
+ */
 export function fmtDate(d: ISODate, style: DateStyle = 'dayMonth'): string {
-  const date = fromISODate(d)
-  const opts: Intl.DateTimeFormatOptions =
-    style === 'short'
-      ? { day: 'numeric', month: 'numeric' }
-      : style === 'medium'
-        ? { day: 'numeric', month: 'short', year: 'numeric' }
-        : style === 'long'
-          ? { weekday: 'long', day: 'numeric', month: 'long' }
-          : style === 'weekday'
-            ? { weekday: 'short' }
-            : { day: 'numeric', month: 'short' }
-  // CLDR's en-GB short month for September is "Sept"; keep every short month at three letters.
-  return new Intl.DateTimeFormat(localeOf(getLang()), opts).format(date).replace(/\bSept\b/, 'Sep')
+  return fmtDateParts(fromISODate(d), DATE_STYLES[style])
 }
 
 /** "Today" / "Yesterday" / "Tue 22 Sep" */
@@ -64,7 +70,7 @@ export function fmtDayLabel(d: ISODate, now: Date = new Date()): string {
   const el = getLang() === 'el'
   if (d === today) return el ? 'Σήμερα' : 'Today'
   if (d === addDays(today, -1)) return el ? 'Χθες' : 'Yesterday'
-  return new Intl.DateTimeFormat(localeOf(getLang()), { weekday: 'short', day: 'numeric', month: 'short' }).format(fromISODate(d))
+  return fmtDate(d, 'weekdayDayMonth')
 }
 
 /** "2 h ago", "πριν από 2 ώρες" */
@@ -95,11 +101,12 @@ export function fmtClock(ms: number): string {
   return h ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`
 }
 
-/** 3900000 -> "1 h 5 min" / "65 min" style short duration */
+/** Short duration in whole minutes: 3900000 -> "1 h 5 min" / "1 ώ. 5 λεπ."; any positive time reads at least "1 min". */
 export function fmtDuration(ms: number): string {
-  const min = Math.round(ms / 60000)
-  if (min < 60) return `${min} min`
+  const min = ms > 0 ? Math.max(1, Math.round(ms / 60000)) : 0
+  const [hU, mU] = getLang() === 'el' ? ['ώ.', 'λεπ.'] : ['h', 'min']
+  if (min < 60) return `${min} ${mU}`
   const h = Math.floor(min / 60)
   const m = min % 60
-  return m ? `${h} h ${m} min` : `${h} h`
+  return m ? `${h} ${hU} ${m} ${mU}` : `${h} ${hU}`
 }

@@ -95,7 +95,7 @@ export function VolumeChart({ a, b, data, today, unit }: Duo & { unit: Unit }) {
     <ChartCard title={t('volumeTitle')} sub={t(full ? 'volumeSub' : 'volumeSubStart', { unit: u })}>
       {any ? (
         <BarChart
-          categories={weeks.map((w) => fmtDate(w, 'short'))}
+          categories={weeks.map((w) => fmtDate(w, 'dayMonth'))}
           categoryTitles={weeks.map((w) => fmtDate(w, 'medium'))}
           series={[
             { id: a.id, label: a.name, color: memberColorVar(a.color), values: va },

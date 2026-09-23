@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useMe, useStore } from '../../data/store'
 import { useLang, useT } from '../../i18n'
 import { addDays, fromISODate, isoFromMs, todayISO } from '../../lib/dates'
-import { fmtDate, fmtDayLabel, fmtNum, fmtSigned } from '../../lib/format'
+import { fmtDate, fmtDayLabel, fmtNum } from '../../lib/format'
 import { weightSeries } from '../../lib/stats'
 import { kgToUnit } from '../../lib/units'
 import { EmptyState, Icon, memberColorVar } from '../../ui'
@@ -10,7 +10,7 @@ import { LineChart, type LineSeries, type RefLine } from '../../ui/charts'
 import { useMemberWeights } from './hooks'
 import { changeSeries, goalFits, toDisplay, weightModeFor } from './logic'
 import { M } from './messages'
-import { wSigned, wText } from './format'
+import { fixedSigned, wSigned, wText } from './format'
 import './body.css'
 
 const ms = (d: string) => fromISODate(d).getTime()
@@ -104,8 +104,8 @@ export function WeightTrendChart({ memberId, days = 90, height = 200 }: { member
         yPadding={0.08}
         legend={!change}
         table="hidden"
-        formatY={change ? (n) => fmtSigned(n, 1) : (n) => fmtNum(n, 1)}
-        formatTooltipY={change ? (n) => `${fmtSigned(n, 1)} ${unit}` : (n) => `${fmtNum(n, 1, 1)} ${unit}`}
+        formatY={change ? fixedSigned : (n) => fmtNum(n, 1)}
+        formatTooltipY={change ? (n) => `${fixedSigned(n)} ${unit}` : (n) => `${fmtNum(n, 1, 1)} ${unit}`}
         formatX={(x) => fmtDate(isoFromMs(x), 'dayMonth')}
         formatTooltipX={(x) => fmtDayLabel(isoFromMs(x))}
         ariaLabel={chart.aria}

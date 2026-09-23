@@ -3,6 +3,7 @@ import { AvatarStack, Button, ButtonLink, Card, IconButton, Tag, toast } from '.
 import { useT } from '../../../i18n'
 import type { Member, Program } from '../../../data/types'
 import { fmtNum } from '../../../lib/format'
+import { useProgramName } from '../../train/programText'
 import { programSummary } from '../lib/programs'
 import { M } from '../messages'
 
@@ -18,6 +19,7 @@ export interface ProgramCardProps {
 export function ProgramCard({ program: p, members, onExport, onDelete }: ProgramCardProps) {
   const t = useT(M)
   const s = programSummary(p)
+  const name = useProgramName(p)
   const names = members.map((m) => m.name).join(', ')
 
   const tryDelete = () => {
@@ -34,10 +36,10 @@ export function ProgramCard({ program: p, members, onExport, onDelete }: Program
         <Tag tone={p.builtIn ? 'solid' : 'accent'} icon={p.builtIn ? 'lock' : 'upload'}>
           {p.builtIn ? t('builtIn') : t('imported')}
         </Tag>
-        {!p.builtIn ? <IconButton icon="trash" label={t('deleteA11y', { name: p.name })} variant="ghost" size={36} onClick={tryDelete} /> : null}
+        {!p.builtIn ? <IconButton icon="trash" label={t('deleteA11y', { name })} variant="ghost" size={36} onClick={tryDelete} /> : null}
       </div>
       <h3 className="program-card__name" id={`program-${p.id}`}>
-        <Link to={`/coach/program/${encodeURIComponent(p.id)}`}>{p.name}</Link>
+        <Link to={`/coach/program/${encodeURIComponent(p.id)}`}>{name}</Link>
       </h3>
       {p.description ? <p className="program-card__desc">{p.description}</p> : null}
       <dl className="spec-strip">

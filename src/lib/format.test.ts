@@ -76,10 +76,13 @@ describe('in English', () => {
   it('fmtDate styles', () => {
     const d = '2026-09-22'
     expect(fmtDate(d, 'short')).toMatch(/^22\/0?9$/)
-    expect(fmtDate(d)).toMatch(/^22 Sept?$/)
-    expect(fmtDate(d, 'medium')).toMatch(/^22 Sept? 2026$/)
+    expect(fmtDate(d)).toBe('22 Sep')
+    expect(fmtDate(d, 'medium')).toBe('22 Sep 2026')
     expect(fmtDate(d, 'long')).toBe('Tuesday 22 September')
     expect(fmtDate(d, 'weekday')).toBe('Tue')
+    expect(fmtDate(d, 'weekdayDayMonth')).toBe('Tue 22 Sep')
+    expect(fmtDate(d, 'month')).toBe('Sep')
+    expect(fmtDate('2026-06-01', 'medium')).toBe('1 Jun 2026')
     expect(fmtDate(DST_SPRING, 'long')).toBe('Sunday 29 March')
   })
 
@@ -87,8 +90,8 @@ describe('in English', () => {
     const now = new Date(2026, 8, 22, 9)
     expect(fmtDayLabel('2026-09-22', now)).toBe('Today')
     expect(fmtDayLabel('2026-09-21', now)).toBe('Yesterday')
-    expect(fmtDayLabel('2026-09-20', now)).toMatch(/^Sun 20 Sept?$/)
-    expect(fmtDayLabel('2026-09-23', now)).toMatch(/^Wed 23 Sept?$/)
+    expect(fmtDayLabel('2026-09-20', now)).toBe('Sun 20 Sep')
+    expect(fmtDayLabel('2026-09-23', now)).toBe('Wed 23 Sep')
   })
 
   it('fmtDayLabel right after midnight on the day after a DST switch', () => {
@@ -131,6 +134,13 @@ describe('in English', () => {
     expect(fmtDuration(59 * 60_000)).toBe('59 min')
     expect(fmtDuration(60 * 60_000)).toBe('1 h')
     expect(fmtDuration(0)).toBe('0 min')
+    expect(fmtDuration(125 * 60_000)).toBe('2 h 5 min')
+  })
+
+  it('fmtDuration never reads below 1 min for a positive duration', () => {
+    expect(fmtDuration(1000)).toBe('1 min')
+    expect(fmtDuration(20_000)).toBe('1 min')
+    expect(fmtDuration(-5000)).toBe('0 min')
   })
 })
 
@@ -153,6 +163,14 @@ describe('in Greek', () => {
     expect(fmtDayLabel('2026-09-21', now)).toBe('Χθες')
     expect(fmtDate('2026-09-22', 'long')).toBe('Τρίτη 22 Σεπτεμβρίου')
     expect(fmtDate('2026-09-22', 'short')).toBe('22/9')
+    expect(fmtDate('2026-09-22')).toBe('22 Σεπ')
+  })
+
+  it('fmtDuration in Greek', () => {
+    expect(fmtDuration(72 * 60_000)).toBe('1 ώ. 12 λεπ.')
+    expect(fmtDuration(12 * 60_000)).toBe('12 λεπ.')
+    expect(fmtDuration(120 * 60_000)).toBe('2 ώ.')
+    expect(fmtDuration(10_000)).toBe('1 λεπ.')
   })
 
   it('relative times', () => {

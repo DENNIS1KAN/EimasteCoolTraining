@@ -9,6 +9,7 @@ import { FileDrop, Icon, toast, type IconName } from '../../ui'
 import { APP_VERSION } from './version'
 import { buildMyData, downloadText, exportFileName, myWorkoutsCSV } from './exportData'
 import { ImportSheet, type ImportPreview } from './ImportSheet'
+import { useProgramName } from '../train/programText'
 import { SETTINGS } from './messages'
 import { Section } from './Section'
 
@@ -31,6 +32,7 @@ function ExportRow({ icon, title, sub, disabled, onClick }: { icon: IconName; ti
 export function DataSection({ me }: { me: Member }) {
   const t = useT(SETTINGS)
   const program = useStore((s) => s.programs[me.programId ?? DEFAULT_PROGRAM_ID] ?? s.programs[DEFAULT_PROGRAM_ID] ?? BTS_PROGRAM)
+  const programName = useProgramName(program)
   const myLogCount = useStore((s) => {
     let n = 0
     for (const l of Object.values(s.logs)) if (l.memberId === me.id) n++
@@ -83,7 +85,7 @@ export function DataSection({ me }: { me: Member }) {
           accept=".csv,text/csv,text/plain,application/vnd.ms-excel"
           onFiles={(fs) => void onFiles(fs)}
           label={reading ? t('importReading') : t('importDrop')}
-          hint={`${t('importDropHint')} · ${t('importInto', { program: program.name })}`}
+          hint={`${t('importDropHint')} · ${t('importInto', { program: programName })}`}
           icon="upload"
           buttonLabel={t('importChoose')}
           disabled={reading}

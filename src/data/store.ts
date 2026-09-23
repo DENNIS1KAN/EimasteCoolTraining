@@ -13,7 +13,7 @@
  */
 import { useRef, useSyncExternalStore } from 'react'
 import { BUILT_IN_PROGRAMS } from './programs'
-import type { Backend } from './backend/types'
+import type { Backend, BackendErrorCode } from './backend/types'
 import { BackendError, isRetryable } from './backend/types'
 import type { ChangeEvent, Member, Snapshot, TableName, Tables } from './types'
 import { TABLES } from './types'
@@ -35,6 +35,8 @@ export interface State extends TableState {
   meId: string | null
   sync: SyncState
   bootError: string | null
+  /** Why booting failed ('config': the deployment's config.js is wrong, not the connection). */
+  bootErrorCode: BackendErrorCode | null
 }
 
 const emptyTables = (): TableState => ({
@@ -53,6 +55,7 @@ let state: State = {
   meId: null,
   sync: { pending: 0, online: typeof navigator === 'undefined' ? true : navigator.onLine !== false, error: null, lastSyncAt: null },
   bootError: null,
+  bootErrorCode: null,
   ...emptyTables(),
 }
 
@@ -606,7 +609,7 @@ async function startSession(meId: string) {
   const mark = beginLoad()
   try {
     const snap = await b.loadAll()
-    setState({ status: 'ready', meId, bootError: null })
+    setState({ status: 'ready', meId, bootError: null, bootErrorCode: null })
     mergeSnapshot(snap, mark)
   } finally {
     endLoad()
@@ -659,7 +662,7 @@ async function endSession(explicit: boolean, dropLogin = false) {
 export async function boot(b: Backend, namespace: string): Promise<void> {
   backend = b
   cacheNs = namespace
-  setState({ backend: b.kind, status: 'booting', bootError: null })
+  setState({ backend: b.kind, status: 'booting', bootError: null, bootErrorCode: null })
   hookWindow()
   const cached = b.kind === 'demo' ? null : readCache()
   if (cached?.meId) {
@@ -683,7 +686,7 @@ export async function boot(b: Backend, namespace: string): Promise<void> {
       scheduleReconnect()
       return
     }
-    setState({ status: 'error', bootError: e instanceof Error ? e.message : String(e) })
+    setState({ status: 'error', bootError: e instanceof Error ? e.message : String(e), bootErrorCode: errorCode(e) })
   }
 }
 
@@ -726,5 +729,5 @@ export function __resetForTests(): void {
   cacheTimer = null
   stopReconnect()
   backend = null
-  state = { ...state, status: 'booting', meId: null, bootError: null, ...emptyTables() }
+  state = { ...state, status: 'booting', meId: null, bootError: null, bootErrorCode: null, ...emptyTables() }
 }

@@ -44,9 +44,13 @@ export default function CoachPage() {
       <div role="tabpanel" id={panelId(tab)} aria-labelledby={tabId(tab)} className="coach-panel">
         {tab === 'squad' && <SquadTab />}
         {tab === 'nutrition' && (
-          <Suspense fallback={<NutritionFallback />}>
-            <CoachNutritionTab />
-          </Suspense>
+          <>
+            {/* The tab's athlete cards are h3s: give them their h2 (the other tabs' cards are h2s themselves). */}
+            <h2 className="visually-hidden">{labels.nutrition}</h2>
+            <Suspense fallback={<NutritionFallback />}>
+              <CoachNutritionTab />
+            </Suspense>
+          </>
         )}
         {tab === 'programs' && <ProgramsTab />}
       </div>

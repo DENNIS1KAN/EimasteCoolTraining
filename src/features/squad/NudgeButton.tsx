@@ -18,6 +18,9 @@ const PRESETS = [
 ] as const
 const CUSTOM_EMOJI = ['👊', '💪', '🔥', '😄', '⏰', '🚀']
 
+/** End a sentence with a period unless it already ends in one ("…πριν από 4 ώ." must not become "ώ.."). */
+const sentence = (s: string) => (/[.!?…]$/.test(s) ? s : `${s}.`)
+
 /**
  * "Nudge" a squad mate: a sheet with preset one-tap nudges or a short custom message (140 chars).
  * One nudge per recipient every 6 hours; while cooling down the button reads "Nudged 2 h ago".
@@ -45,7 +48,9 @@ export function NudgeButton({ member, size = 'md' }: { member: Member; size?: 's
     toast(t('nudgeSent', { name: member.name }), { tone: 'good' })
   }
 
-  const label = cooling ? t('nudgedAgo', { time: fmtRelative(state.lastAt!, now) }) : t('nudge')
+  const ago = cooling ? fmtRelative(state.lastAt!, now) : ''
+  const again = cooling ? t('nudgeAgainAt', { time: fmtRelative(state.readyAt!, now) }) : ''
+  const label = cooling ? t('nudgedAgo', { time: ago }) : t('nudge')
   const count = charCount(text)
 
   return (
@@ -56,15 +61,23 @@ export function NudgeButton({ member, size = 'md' }: { member: Member; size?: 's
         icon={cooling ? 'check' : 'bell'}
         className={`sq-nudge-btn sq-nudge-btn--${size}`}
         disabled={cooling}
-        aria-label={cooling ? `${label}. ${t('nudgeAgainAt', { time: fmtRelative(state.readyAt!, now) })}` : t('nudgeName', { name: member.name })}
-        title={cooling ? t('nudgeAgainAt', { time: fmtRelative(state.readyAt!, now) }) : undefined}
+        aria-label={cooling ? `${sentence(label)} ${again}` : t('nudgeName', { name: member.name })}
+        title={cooling ? again : undefined}
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
           setOpen(true)
         }}
       >
-        {label}
+        {cooling ? (
+          // Two short lines ("Nudged" over "2 h ago") fit a half-width button at 360 px; the full sentence is the aria-label.
+          <span className="sq-nudge-btn__cool">
+            <span className="sq-nudge-btn__done">{t('nudgedDone')}</span>
+            <span className="sq-nudge-btn__ago">{ago}</span>
+          </span>
+        ) : (
+          label
+        )}
       </Button>
       <Sheet
         open={open}

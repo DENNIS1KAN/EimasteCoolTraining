@@ -8,6 +8,7 @@ import { addDays, todayISO } from '../../lib/dates'
 import { mkMember, mkWeight } from '../../lib/testing/fixtures'
 import BodyPage from './BodyPage'
 import { WeightMiniCard } from './WeightMiniCard'
+import { WeightEntrySheet } from './WeightEntrySheet'
 import { WeightTrendChart } from './WeightTrendChart'
 
 const today = todayISO()
@@ -124,5 +125,31 @@ describe('BodyPage', () => {
     expect(within(dialog).getByText('Yesterday')).toBeTruthy()
     // editing yesterday's entry is not a clash with today's
     expect(within(dialog).queryByText(/already logged/)).toBeNull()
+  })
+})
+
+describe('WeightEntrySheet', () => {
+  it('keeps an out-of-range body fat or waist from being saved', () => {
+    seed([mkMember({ id: 'me', name: 'Stelios' })], 'me', history('me'))
+    ui(<WeightEntrySheet open onClose={() => {}} memberId="me" unit="kg" startValue={82} />)
+    const dialog = screen.getByRole('dialog', { name: 'Log weight' })
+    const save = within(dialog).getByRole('button', { name: 'Save weight' }) as HTMLButtonElement
+    const fat = within(dialog).getByLabelText('Body fat')
+    const waist = within(dialog).getByLabelText('Waist')
+    fireEvent.change(fat, { target: { value: '1' } })
+    expect(save.disabled).toBe(true)
+    // Enter in the field: nothing is saved and the allowed range shows at once
+    fireEvent.submit(fat.closest('form')!)
+    expect(getState().weights[`me__${today}`]).toBeUndefined()
+    expect(within(dialog).getByText('Enter a number from 2 to 70')).toBeTruthy()
+    fireEvent.change(fat, { target: { value: '18,5' } })
+    fireEvent.change(waist, { target: { value: '850' } })
+    expect(save.disabled).toBe(true)
+    fireEvent.change(waist, { target: { value: '85' } })
+    expect(save.disabled).toBe(false)
+    act(() => {
+      fireEvent.click(save)
+    })
+    expect(getState().weights[`me__${today}`]).toMatchObject({ kg: 82, bodyFat: 18.5, waistCm: 85 })
   })
 })

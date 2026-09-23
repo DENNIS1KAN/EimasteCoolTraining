@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Link, useParams } from 'react-router'
+import { Link, useParams, useSearchParams } from 'react-router'
 import type { Member, Program, WorkoutLog } from '../../data/types'
 import { dayShortName } from '../../data/programs'
 import { useMe, useStore } from '../../data/store'
@@ -18,13 +18,19 @@ import { KudosBar } from './KudosBar'
 import '../train/train.css'
 import '../train/lift.css'
 
-/** /member/:slug/workout/:week/:day: a read-only view of a member's (or my) logged workout. */
+/**
+ * /member/:slug/workout/:week/:day[?program=<programId>]: a read-only view of a member's (or my) logged workout.
+ * `?program=` names the program the log belongs to (it can be an older one after a program change); without it,
+ * or when that program is unknown, the member's current program.
+ */
 export default function MemberWorkoutPage() {
   const l = useT(LIFT)
   const params = useParams()
+  const [search] = useSearchParams()
   const me = useMe()
   const member = useStore((s) => Object.values(s.members).find((m) => m.slug === params.slug) ?? null)
-  const program = useStore((s) => (member?.programId ? (s.programs[member.programId] ?? null) : null))
+  const asked = search.get('program')
+  const program = useStore((s) => (asked ? s.programs[asked] : undefined) ?? (member?.programId ? s.programs[member.programId] : undefined) ?? null)
   if (!me) return null
   if (!member || !program || !program.weeks.length) {
     return (
@@ -52,6 +58,8 @@ function MemberWorkout({ me, member, program, week, day }: { me: Member; member:
   const view = useMemo(() => workoutView(log, program, week, day, memberLogs, programs), [log, program, week, day, memberLogs, programs])
   const unit = me.settings.unit
   const isMe = me.id === member.id
+  /** Train logs the current program only, so an older program's workout is view-only even for its owner. */
+  const canEdit = isMe && program.id === member.programId
   const prs = view.reduce((a, x) => a + x.sets.filter((s) => s.pr).length, 0)
   const logged = !!log && view.some((x) => !x.skipped)
   const title = t('dayTitle', { day: dayShortName(pday) })
@@ -69,7 +77,7 @@ function MemberWorkout({ me, member, program, week, day }: { me: Member; member:
         }
       />
       {log && (logged || log.done) ? (
-        <Summary log={log} program={program} unit={unit} prs={prs} member={member} isMe={isMe} />
+        <Summary log={log} program={program} unit={unit} prs={prs} member={member} isMe={isMe} canEdit={canEdit} />
       ) : (
         <Card>
           <EmptyState
@@ -77,7 +85,7 @@ function MemberWorkout({ me, member, program, week, day }: { me: Member; member:
             title={l('notLogged')}
             body={l('notLoggedBody')}
             action={
-              isMe ? (
+              canEdit ? (
                 <ButtonLink to={`/train/${week}/${day}`} icon="edit">
                   {l('edit')}
                 </ButtonLink>
@@ -97,7 +105,8 @@ function MemberWorkout({ me, member, program, week, day }: { me: Member; member:
   )
 }
 
-function Summary({ log, program, unit, prs, member, isMe }: { log: WorkoutLog; program: Program; unit: 'kg' | 'lb'; prs: number; member: Member; isMe: boolean }) {
+function Summary(p: { log: WorkoutLog; program: Program; unit: 'kg' | 'lb'; prs: number; member: Member; isMe: boolean; canEdit: boolean }) {
+  const { log, program, unit, prs, member, isMe, canEdit } = p
   const t = useT(M)
   const l = useT(LIFT)
   const at = log.doneAt ?? log.startedAt ?? log.updatedAt
@@ -131,7 +140,7 @@ function Summary({ log, program, unit, prs, member, isMe }: { log: WorkoutLog; p
         </p>
       ) : null}
       {log.done ? <KudosBar itemId={`workout:${log.id}`} toId={member.id} /> : null}
-      {isMe ? (
+      {canEdit ? (
         <ButtonLink to={`/train/${log.week}/${log.day}`} variant="secondary" size="sm" icon="edit" className="mw-sum__edit">
           {l('edit')}
         </ButtonLink>

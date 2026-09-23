@@ -92,7 +92,12 @@ function Hero({ me, program }: { me: Member; program: Program | null }) {
       const p = dayProgress(state.log, d)
       const started = state.log.startedAt
       return shell({
-        eyebrow: started ? `${t('inProgress')} · ${fmtClock(now - started)}` : t('inProgress'),
+        // a live clock while it's plausibly still going; after 3 h (forgot to finish?) show when it started instead
+        eyebrow: !started
+          ? t('inProgress')
+          : now - started < 3 * 3600000
+            ? `${t('inProgress')} · ${fmtClock(now - started)}`
+            : `${t('inProgress')} · ${t('inProgressSince', { time: fmtTime(started) })}`,
         live: true,
         children: (
           <>

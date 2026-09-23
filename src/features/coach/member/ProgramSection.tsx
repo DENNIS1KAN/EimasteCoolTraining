@@ -10,6 +10,8 @@ import { PatternStrip } from '../components/PatternStrip'
 import { fmtDayDate } from '../lib/fmt'
 import type { MemberDraft } from '../lib/memberForm'
 import { programEnd, sortPrograms, weekdayIndex } from '../lib/programs'
+import { splitProgramName } from '../../train/programText'
+import { M as TRAIN } from '../../train/messages'
 import { M } from '../messages'
 
 export interface ProgramSectionProps {
@@ -21,6 +23,12 @@ export interface ProgramSectionProps {
 /** Program + start date, with the calendar spelled out ("Week 1 starts on Mon 8 Sep") and the weekly pattern. */
 export function ProgramSection({ draft, set, error }: ProgramSectionProps) {
   const t = useT(M)
+  const tt = useT(TRAIN)
+  // Same wording as useProgramName ("BTS · 12 εβδομάδες"), for every option of the list.
+  const nameOf = (p: { name: string }) => {
+    const s = splitProgramName(p.name)
+    return s ? `${s.base} · ${tt('weeksN', { n: s.weeks })}` : p.name
+  }
   const programsById = useStore((s) => s.programs)
   const programs = useMemo(() => sortPrograms(Object.values(programsById)), [programsById])
   const program = draft.programId ? programsById[draft.programId] : undefined
@@ -43,7 +51,7 @@ export function ProgramSection({ draft, set, error }: ProgramSectionProps) {
       <CardHeader title={<span id="member-program-title">{t('program')}</span>} subtitle={status} />
       <Select
         label={t('program')}
-        options={[{ value: '', label: t('noneProgram') }, ...programs.map((p) => ({ value: p.id, label: p.name }))]}
+        options={[{ value: '', label: t('noneProgram') }, ...programs.map((p) => ({ value: p.id, label: nameOf(p) }))]}
         value={draft.programId}
         onChange={(programId) => set({ programId })}
         icon="list"

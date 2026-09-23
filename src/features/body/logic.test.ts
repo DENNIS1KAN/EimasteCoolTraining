@@ -19,7 +19,10 @@ import {
   suggestWeight,
   toDisplay,
   toneOf,
+  validExtra,
   validWeight,
+  BODY_FAT_LIMITS,
+  WAIST_LIMITS,
   weightModeFor,
 } from './logic'
 
@@ -154,6 +157,15 @@ describe('units', () => {
     expect(validWeight(null, 'kg')).toBe(false)
     expect(validWeight(300, 'lb')).toBe(true)
     expect(validWeight(300, 'kg')).toBe(false)
+  })
+  it('validates the optional body fat and waist', () => {
+    expect(validExtra('', BODY_FAT_LIMITS)).toBe(true)
+    expect(validExtra('18,5', BODY_FAT_LIMITS)).toBe(true)
+    expect(validExtra('1', BODY_FAT_LIMITS)).toBe(false)
+    expect(validExtra('71', BODY_FAT_LIMITS)).toBe(false)
+    expect(validExtra('85', WAIST_LIMITS)).toBe(true)
+    expect(validExtra('8', WAIST_LIMITS)).toBe(false)
+    expect(validExtra('850', WAIST_LIMITS)).toBe(false)
   })
   it('suggests the likely value for a mistyped weight', () => {
     expect(suggestWeight(725, 'kg')).toBe(72.5)

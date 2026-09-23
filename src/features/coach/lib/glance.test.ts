@@ -53,13 +53,16 @@ describe('athleteGlance', () => {
     expect(athleteGlance(d, noStart, '2026-01-08').weekTarget).toBe(0)
   })
 
-  it('expects weigh-ins once the program runs, or once they weigh in anyway', () => {
+  it('expects weigh-ins a week into the program, or once they weigh in anyway', () => {
     const future = mkMember({ id: 'a', programStart: '2026-01-12' })
     const weighs = mkMember({ id: 'b', programId: null })
     const d = squad({ members: [future, weighs], weights: [mkWeight('b', '2025-12-20', 70)] })
     expect(athleteGlance(d, future, '2026-01-08').flags).toEqual([])
     expect(athleteGlance(d, future, '2026-01-08').weekTarget).toBe(0)
-    expect(athleteGlance(d, future, '2026-01-12').flags).toEqual(['noWeighIn'])
+    // not on the start day (a brand-new squad must not read "needs a push" on day 1), nor during week 1
+    expect(athleteGlance(d, future, '2026-01-12').flags).toEqual([])
+    expect(athleteGlance(d, future, '2026-01-18').flags).not.toContain('noWeighIn')
+    expect(athleteGlance(d, future, '2026-01-19').flags).toContain('noWeighIn')
     expect(athleteGlance(d, weighs, '2026-01-08').flags).toEqual(['noProgram', 'noWeighIn'])
   })
 
@@ -75,6 +78,21 @@ describe('athleteGlance', () => {
     const g = athleteGlance(d, m, '2026-01-07')
     expect(g.adherence).toBeLessThan(0.6)
     expect(g.flags).toContain('lowFood')
+  })
+
+  it('waits a few days before judging a new meal plan', () => {
+    const m = mkMember({ id: 'a', programStart: START })
+    const plan = mkPlan({ id: 'p', memberId: 'a', startDate: '2026-01-06', active: true, meals: meals('m1', 'm2') })
+    const d = squad({
+      members: [m],
+      mealPlans: [plan],
+      checkins: [mkCheckin('a', '2026-01-06', { meals: ['m1'] })],
+      weights: [mkWeight('a', '2026-01-07', 80)],
+    })
+    const g = athleteGlance(d, m, '2026-01-07')
+    expect(g.adherence).toBeLessThan(0.6)
+    expect(g.stats.adherence14Days).toBe(1)
+    expect(g.flags).not.toContain('lowFood')
   })
 })
 

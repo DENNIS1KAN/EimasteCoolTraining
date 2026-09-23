@@ -6,6 +6,7 @@ import type { Member, Program } from '../../../data/types'
 import { fmtRelative } from '../../../lib/format'
 import { useInviteActions } from '../hooks/useInviteActions'
 import { appLocation, inviteLink } from '../lib/invite'
+import { useProgramName } from '../../train/programText'
 import { M } from '../messages'
 
 export interface MemberRowInfo {
@@ -29,13 +30,14 @@ export function MemberRow({ info, code, loadingCode, isMe }: MemberRowProps) {
   const tc = useT(COMMON)
   const { copyLink, share } = useInviteActions()
   const { member: m, program, week } = info
+  const programName = useProgramName(program ?? { name: '' })
   const link = code ? inviteLink(appLocation(), m.slug, code) : null
 
   const programLine = !program
     ? t('noProgram')
     : !m.programStart || week === 0
-      ? t('programNotStarted', { program: program.name })
-      : t('programWeek', { program: program.name, week })
+      ? t('programNotStarted', { program: programName })
+      : t('programWeek', { program: programName, week })
 
   return (
     <li className="member-row">

@@ -63,9 +63,12 @@
   color: var(--ink);
   white-space: nowrap;
 }
-.lf-sub {
+.lf-sub,
+.lf-hero__stats dd.lf-sub {
+  margin: 0;
   font: 600 11px/14px var(--font-body);
   color: var(--muted);
+  white-space: normal;
 }
 .lf-chart {
   display: grid;

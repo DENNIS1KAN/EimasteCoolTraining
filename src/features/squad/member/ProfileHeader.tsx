@@ -3,6 +3,7 @@ import { useT } from '../../../i18n'
 import { fmtDate } from '../../../lib/format'
 import type { MemberStats } from '../../../lib/stats'
 import { Avatar, ButtonLink, Icon, Tag, memberColorVar } from '../../../ui'
+import { splitProgramName, useProgramName } from '../../train/programText'
 import { NudgeButton } from '../NudgeButton'
 import { compareHref } from '../format'
 import { SQ } from '../messages'
@@ -21,12 +22,14 @@ export interface ProfileHeaderProps {
 export function ProfileHeader({ member, stats, isMe, compareWith, viewerFirst }: ProfileHeaderProps) {
   const t = useT(SQ)
   const program = stats.program
+  const programName = useProgramName(program ?? { name: '' })
   const programLine = program
     ? stats.programWeek > 0
-      ? t('programWeekOf', { program: program.name, n: stats.programWeek, total: program.weeks.length })
+      ? // "BTS · week 3 of 12": the week count is already in "of 12", so drop "12 weeks" from the name
+        t('programWeekOf', { program: splitProgramName(program.name)?.base ?? programName, n: stats.programWeek, total: program.weeks.length })
       : member.programStart
-        ? `${program.name} · ${t('startsOn', { date: fmtDate(member.programStart) })}`
-        : `${program.name} · ${t('notStarted')}`
+        ? `${programName} · ${t('startsOn', { date: fmtDate(member.programStart) })}`
+        : `${programName} · ${t('notStarted')}`
     : null
   return (
     <section className="ui-card sq-profile" style={{ ['--c' as string]: memberColorVar(member.color) }} aria-label={member.name}>

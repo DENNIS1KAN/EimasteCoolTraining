@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
-import { localeOf, useLang, useT, type Lang } from '../../i18n'
+import { localeOf, useLang, useT } from '../../i18n'
 import { addDays, fromISODate } from '../../lib/dates'
+import { fmtDate } from '../../lib/format'
 import { ChartTable, type TableMode } from './ChartTable'
 import { useScrub, useWidth } from './hooks'
 import { DASH, M } from './messages'
@@ -57,14 +58,14 @@ interface Layout {
   index: Map<number, number>
 }
 
-function layoutHeat(days: HeatDay[], W: number, maxCell: number, lang: Lang): Layout | null {
+/** Month labels use the current language (callers recompute on a language change). */
+function layoutHeat(days: HeatDay[], W: number, maxCell: number): Layout | null {
   const avail = W - LEFT
   const fitWeeks = Math.max(1, Math.floor((avail + GAP) / (MIN_CELL + GAP)))
   const grid = calendarGrid(days, fitWeeks)
   if (!grid.cells.length) return null
   const cell = clamp(Math.floor((avail - GAP * (grid.weeks - 1)) / grid.weeks), MIN_CELL, maxCell)
   const colX = (c: number) => LEFT + c * (cell + GAP)
-  const monthFmt = new Intl.DateTimeFormat(localeOf(lang), { month: 'short' })
   const months: { x: number; text: string }[] = []
   for (let c = 0; c < grid.weeks; c++) {
     const monday = addDays(grid.start, c * 7)
@@ -73,7 +74,7 @@ function layoutHeat(days: HeatDay[], W: number, maxCell: number, lang: Lang): La
     const newMonth = monday.endsWith('-01') || monday.slice(0, 7) !== sunday.slice(0, 7)
     if (c > 0 && !newMonth) continue
     const ref = newMonth && !monday.endsWith('-01') ? sunday : monday
-    const text = monthFmt.format(fromISODate(ref)).replace('.', '')
+    const text = fmtDate(ref, 'month').replace('.', '')
     const x = colX(c)
     const prev = months[months.length - 1]
     if (prev && x < prev.x + textWidth(prev.text, 10.5) + 8) {
@@ -99,7 +100,8 @@ export function Heatmap(props: HeatmapProps) {
   const lang = useLang()
   const [boxRef, width] = useWidth<HTMLDivElement>()
   const maxCell = props.maxCell ?? 26
-  const L = useMemo(() => (width ? layoutHeat(props.days, width, maxCell, lang) : null), [props.days, width, maxCell, lang])
+  // `lang` re-runs the layout so the month labels follow a language switch.
+  const L = useMemo(() => (width ? layoutHeat(props.days, width, maxCell) : null), [props.days, width, maxCell, lang])
   const max = props.max ?? Math.max(0, ...props.days.map((d) => d.value ?? 0))
   const step = (L?.cell ?? 0) + GAP
   const scrub = useScrub({
@@ -122,8 +124,7 @@ export function Heatmap(props: HeatmapProps) {
     },
   })
   const weekday = new Intl.DateTimeFormat(localeOf(lang), { weekday: 'narrow' })
-  const fmtDate =
-    props.formatDate ?? ((d: string) => new Intl.DateTimeFormat(localeOf(lang), { weekday: 'short', day: 'numeric', month: 'short' }).format(fromISODate(d)))
+  const fmtDay = props.formatDate ?? ((d: string) => fmtDate(d, 'weekdayDayMonth'))
   const fmtValue = props.formatValue ?? ((n: number) => new Intl.NumberFormat(localeOf(lang), { maximumFractionDigits: 1 }).format(n))
   const active = L && scrub.active != null && scrub.active < L.cells.length ? L.cells[scrub.active] : null
   const tip = active ? props.formatTooltip({ date: active.date, value: active.value }) : ''
@@ -190,7 +191,7 @@ export function Heatmap(props: HeatmapProps) {
               mode={tableMode}
               caption={props.ariaLabel}
               columns={[t('date'), props.valueLabel ?? '']}
-              rows={[...L.cells].reverse().map((c) => [fmtDate(c.date), c.value == null ? DASH : fmtValue(c.value)])}
+              rows={[...L.cells].reverse().map((c) => [fmtDay(c.date), c.value == null ? DASH : fmtValue(c.value)])}
             />
           )}
         </div>

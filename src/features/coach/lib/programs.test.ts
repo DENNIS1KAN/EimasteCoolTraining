@@ -86,6 +86,7 @@ describe('exercise text helpers', () => {
     expect(focusAbbr('Upper (Strength Focus)')).toBe('STR')
     expect(focusAbbr('Legs (Hypertrophy Focus)')).toBe('HYP')
     expect(focusAbbr('Full')).toBe('')
+    expect(focusAbbr('Πάνω (Ύψος έντασης)')).toBe('ΥΨΟ')
   })
   it('blockGroups', () => {
     expect(blockGroups(BTS_PROGRAM).map((g) => [g.block, g.weeks[0], g.weeks[g.weeks.length - 1]])).toEqual([

@@ -11,6 +11,8 @@ import { memberStats, programOf, sortedMembers, weightsOf, workoutOn, type Membe
 export const WEIGH_IN_STALE_DAYS = 7
 /** Nutrition adherence (last 14 days) below which the coach is warned. */
 export const LOW_ADHERENCE = 0.6
+/** Days on a meal plan before its adherence can raise a warning (one bad first day is not a trend). */
+export const MIN_FOOD_DAYS = 3
 
 export type GlanceFlag = 'behind' | 'noWeighIn' | 'lowFood' | 'notStarted' | 'noProgram'
 
@@ -68,10 +70,10 @@ export function athleteGlance(d: SquadData, m: Member, today: ISODate): AthleteG
   if (!program) flags.push('noProgram')
   else if (!start) flags.push('notStarted')
   if (behindBy > 0) flags.push('behind')
-  // Weigh-ins are expected once the program runs (or once they have started weighing in).
-  const expectsWeighIns = started || lastWeighIn != null
+  // Weigh-ins are expected once they have weighed in before, or a week into the program (not on day 1).
+  const expectsWeighIns = lastWeighIn != null || (started && diffDays(start!, today) >= WEIGH_IN_STALE_DAYS)
   if (expectsWeighIns && (daysSinceWeighIn == null || daysSinceWeighIn >= WEIGH_IN_STALE_DAYS)) flags.push('noWeighIn')
-  if (stats.adherence14 != null && stats.adherence14 < LOW_ADHERENCE) flags.push('lowFood')
+  if (stats.adherence14 != null && stats.adherence14Days >= MIN_FOOD_DAYS && stats.adherence14 < LOW_ADHERENCE) flags.push('lowFood')
 
   return {
     member: m,

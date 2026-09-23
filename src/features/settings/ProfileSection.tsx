@@ -6,6 +6,7 @@ import { fmtDate } from '../../lib/format'
 import { parseNum } from '../../lib/units'
 import { Avatar, NumberField, TextArea, TextField } from '../../ui'
 import { memberColorVar } from '../../ui/member'
+import { useProgramName } from '../train/programText'
 import { SETTINGS } from './messages'
 import { Section } from './Section'
 import { useDraft } from './useDraft'
@@ -17,6 +18,7 @@ export function ProfileSection({ me }: { me: Member }) {
   const t = useT(SETTINGS)
   const c = useT(COMMON)
   const program = useStore((s) => (me.programId ? (s.programs[me.programId] ?? null) : null))
+  const programName = useProgramName(program ?? { name: '' })
   const name = useDraft(me.name, { required: true })
   const goal = useDraft(me.goal)
   const height = useDraft(me.heightCm == null ? '' : String(me.heightCm))
@@ -31,11 +33,16 @@ export function ProfileSection({ me }: { me: Member }) {
     goal.setDraft(v)
     update('members', me.id, { goal: v.slice(0, 160) }, DEBOUNCE)
   }
+  // Only a valid height is stored while typing; clearing it counts once the field is left empty (a half-typed
+  // "1" after clearing must not have stored "no height" already).
   const setHeight = (v: string) => {
     height.setDraft(v)
     const n = parseNum(v)
-    if (v === '') update('members', me.id, { heightCm: null }, DEBOUNCE)
-    else if (n != null && n >= 100 && n <= 250) update('members', me.id, { heightCm: Math.round(n) }, DEBOUNCE)
+    if (n != null && n >= 100 && n <= 250 && Math.round(n) !== me.heightCm) update('members', me.id, { heightCm: Math.round(n) }, DEBOUNCE)
+  }
+  const blurHeight = () => {
+    height.bind.onBlur()
+    if (height.draft.trim() === '' && me.heightCm != null) update('members', me.id, { heightCm: null })
   }
 
   return (
@@ -52,8 +59,8 @@ export function ProfileSection({ me }: { me: Member }) {
           {program ? (
             <p className="set-profile__program">
               {me.programStart
-                ? t('programLine', { program: program.name, date: fmtDate(me.programStart, 'medium') })
-                : t('programNotStarted', { program: program.name })}
+                ? t('programLine', { program: programName, date: fmtDate(me.programStart, 'medium') })
+                : t('programNotStarted', { program: programName })}
             </p>
           ) : null}
         </div>
@@ -88,7 +95,7 @@ export function ProfileSection({ me }: { me: Member }) {
         value={height.draft}
         onChange={setHeight}
         onFocus={height.bind.onFocus}
-        onBlur={height.bind.onBlur}
+        onBlur={blurHeight}
         decimals={0}
         min={100}
         max={250}

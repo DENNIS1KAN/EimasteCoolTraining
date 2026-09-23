@@ -43,7 +43,7 @@ export function ExerciseExtras({ index, e, v, machine, machineOptions, unit, wor
     <div className="tr-xp">
       {tech && techText ? (
         <section className="tr-xp__sec">
-          <h4 className="micro">{t('technique')}</h4>
+          <h3 className="micro">{t('technique')}</h3>
           <p className="tr-xp__p">
             <b>{techLabel}</b> · {techText}
           </p>
@@ -51,9 +51,9 @@ export function ExerciseExtras({ index, e, v, machine, machineOptions, unit, wor
       ) : null}
 
       <section className="tr-xp__sec">
-        <h4 className="micro">
+        <h3 className="micro">
           {t('warmup')} <span className="tr-xp__muted">· {e.w}</span>
-        </h4>
+        </h3>
         {workingWeight == null ? (
           <p className="tr-xp__p tr-xp__muted">{t('warmupNoWeight')}</p>
         ) : (
@@ -79,9 +79,9 @@ export function ExerciseExtras({ index, e, v, machine, machineOptions, unit, wor
 
       {variants.length > 1 ? (
         <section className="tr-xp__sec">
-          <h4 className="micro" id={`${ids}-swap`}>
+          <h3 className="micro" id={`${ids}-swap`}>
             {t('swap')}
-          </h4>
+          </h3>
           <div className="tr-swaps" role="radiogroup" aria-labelledby={`${ids}-swap`}>
             {variants.map((k) => {
               const vid = exerciseVideo(e, k)
@@ -134,7 +134,7 @@ export function ExerciseExtras({ index, e, v, machine, machineOptions, unit, wor
 
       {e.note ? (
         <section className="tr-xp__sec">
-          <h4 className="micro">{t('coachNote')}</h4>
+          <h3 className="micro">{t('coachNote')}</h3>
           <p className="tr-xp__p" lang={textLang(e.note)}>
             {e.note}
           </p>

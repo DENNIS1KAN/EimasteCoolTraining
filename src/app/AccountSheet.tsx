@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
-import { signOut, useMe, useStore } from '../data/store'
+import { getState, signOut, useMe, useStore } from '../data/store'
 import { defineMessages, setLang, useLang, useT, type Lang } from '../i18n'
 import { COMMON } from '../i18n/common'
 import { Avatar, ConfirmSheet, Icon, Segmented, Sheet, Tag, onAccountSheet, toast, type IconName } from '../ui'
@@ -11,7 +11,6 @@ const M = defineMessages(
   {
     account: 'Account',
     switchProfile: 'Switch profile',
-    demo: 'Demo',
     appearance: 'Appearance',
     system: 'System',
     light: 'Light',
@@ -27,7 +26,6 @@ const M = defineMessages(
   {
     account: 'Λογαριασμός',
     switchProfile: 'Αλλαγή προφίλ',
-    demo: 'Επίδειξη',
     appearance: 'Εμφάνιση',
     system: 'Σύστημα',
     light: 'Φωτεινό',
@@ -77,16 +75,18 @@ export function AccountSheet() {
     setMode('closed')
   }
 
-  const doSignOut = async (thenLogin: boolean) => {
+  // Both "Sign out" and "Switch profile" end on #/login, so the next person never lands on the previous member's
+  // screen (signed out, every path shows the login page, and signing in would reopen that path).
+  const doSignOut = async () => {
     signingOut.current = true
     setBusy(true)
     keepOpen = false
     try {
       await signOut()
-      if (thenLogin) window.location.hash = '#/login'
     } catch {
       toast(t('signOutFailed'), { tone: 'danger' })
     } finally {
+      if (getState().status === 'signed-out') window.location.hash = '#/login'
       signingOut.current = false
       setBusy(false)
       setMode('closed')
@@ -114,7 +114,7 @@ export function AccountSheet() {
               <p className="acct__name">{me.name}</p>
               <div className="acct__role">
                 <span>{isCoach ? tc('coach') : tc('athlete')}</span>
-                {isDemo ? <Tag tone="accent">{t('demo')}</Tag> : null}
+                {isDemo ? <Tag tone="accent">{tc('demoTitle')}</Tag> : null}
               </div>
             </div>
           </div>
@@ -166,7 +166,7 @@ export function AccountSheet() {
           <ul className="acct__group">
             {isDemo ? (
               <li>
-                <RowButton icon="swap" disabled={busy} onClick={() => void doSignOut(true)}>
+                <RowButton icon="swap" disabled={busy} onClick={() => void doSignOut()}>
                   {t('switchProfile')}
                 </RowButton>
               </li>
@@ -186,7 +186,7 @@ export function AccountSheet() {
         body={signOutBody}
         confirmLabel={tc('signOut')}
         danger
-        onConfirm={() => void doSignOut(false)}
+        onConfirm={() => void doSignOut()}
         onClose={() => {
           // Cancel returns to the account sheet; closing because we're signing out does not.
           if (!signingOut.current) setMode('account')
